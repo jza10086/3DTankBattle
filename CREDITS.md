@@ -14,6 +14,18 @@
 
 No War Thunder, Battlefield, or other proprietary game assets are included.
 
+## Additional static target models
+
+The same verified **2019 CC0 Animated Tanks Pack** supplies three distinct target silhouettes, not recolors of the player's tank:
+
+| Included file | Source model | Original author download |
+|---|---|---|
+| `tank_olive_target.glb` | Tank / olive medium tank | [Tank.fbx](https://drive.google.com/file/d/13lbAEkwen5bXY2fSiyo4rVt5q_gxy0Fm/view) |
+| `tank_heavy_target.glb` | Tank3 / yellow heavy tank | [Tank3.fbx](https://drive.google.com/file/d/1VT0Sto8hXARIcanbdv9oJmMAH31a9hGf/view) |
+| `tank_artillery_target.glb` | Tank4 / red artillery tank | [Tank4.fbx](https://drive.google.com/file/d/1xnaBeAxwyIpjhFRDT6i-TTHDscFnsOtc/view) |
+
+These target variants bake the original rest-pose meshes, retain separate hull/turret/barrel/tracks, normalize +Y up / -Z forward and ground contact, and fix imported alpha values. No animation or AI is implied for the static targets. Exact hashes, dimensions and conversion provenance: `assets/quaternius/TARGET_MODELS_SOURCE_AND_LICENSE.txt`. The three are used twice each around the six-station course; the animated Tank2 remains the player vehicle. Generic in-game labels are not claims about real military models.
+
 ## Studied examples — no copied source code
 
 - [Godot VehicleBody3D documentation](https://docs.godotengine.org/en/stable/classes/class_vehiclebody3d.html): vehicle-physics limitations and custom CharacterBody3D/RigidBody3D alternatives informed the choice of a predictable kinematic training chassis.

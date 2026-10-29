@@ -51,7 +51,8 @@ func _draw() -> void:
 		_draw_title(false)
 
 func _draw_compass() -> void:
-	var heading := fposmod(-rad_to_deg(game.camera_yaw), 360.0)
+	var view_direction: Vector3 = -game.camera.global_basis.z
+	var heading := fposmod(rad_to_deg(atan2(view_direction.x, -view_direction.z)), 360.0)
 	var center := 800.0
 	for mark in range(-5, 6):
 		var value := floori(heading / 15.0) * 15 + mark * 15
@@ -75,7 +76,7 @@ func _draw_targets() -> void:
 	for target in game.targets:
 		if target.dead or game.camera.is_position_behind(target.global_position):
 			continue
-		var point: Vector2 = game.camera.unproject_position(target.global_position + Vector3(0, 5.7, 0)) / Vector2(sx, sy)
+		var point: Vector2 = game.camera.unproject_position(target.get_marker_point() + Vector3(0, 0.6, 0)) / Vector2(sx, sy)
 		if point.x < 65 or point.x > 1535 or point.y < 115 or point.y > 740:
 			continue
 		var distance: float = game.tank.global_position.distance_to(target.global_position)
@@ -85,8 +86,9 @@ func _draw_targets() -> void:
 		var r := 5.0
 		draw_polyline(PackedVector2Array([point + Vector2(0,-r), point + Vector2(r,0), point + Vector2(0,r), point + Vector2(-r,0), point + Vector2(0,-r)]), color, 1.5, true)
 		_center("%02d  /  %d M" % [target.index + 1, roundi(distance)], point.x, point.y - 12, 10, color)
-		for hp in target.hit_points:
-			_rect(Rect2(point.x - 7 + hp * 9, point.y + 12, 5, 2), color)
+		_rect(Rect2(point.x - 27, point.y + 11, 54, 4), Color(0.05, 0.09, 0.07, 0.75))
+		_rect(Rect2(point.x - 27, point.y + 11, 54 * clampf(target.hp / target.max_hp, 0, 1), 4), color)
+		_center("%d HP" % roundi(target.hp), point.x, point.y + 29, 10, WHITE)
 
 func _draw_reticle() -> void:
 	var center := Vector2(800, 450)
@@ -94,9 +96,11 @@ func _draw_reticle() -> void:
 	for axis in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
 		draw_line(center + axis * 13, center + axis * 22, color, 1.4, true)
 	draw_circle(center, 1.7, color)
-	if game.zooming:
+	if game.first_person:
+		_draw_scope(center)
+	elif game.zooming:
 		draw_arc(center, 240, 0, TAU, 96, Color(1, 1, 1, 0.12), 1.0, true)
-		_text("GUNNER / 2.1×", Vector2(1032, 685), 11, MUTED)
+		_text("EXTERIOR / 2.1×", Vector2(1032, 685), 11, MUTED)
 		for tick in range(-3, 4):
 			draw_line(Vector2(800 + tick * 40, 510), Vector2(800 + tick * 40, 516), Color(1,1,1,0.3), 1)
 	if not game.camera.is_position_behind(game.actual_impact):
@@ -108,6 +112,8 @@ func _draw_reticle() -> void:
 			draw_arc(actual, 9, 0, TAU, 24, aim_color, 1.8, true)
 			draw_line(actual + Vector2(-14, 0), actual + Vector2(-11, 0), aim_color, 2)
 			draw_line(actual + Vector2(11, 0), actual + Vector2(14, 0), aim_color, 2)
+			if game.first_person:
+				_center("%d M" % roundi(game.tank.visual.muzzle.global_position.distance_to(game.actual_impact)), actual.x, actual.y + 26, 10, aim_color)
 			if actual.distance_to(center) > 38:
 				draw_line(center, actual, Color(1, 0.8, 0.5, 0.16), 1, true)
 	if game.hit_flash > 0:
@@ -115,6 +121,29 @@ func _draw_reticle() -> void:
 			draw_line(center + direction * 27, center + direction * 36, AMBER, 3, true)
 	if game.tank.muzzle_obstructed:
 		_center("BARREL BLOCKED", 800, 494, 12, Color("ffab80"))
+
+func _draw_scope(center: Vector2) -> void:
+	# Keep the optical circle round even in a tall / resized window.
+	var optical_center := Vector2(center.x, center.y * sy / sx)
+	draw_set_transform(Vector2.ZERO, 0, Vector2(sx, sx))
+	center = optical_center
+	# Etched sight overlay: center follows the actual barrel, not mouse demand.
+	var line := Color(0.07, 0.12, 0.09, 0.82)
+	var light := Color(0.94, 0.95, 0.82, 0.68)
+	for side in [-1, 1]:
+		draw_line(center + Vector2(side * 30, 0), center + Vector2(side * 280, 0), line, 2, true)
+		draw_line(center + Vector2(0, side * 30), center + Vector2(0, side * 215), line, 2, true)
+		for tick in range(1, 7):
+			var x: float = side * (40 + tick * 30)
+			draw_line(center + Vector2(x, -5), center + Vector2(x, 5), light, 1.4, true)
+		for tick in range(1, 5):
+			var y: float = side * (40 + tick * 30)
+			draw_line(center + Vector2(-5, y), center + Vector2(5, y), light, 1.4, true)
+	draw_arc(center, 292, 0, TAU, 96, Color(0.06, 0.1, 0.08, 0.26), 1.5, true)
+	draw_set_transform(Vector2.ZERO, 0, Vector2(sx, sy))
+	_rect(Rect2(670, 116, 260, 28), DARK)
+	_center("GUN SIGHT  /  %s" % ("4.2×" if game.zooming else "2.1×"), 800, 135, 12, WHITE)
+	_center("SHIFT  EXTERIOR VIEW", 800, 724, 11, MUTED)
 
 func _draw_dashboard() -> void:
 	var tank: TankController = game.tank
@@ -127,7 +156,7 @@ func _draw_dashboard() -> void:
 	_text("∞" if ready else "%.1f s" % tank.reload_remaining, Vector2(270, 820), 20, WHITE)
 	_rect(Rect2(54, 833, 264, 3), Color(1,1,1,0.15))
 	_rect(Rect2(54, 833, 264 * (1.0 - tank.reload_remaining / TankController.RELOAD_TIME), 3), AMBER)
-	_text("%s  /  TWO HITS PER TARGET" % _time(game.elapsed), Vector2(37, 745), 11, MUTED)
+	_text("%s  /  FLANK ARMOR FOR MORE DAMAGE" % _time(game.elapsed), Vector2(37, 745), 11, MUTED)
 	var v := absf(tank.speed) * 3.6
 	_rect(Rect2(1360, 750, 204, 99), DARK)
 	_text("%02d" % roundi(v), Vector2(1380, 817), 54, WHITE)
@@ -135,7 +164,7 @@ func _draw_dashboard() -> void:
 	_text("REVERSE" if tank.speed < -0.25 else ("PIVOT" if absf(tank.yaw_rate) > .2 and v < 2 else "DRIVE"), Vector2(1380, 839), 10, AMBER)
 	_text("BRAKE" if tank.brake else "TRACKED / 07", Vector2(1460, 839), 10, MUTED)
 	_rect(Rect2(0, 869, 1600, 31), Color(0.04,0.07,0.06,0.72))
-	_center("W S  DRIVE     A D  TRACK STEER     MOUSE  AIM     LMB  FIRE     RMB  GUNNER     SPACE  BRAKE     C  CENTER     F  RECOVER     R  RESTART     ESC  PAUSE", 800, 889, 11, MUTED)
+	_center("W S  DRIVE   A D  STEER   MOUSE  AIM   LMB  FIRE   SHIFT  SIGHT   RMB  ZOOM   SPACE  BRAKE   C  CENTER   F  RECOVER   R  RESTART   ESC  PAUSE", 800, 889, 11, MUTED)
 
 func _draw_title(is_pause: bool) -> void:
 	_rect(Rect2(0, 0, 1600, 900), Color(0.03, 0.07, 0.06, 0.43))
@@ -143,10 +172,10 @@ func _draw_title(is_pause: bool) -> void:
 	_rect(Rect2(490, 269, 620, 3), AMBER)
 	_center("RANGE PAUSED" if is_pause else "IRON RANGE", 800, 334, 36, WHITE)
 	_center("A TRACKED DRIVING & GUNNERY PLAYGROUND", 800, 366, 12, AMBER)
-	_center("Drive the course. Traverse the ramps. Clear all six targets.", 800, 409, 16, WHITE)
+	_center("Drive the course. Flank enemy armor. Clear all six tanks.", 800, 409, 16, WHITE)
 	_center("W S  drive    /    A D  pivot & steer    /    Mouse  aim turret", 800, 445, 14, MUTED)
-	_center("LMB  fire    /    Hold RMB  gunner zoom    /    Space  brake", 800, 473, 14, MUTED)
-	_center("White cross = camera aim  •  Amber ring = shell impact", 800, 510, 13, AMBER)
+	_center("SHIFT  first-person sight    /    Hold RMB  zoom    /    LMB  fire", 800, 473, 14, MUTED)
+	_center("Sight cross = gun bore  •  Amber ring = actual shell impact", 800, 510, 13, AMBER)
 	_center("ENTER TO RESUME" if is_pause else "ENTER TO DRIVE", 800, 563, 22, WHITE)
 	_center("F  recover vehicle     R  restart range", 800, 594, 12, MUTED)
 

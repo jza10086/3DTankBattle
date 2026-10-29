@@ -1,0 +1,40 @@
+Quaternius Animated Tanks Pack (June 2019) — Additional static tank targets
+Author: Quaternius
+Verified 2026-10-29
+
+Original pack page: https://quaternius.com/packs/animatedtanks.html
+Official download folder: https://drive.google.com/drive/folders/1tHX0RF9l4Nw4EZwxH6xWta0HsICU2h-G
+Original pack License.txt: https://drive.google.com/file/d/1VuTMkuQymqZGmLIACWWMOI4lXLx0TCCY/view
+
+LICENSE: This specific historical pack includes the original License.txt declaring CC0 1.0 Universal, Public Domain Dedication. The pack-specific official page also explicitly marks the June 2019 Animated Tanks Pack CC0. This statement covers only these downloaded pack files; it does not assert that newer Quaternius assets under the general Quaternius Asset License (QAL) are CC0.
+License URL: https://creativecommons.org/publicdomain/zero/1.0/
+Original download License.txt SHA256 (repository copy only normalizes CRLF/trailing whitespace): 83d8959f9fc56353ed571fbe2dc52e4bcd64508e2399501cd45ac2ce3df0bf8c
+
+Conversion (Blender 4.3.2):
+- Reused original FBX files already downloaded from official pack; no model was generated from an image.
+- Applied source scale 0.36, transformed forward to -Z and up to +Y, lifted the minimum track point to ground Y=0.
+- Baked evaluated rest-pose mesh with full original object/armature transforms; removed skeletons and animation. These are static target assets, not replacements for the animated player tank.
+- Kept separate Hull, TrackLeft, TrackRight, TurretPivot/TurretMesh, TurretPivot/BarrelPivot/BarrelMesh and BarrelPivot/Muzzle nodes. Mesh nodes have unit scale. Turret and barrel pivots retain true source positions.
+- Corrected original imported material alpha=0 to opaque alpha=1; roughness 0.72, metallic 0.15. Original colors preserved.
+- Hull includes source merged wheels. Use connected-island convex collision rather than one whole-Hull convex hull, to avoid enclosing empty space. Olive turret includes a tall antenna: likewise do not include the entire turret + antenna in a single oversized convex hull.
+- Actual Blender renders visually inspected. Canonical-space full bounds and source/converted hashes are listed below.
+
+Redistribute the three *_target.glb files with the original License.txt and this source note. Attribution is not required by CC0, but is retained here as useful provenance.
+
+tank_olive_target.glb — Olive medium tank
+Original Tank.fbx: https://drive.google.com/file/d/13lbAEkwen5bXY2fSiyo4rVt5q_gxy0Fm/view
+Original SHA256: 9fcbeaca34d1bcc586a815d92bb3b29b0affbdd66658f264dd13f0c19156134b
+GLB SHA256: 6cb562a109ca1291990738a6dc605bb3b10a4c3f8b41036270ae7075f22eae70
+Full bounds +Y up/-Z forward: {'min': [-1.79142, 0.0, -3.538354], 'max': [1.841882, 2.69201, 2.654502]}
+
+tank_heavy_target.glb — Yellow heavy tank
+Original Tank3.fbx: https://drive.google.com/file/d/1VT0Sto8hXARIcanbdv9oJmMAH31a9hGf/view
+Original SHA256: 79db2e3a79fa5b4d2e42749ff4f38a2921c8f85c5d63c9c284c480e27d0ee629
+GLB SHA256: ba886daf6eac782de32eea9396578e339a64feb6093fbe76181a5dd2eeeb0b3c
+Full bounds +Y up/-Z forward: {'min': [-1.873388, 0.0, -2.6543], 'max': [1.921977, 2.430052, 2.654502]}
+
+tank_artillery_target.glb — Red artillery tank
+Original Tank4.fbx: https://drive.google.com/file/d/1xnaBeAxwyIpjhFRDT6i-TTHDscFnsOtc/view
+Original SHA256: e34fbe21e8b23a0ee73ac6c5e5fab05ebae1894032cfc17db1e11c8a289d112f
+GLB SHA256: 961ab307643607a7d1eca9f5c6a57df6f79fa14a0ffcf5a37ed15710be06e46a
+Full bounds +Y up/-Z forward: {'min': [-1.777372, 0.0, -3.155501], 'max': [1.814949, 2.152181, 2.654502]}

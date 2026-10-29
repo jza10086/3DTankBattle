@@ -20,6 +20,8 @@ var steering := 0.0
 var brake := false
 var controls_enabled := true
 var aim_point := Vector3(0, 1.6, -100)
+var aim_direction_mode := false
+var requested_gun_direction := Vector3.FORWARD
 var reload_remaining := 0.0
 var rounds_fired := 0
 var recoil := 0.0
@@ -132,17 +134,20 @@ func _update_aim(delta: float) -> void:
 	# Solve world-space convergence from turret pivot, then use the ACTUAL muzzle
 	# for the displayed trajectory. The camera cross is a request, not a hit promise.
 	var pivot := visual.turret.global_position
-	var direction := aim_point - pivot
-	var local_direction := visual.global_basis.inverse() * direction
+	var direction := requested_gun_direction if aim_direction_mode else aim_point - pivot
+	var local_direction := visual.global_basis.orthonormalized().inverse() * direction
 	var target_yaw := atan2(-local_direction.x, -local_direction.z)
 	visual.turret.rotation.y = rotate_toward(visual.turret.rotation.y, target_yaw, TURRET_RATE * delta)
-	var local_barrel := visual.turret.global_basis.orthonormalized().inverse() * (aim_point - visual.barrel.global_position)
+	var barrel_target := requested_gun_direction if aim_direction_mode else aim_point - visual.barrel.global_position
+	var local_barrel := visual.turret.global_basis.orthonormalized().inverse() * barrel_target
 	var horizontal := Vector2(local_barrel.x, local_barrel.z).length()
-	# Low ballistic arc; finite elevation/depression like a real tank.
+	# Third person solves a low ballistic arc to a requested world point.
+	# The first-person sight instead commands a bore direction directly: feeding
+	# the actual gun camera back into the arc solver would cause elevation drift.
 	var v2 := SHELL_SPEED * SHELL_SPEED
 	var discriminant := v2 * v2 - SHELL_GRAVITY * (SHELL_GRAVITY * horizontal * horizontal + 2.0 * local_barrel.y * v2)
 	var elevation := atan2(local_barrel.y, horizontal)
-	if horizontal > 1.0 and discriminant >= 0.0:
+	if not aim_direction_mode and horizontal > 1.0 and discriminant >= 0.0:
 		elevation = atan((v2 - sqrt(discriminant)) / (SHELL_GRAVITY * horizontal))
 	elevation = clampf(elevation, deg_to_rad(-9), deg_to_rad(23))
 	visual.barrel.rotation.x = move_toward(visual.barrel.rotation.x, elevation, ELEVATION_RATE * delta)

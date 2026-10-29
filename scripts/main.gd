@@ -16,6 +16,8 @@ var camera_position := Vector3.ZERO
 var started := false
 var paused := false
 var zooming := false
+var first_person := false
+var last_hit_result: Dictionary = {}
 var destroyed_count := 0
 var total_targets := 6
 var elapsed := 0.0
@@ -107,8 +109,8 @@ func _create_targets() -> void:
 		target.process_mode = Node.PROCESS_MODE_PAUSABLE
 		target.index = i
 		target.position = positions[i]
-		# Double-sided plates remain hittable from either side of the circuit.
-		target.rotation.y = [0.0, -0.3, 0.5, 1.5, -1.2, 0.0][i % 6]
+		# Present a mix of frontal, oblique and flank approaches around the course.
+		target.rotation.y = [PI, PI - 0.35, PI + 0.55, 1.5, -1.2, 0.0][i % 6]
 		add_child(target)
 		target.destroyed.connect(_target_destroyed)
 		targets.append(target)
@@ -151,6 +153,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				tank.controls_enabled = not paused
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused else Input.MOUSE_MODE_CAPTURED
 				capture_guard = 0.18 if not paused else 0.0
+		elif event.keycode == KEY_SHIFT and started and not paused:
+			set_first_person(not first_person)
 		elif event.keycode == KEY_R and started:
 			reset_range()
 		elif event.keycode == KEY_F and started:
@@ -162,9 +166,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			camera_yaw = tank.rotation.y
 			camera_pitch = -0.023
 	if event is InputEventMouseMotion and started and not paused and capture_guard <= 0:
-		var sensitivity := 0.00135 if zooming else 0.0025
+		var sensitivity := (0.00065 if zooming else 0.0013) if first_person else (0.00135 if zooming else 0.0025)
 		camera_yaw -= event.relative.x * sensitivity
-		camera_pitch = clampf(camera_pitch - event.relative.y * sensitivity, -0.58, 0.30)
+		camera_pitch = clampf(camera_pitch - event.relative.y * sensitivity, -0.58, 0.50 if first_person else 0.30)
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if not started:
 			start_game()
@@ -200,7 +204,39 @@ func _physics_process(delta: float) -> void:
 	engine_audio.volume_db = -28.0 if paused or not started else lerpf(-24, -16, absf(tank.speed) / TankController.MAX_FORWARD)
 	hud.queue_redraw()
 
+func _process(_delta: float) -> void:
+	# Camera follows the final gun pose AFTER the vehicle physics step, avoiding
+	# a one-frame disagreement between the bore reticle and the visible gun.
+	if first_person and is_instance_valid(tank):
+		_update_sight_camera()
+
+func set_first_person(active: bool) -> void:
+	first_person = active
+	tank.visual.visible = not active
+	tank.aim_direction_mode = active
+	var direction := tank.muzzle_direction()
+	camera_yaw = atan2(-direction.x, -direction.z)
+	camera_pitch = asin(clampf(direction.y, -1, 1))
+	tank.requested_gun_direction = direction
+	capture_guard = 0.12
+	if active:
+		_update_sight_camera()
+	else:
+		_update_camera(1.0)
+
+func _update_sight_camera() -> void:
+	var bore_basis := tank.visual.muzzle.global_basis.orthonormalized()
+	# An optical mount near the breech, not a camera teleported through cover
+	# to the muzzle. Its 28 cm vertical offset is reflected by the impact ring.
+	camera.global_position = tank.visual.barrel.global_position + bore_basis.y * 0.28 - bore_basis.z * 0.10
+	camera.global_basis = bore_basis
+	camera.fov = 16.0 if zooming else 32.0
+	camera_position = camera.global_position
+
 func _update_camera(delta: float) -> void:
+	if first_person:
+		_update_sight_camera()
+		return
 	var aim_basis := Basis(Vector3.UP, camera_yaw)
 	var focus := tank.global_position + Vector3(0, 1.6, 0)
 	var distance := 6.2 if zooming else 12.8
@@ -219,6 +255,10 @@ func _update_camera(delta: float) -> void:
 	camera.fov = lerpf(camera.fov, 32.0 if zooming else 67.0, 1.0 - exp(-delta * 10))
 
 func _update_aim_point() -> void:
+	if first_person:
+		tank.requested_gun_direction = Basis(Vector3.UP, camera_yaw) * Vector3(0, sin(camera_pitch), -cos(camera_pitch))
+		tank.aim_point = tank.visual.barrel.global_position + tank.requested_gun_direction * 500
+		return
 	var center := get_viewport().get_visible_rect().size * 0.5
 	var origin := camera.project_ray_origin(center)
 	var end := origin + camera.project_ray_normal(center) * 500
@@ -238,7 +278,7 @@ func _predict_impact() -> void:
 		var hit := get_world_3d().direct_space_state.intersect_ray(query)
 		if not hit.is_empty():
 			actual_impact = hit.position
-			actual_hit_target = hit.collider is RangeTarget
+			actual_hit_target = hit.collider is RangeTarget and not hit.collider.dead
 			return
 		point = next
 		velocity.y -= TankController.SHELL_GRAVITY * 0.04
@@ -258,18 +298,31 @@ func fire() -> bool:
 	shell.impacted.connect(_shell_impact)
 	shot_shake = 1.0
 	cannon_audio.play()
-	_emit_effect(shell.global_position, Color("ffdb7c"), 1.2, 0.12, Vector3.ZERO)
-	for i in 7:
-		_emit_effect(shell.global_position, Color("d1bd96"), randf_range(0.35, 0.65), randf_range(0.6, 1.0), tank.muzzle_direction() * randf_range(2, 6) + Vector3.UP)
+	# Keep near-muzzle effects brief and small through the magnified optic.
+	# The external view retains the broader stylized plume.
+	var plume_scale := 0.22 if first_person else 1.0
+	_emit_effect(shell.global_position, Color("ffdb7c"), 1.2 * plume_scale, 0.12, Vector3.ZERO)
+	for i in (3 if first_person else 7):
+		_emit_effect(shell.global_position, Color("d1bd96"), randf_range(0.35, 0.65) * plume_scale, randf_range(0.22, 0.4) if first_person else randf_range(0.6, 1.0), tank.muzzle_direction() * randf_range(2, 6) + Vector3.UP)
 	return true
 
-func _shell_impact(point: Vector3, normal: Vector3, collider: Node) -> void:
+func _shell_impact(point: Vector3, normal: Vector3, collider: Node, result: Dictionary = {}) -> void:
 	impact_audio.play()
-	var target_hit := collider is RangeTarget
+	var target_hit := collider is RangeTarget and not bool(result.get("ignored", false))
 	if target_hit:
 		hits += 1
 		hit_flash = 0.5
-		show_notice("TARGET DESTROYED" if collider.dead else "HIT • 1 / 2")
+		last_hit_result = result
+		var angle := float(result.get("angle_degrees", 0.0))
+		if collider.dead:
+			if destroyed_count == total_targets:
+				show_notice("RANGE CLEAR — EXCELLENT SHOOTING", 6.0)
+			else:
+				show_notice("TANK DESTROYED", 2.5)
+		elif bool(result.get("ricochet", false)):
+			show_notice("RICOCHET • %.0f°" % angle)
+		else:
+			show_notice("%s • −%.0f HP • %.0f°" % [str(result.get("region", "ARMOR")).to_upper().replace("_", " "), float(result.get("damage", 0.0)), angle])
 	_emit_effect(point + normal * 0.2, Color("ffca67"), 1.25 if target_hit else 0.8, 0.18, Vector3.ZERO)
 	for i in 12:
 		var velocity := Vector3(randf_range(-3, 3), randf_range(0.4, 5), randf_range(-3, 3))
@@ -313,6 +366,8 @@ func show_notice(message: String, duration: float = 2.0) -> void:
 	notice_time = duration
 
 func reset_range() -> void:
+	set_first_person(false)
+	last_hit_result.clear()
 	for effect in effects:
 		effect.node.queue_free()
 	effects.clear()
