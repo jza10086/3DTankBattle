@@ -1,0 +1,23 @@
+Quaternius Animated Tanks Pack — Tank2 desert variant
+Author: Quaternius
+Original pack: June 2019
+Verified source: https://quaternius.com/packs/animatedtanks.html
+Official download folder linked from that page:
+https://drive.google.com/drive/folders/1tHX0RF9l4Nw4EZwxH6xWta0HsICU2h-G
+Original Tank2.fbx: https://drive.google.com/file/d/1a57hqb1yEdLCbeQiQQjf2mobANJNc5dc/view
+Original License.txt: https://drive.google.com/file/d/1VuTMkuQymqZGmLIACWWMOI4lXLx0TCCY/view
+
+The exact downloaded pack includes License.txt declaring CC0 1.0 Universal (Public Domain Dedication). The pack-specific official page also explicitly labels this June 2019 pack CC0. This assessment is specific to these downloaded files, NOT a blanket statement about current Quaternius assets. The author's general website license now lists QAL for assets released under that license; newer packs must be checked independently.
+
+Conversion performed 2026-10-29:
+- Source Tank2.fbx converted using Blender 4.3.2 to GLB.
+- Canonical +Y up / -Z forward axes and metric-like scale.
+- Separate Hull, TurretPivot/TurretMesh, BarrelPivot/BarrelMesh and Muzzle.
+- Source alpha=0 material values corrected to opaque alpha=1; roughness .72, metallic .15.
+- Four original track animation clips preserved: Backwards, Forward, TurningLeft, TurningRight.
+- Original track skins retained; wheels remain merged into source Hull mesh.
+- No code from third-party examples included.
+
+Files redistributed with this project: tank_desert.glb, License.txt, this source note.
+The converted source file tank_desert_ready.glb was renamed to tank_desert.glb without changing its bytes.
+At runtime TankVisual applies a uniform .8136 scale and -.60m Y offset, separates the Forward clip into left/right tread animation channels, and adds an original ID plate / antenna. A separately authored procedural fallback is included under the project code license.
