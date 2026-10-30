@@ -37,6 +37,7 @@ func _draw() -> void:
 		_draw_targets()
 		_draw_reticle()
 		_draw_dashboard()
+		_draw_component_status()
 		if game.notice_time > 0:
 			var color := AMBER if game.hit_flash > 0 else WHITE
 			_center(game.notice, 800, 565, 16, color)
@@ -89,6 +90,11 @@ func _draw_targets() -> void:
 		_rect(Rect2(point.x - 27, point.y + 11, 54, 4), Color(0.05, 0.09, 0.07, 0.75))
 		_rect(Rect2(point.x - 27, point.y + 11, 54 * clampf(target.hp / target.max_hp, 0, 1), 4), color)
 		_center("%d HP" % roundi(target.hp), point.x, point.y + 29, 10, WHITE)
+		var status_lines := _component_lines(target.components, true)
+		for line_index in status_lines.size():
+			var label_width := font.get_string_size(status_lines[line_index], HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x
+			_rect(Rect2(point.x - label_width * 0.5 - 6, point.y + 34 + line_index * 14, label_width + 12, 15), DARK)
+			_center(status_lines[line_index], point.x, point.y + 45 + line_index * 14, 10, AMBER)
 
 func _draw_reticle() -> void:
 	var center := Vector2(800, 450)
@@ -151,9 +157,11 @@ func _draw_dashboard() -> void:
 	_rect(Rect2(36, 766, 300, 83), DARK)
 	_rect(Rect2(36, 766, 3, 83), AMBER)
 	_text("105 MM  /  PRACTICE AP", Vector2(54, 790), 12, MUTED)
-	var ready := tank.reload_remaining <= 0
-	_text("READY" if ready else "RELOADING", Vector2(53, 820), 22, WHITE if ready else AMBER)
-	_text("∞" if ready else "%.1f s" % tank.reload_remaining, Vector2(270, 820), 20, WHITE)
+	var damaged := tank.components.barrel_remaining > 0
+	var ready := tank.reload_remaining <= 0 and not damaged
+	_text("GUN REPAIR" if damaged else ("READY" if ready else "RELOADING"), Vector2(53, 820), 22, WHITE if ready else AMBER)
+	var countdown: float = tank.components.barrel_remaining if damaged else tank.reload_remaining
+	_text("∞" if ready else "%.1f s" % countdown, Vector2(270, 820), 20, WHITE)
 	_rect(Rect2(54, 833, 264, 3), Color(1,1,1,0.15))
 	_rect(Rect2(54, 833, 264 * (1.0 - tank.reload_remaining / TankController.RELOAD_TIME), 3), AMBER)
 	_text("%s  /  FLANK ARMOR FOR MORE DAMAGE" % _time(game.elapsed), Vector2(37, 745), 11, MUTED)
@@ -164,7 +172,28 @@ func _draw_dashboard() -> void:
 	_text("REVERSE" if tank.speed < -0.25 else ("PIVOT" if absf(tank.yaw_rate) > .2 and v < 2 else "DRIVE"), Vector2(1380, 839), 10, AMBER)
 	_text("BRAKE" if tank.brake else "TRACKED / 07", Vector2(1460, 839), 10, MUTED)
 	_rect(Rect2(0, 869, 1600, 31), Color(0.04,0.07,0.06,0.72))
-	_center("W S  DRIVE   A D  STEER   MOUSE  AIM   LMB  FIRE   SHIFT  SIGHT   RMB  ZOOM   SPACE  BRAKE   C  CENTER   F  RECOVER   R  RESTART   ESC  PAUSE", 800, 889, 11, MUTED)
+	_center("W S  DRIVE   A D  STEER   MOUSE  AIM   LMB  FIRE   SHIFT  SIGHT   RMB  ZOOM   SPACE  BRAKE   C  CENTER   F  RECOVER   R  RESTART   F3  EFFECTS   ESC  PAUSE", 800, 889, 11, MUTED)
+
+func _component_lines(state, include_reload: bool = false) -> Array[String]:
+	var labels: Array[String] = []
+	if state.engine_remaining > 0:
+		labels.append("ENGINE OUT  %.1f s" % state.engine_remaining)
+	if state.left_track_remaining > 0:
+		labels.append("L TRACK  %.1f s" % state.left_track_remaining)
+	if state.right_track_remaining > 0:
+		labels.append("R TRACK  %.1f s" % state.right_track_remaining)
+	if state.barrel_remaining > 0:
+		labels.append("GUN REPAIR  %.1f s" % state.barrel_remaining)
+	elif include_reload and state.reload_remaining > 0:
+		labels.append("RELOADING  %.1f s" % state.reload_remaining)
+	return labels
+
+func _draw_component_status() -> void:
+	var lines := _component_lines(game.tank.components)
+	if not lines.is_empty():
+		_rect(Rect2(600, 754, 400, lines.size() * 19 + 20), DARK)
+	for i in lines.size():
+		_center(lines[i], 800, 778 + i * 19, 14, AMBER)
 
 func _draw_title(is_pause: bool) -> void:
 	_rect(Rect2(0, 0, 1600, 900), Color(0.03, 0.07, 0.06, 0.43))
@@ -177,7 +206,7 @@ func _draw_title(is_pause: bool) -> void:
 	_center("SHIFT  first-person sight    /    Hold RMB  zoom    /    LMB  fire", 800, 473, 14, MUTED)
 	_center("Sight cross = gun bore  •  Amber ring = actual shell impact", 800, 510, 13, AMBER)
 	_center("ENTER TO RESUME" if is_pause else "ENTER TO DRIVE", 800, 563, 22, WHITE)
-	_center("F  recover vehicle     R  restart range", 800, 594, 12, MUTED)
+	_center("F3  effect test panel     F  recover     R  restart", 800, 594, 12, MUTED)
 
 func _text(value: String, at: Vector2, size: int, color: Color) -> void:
 	draw_string(font, at + Vector2(0, 1), value, HORIZONTAL_ALIGNMENT_LEFT, -1, size, Color(0.04,0.07,0.05,0.8))

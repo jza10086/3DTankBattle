@@ -12,7 +12,8 @@ const ELEVATION_RATE := 0.38
 const GRAVITY := 20.0
 const SHELL_SPEED := 105.0
 const SHELL_GRAVITY := 9.8
-const RELOAD_TIME := 3.2
+const ComponentState = preload("res://scripts/component_status.gd")
+const RELOAD_TIME := ComponentState.RELOAD_TIME
 var speed := 0.0
 var yaw_rate := 0.0
 var throttle := 0.0
@@ -22,7 +23,13 @@ var controls_enabled := true
 var aim_point := Vector3(0, 1.6, -100)
 var aim_direction_mode := false
 var requested_gun_direction := Vector3.FORWARD
-var reload_remaining := 0.0
+var components := ComponentState.new()
+# Compatibility for existing HUD, scenario scripts and tests.
+var reload_remaining: float:
+	get:
+		return components.reload_remaining
+	set(value):
+		components.reload_remaining = maxf(value, 0.0)
 var rounds_fired := 0
 var recoil := 0.0
 var ground_normal := Vector3.UP
@@ -53,32 +60,47 @@ func _ready() -> void:
 	start_transform = global_transform
 
 func _physics_process(delta: float) -> void:
+	components.tick(delta)
 	if controls_enabled:
 		throttle = float(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP)) - float(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN))
 		steering = float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)) - float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))
 		brake = Input.is_physical_key_pressed(KEY_SPACE)
 	integrate_drive(delta)
-	reload_remaining = maxf(0.0, reload_remaining - delta)
 	recoil = move_toward(recoil, 0.0, delta * 1.7)
 	visual.set_recoil(recoil)
 	_update_aim(delta)
 
 func integrate_drive(delta: float) -> void:
 	_update_ground(delta)
-	var requested_speed := throttle * (MAX_FORWARD if throttle >= 0 else MAX_REVERSE)
-	var deceleration := BRAKING if brake or throttle * speed < -0.1 else ACCELERATION
+	var mobility := components.get_track_multipliers()
+	var drive_factor := (mobility.x + mobility.y) * 0.5
+	var engine_disabled := components.engine_remaining > 0.0
+	var requested_speed := throttle * (MAX_FORWARD if throttle >= 0 else MAX_REVERSE) * drive_factor
+	var deceleration := BRAKING if brake or throttle * speed < -0.1 else ACCELERATION * drive_factor
 	if brake:
 		requested_speed = 0.0
 	elif is_zero_approx(throttle):
 		deceleration = 2.8
-	if contact_count >= 2:
+	if engine_disabled:
+		# A disabled engine cannot retain powered translation OR pivot momentum.
+		# Horizontal movement stops even in the air, but gravity/contact keep running.
+		speed = 0.0
+		yaw_rate = 0.0
+		velocity.x = 0.0
+		velocity.z = 0.0
+	elif contact_count >= 2:
+		speed = clampf(speed, -MAX_REVERSE * drive_factor, MAX_FORWARD * drive_factor)
 		speed = move_toward(speed, requested_speed, deceleration * delta)
-	# Tracked differential steering: pivot at rest, gentler yaw at cruising speed.
+	# Healthy movement is unchanged. Damaged tracks reduce propulsion and turn
+	# authority; a single weak track also pulls toward that side while rolling.
 	var turn_authority := lerpf(1.08, 0.54, clampf(absf(speed) / MAX_FORWARD, 0, 1))
-	var requested_yaw := steering * turn_authority * (0.32 if brake else 1.0)
+	var requested_yaw := steering * turn_authority * (0.32 if brake else 1.0) * drive_factor
+	var track_pull := (mobility.y - mobility.x) * clampf(speed / MAX_FORWARD, -1.0, 1.0) * 0.85
+	requested_yaw += track_pull
 	if contact_count < 2:
 		requested_yaw *= 0.15
-	yaw_rate = move_toward(yaw_rate, requested_yaw, delta * 2.4)
+	if not engine_disabled:
+		yaw_rate = move_toward(yaw_rate, requested_yaw, delta * 2.4)
 	rotate_y(yaw_rate * delta)
 	var forward := -global_basis.z
 	var direction := forward.slide(ground_normal).normalized() if contact_count >= 2 else forward
@@ -160,17 +182,29 @@ func muzzle_direction() -> Vector3:
 	return -visual.muzzle.global_basis.z.normalized()
 
 func can_fire() -> bool:
-	return reload_remaining <= 0 and not muzzle_obstructed
+	return components.can_fire() and not muzzle_obstructed
 
 func begin_fire() -> bool:
-	if not can_fire():
+	if not can_fire() or not components.begin_fire():
 		return false
-	reload_remaining = RELOAD_TIME
 	rounds_fired += 1
 	recoil = 1.0
 	return true
 
+func apply_component_hit(component: StringName) -> bool:
+	if not components.apply_component(component):
+		return false
+	if component == &"engine":
+		speed = 0.0
+		yaw_rate = 0.0
+		velocity.x = 0.0
+		velocity.z = 0.0
+		left_track_speed = 0.0
+		right_track_speed = 0.0
+	return true
+
 func reset_vehicle() -> void:
+	components.clear()
 	global_transform = start_transform
 	velocity = Vector3.ZERO
 	speed = 0.0
@@ -184,4 +218,3 @@ func reset_vehicle() -> void:
 	visual.rotation = Vector3.ZERO
 	visual.turret.rotation = Vector3.ZERO
 	visual.barrel.rotation = Vector3.ZERO
-	reload_remaining = 0.0

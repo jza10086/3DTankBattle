@@ -100,7 +100,7 @@ func _run() -> void:
 		_check(track_result.get("region", "") == "TRACKS" and track_result.get("damage", 0.0) == 20.0, "Variant %d real side tread hit selects track armor, not hull" % variant)
 		var high_query := PhysicsRayQueryParameters3D.create(target.position + Vector3(0.85, 2.6, -12), target.position + Vector3(0.85, 2.6, 12), 1)
 		_check(scene.get_world_3d().direct_space_state.intersect_ray(high_query).is_empty(), "Variant %d empty space above hull is not an invisible target box" % variant)
-		var part_counts := {"hull": 0, "turret": 0, "track": 0}
+		var part_counts := {"hull": 0, "turret": 0, "track": 0, "barrel": 0}
 		for owner_id in target.get_shape_owners():
 			var shape_node = target.shape_owner_get_owner(owner_id)
 			part_counts[String(shape_node.get_meta("armor_part", "hull"))] += 1

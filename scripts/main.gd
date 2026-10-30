@@ -5,6 +5,7 @@ const WorldScript = preload("res://scripts/range_world.gd")
 const HudScript = preload("res://scripts/range_hud.gd")
 const TargetScript = preload("res://scripts/range_target.gd")
 const ShellScript = preload("res://scripts/shell.gd")
+const PanelScript = preload("res://scripts/component_panel.gd")
 var tank: TankController
 var world: Node3D
 var camera: Camera3D
@@ -17,6 +18,8 @@ var started := false
 var paused := false
 var zooming := false
 var first_person := false
+var component_panel_open := false
+var component_panel: PanelContainer
 var last_hit_result: Dictionary = {}
 var destroyed_count := 0
 var total_targets := 6
@@ -58,6 +61,12 @@ func _ready() -> void:
 	hud = HudScript.new()
 	hud.game = self
 	canvas.add_child(hud)
+	component_panel = PanelScript.new()
+	hud.add_child(component_panel)
+	component_panel.visible = false
+	component_panel.component_requested.connect(_apply_player_component)
+	component_panel.clear_requested.connect(_clear_player_components)
+	component_panel.close_requested.connect(func(): set_component_panel(false))
 	_make_audio()
 	camera_position = tank.global_position + Vector3(0, 6.5, 13)
 	_update_camera(1.0)
@@ -137,8 +146,9 @@ func start_game() -> void:
 	started = true
 	paused = false
 	get_tree().paused = false
-	tank.controls_enabled = true
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	tank.controls_enabled = not component_panel_open
+	component_panel.visible = component_panel_open
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if component_panel_open else Input.MOUSE_MODE_CAPTURED
 	capture_guard = 0.18
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -150,9 +160,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			if started:
 				paused = not paused
 				get_tree().paused = paused
-				tank.controls_enabled = not paused
-				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused else Input.MOUSE_MODE_CAPTURED
+				tank.controls_enabled = not paused and not component_panel_open
+				component_panel.visible = component_panel_open and not paused
+				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused or component_panel_open else Input.MOUSE_MODE_CAPTURED
 				capture_guard = 0.18 if not paused else 0.0
+		elif event.keycode == KEY_F3 and started and not paused:
+			set_component_panel(not component_panel_open)
 		elif event.keycode == KEY_SHIFT and started and not paused:
 			set_first_person(not first_person)
 		elif event.keycode == KEY_R and started:
@@ -165,11 +178,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_C and started:
 			camera_yaw = tank.rotation.y
 			camera_pitch = -0.023
-	if event is InputEventMouseMotion and started and not paused and capture_guard <= 0:
+	if event is InputEventMouseMotion and started and not paused and not component_panel_open and capture_guard <= 0:
 		var sensitivity := (0.00065 if zooming else 0.0013) if first_person else (0.00135 if zooming else 0.0025)
 		camera_yaw -= event.relative.x * sensitivity
 		camera_pitch = clampf(camera_pitch - event.relative.y * sensitivity, -0.58, 0.50 if first_person else 0.30)
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and not component_panel_open:
 		if not started:
 			start_game()
 		elif not paused:
@@ -189,7 +202,7 @@ func _physics_process(delta: float) -> void:
 		tank.brake = true
 	if started and not paused and destroyed_count < total_targets:
 		elapsed += delta
-	zooming = started and not paused and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+	zooming = started and not paused and not component_panel_open and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
 	_update_camera(delta)
 	_update_aim_point()
 	trajectory_timer -= delta
@@ -203,6 +216,28 @@ func _physics_process(delta: float) -> void:
 	engine_audio.pitch_scale = lerpf(0.72, 1.65, absf(tank.speed) / TankController.MAX_FORWARD)
 	engine_audio.volume_db = -28.0 if paused or not started else lerpf(-24, -16, absf(tank.speed) / TankController.MAX_FORWARD)
 	hud.queue_redraw()
+
+func set_component_panel(active: bool) -> void:
+	component_panel_open = active
+	component_panel.visible = active and not paused
+	tank.controls_enabled = started and not paused and not active
+	if active:
+		tank.throttle = 0.0
+		tank.steering = 0.0
+		tank.brake = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if active or paused else Input.MOUSE_MODE_CAPTURED
+	capture_guard = 0.18
+
+func _apply_player_component(component: StringName) -> void:
+	if not started or paused:
+		return
+	tank.apply_component_hit(component)
+	show_notice("PLAYER %s • REPAIR TIMER STARTED" % String(component).to_upper().replace("_", " "))
+
+func _clear_player_components() -> void:
+	if not paused:
+		tank.components.clear()
+		show_notice("PLAYER COMPONENTS RESTORED")
 
 func _process(_delta: float) -> void:
 	# Camera follows the final gun pose AFTER the vehicle physics step, avoiding
@@ -285,6 +320,11 @@ func _predict_impact() -> void:
 	actual_impact = point
 
 func fire() -> bool:
+	if component_panel_open:
+		return false
+	if tank.components.barrel_remaining > 0:
+		show_notice("GUN REPAIR • %.1f s" % tank.components.barrel_remaining)
+		return false
 	if tank.muzzle_obstructed:
 		show_notice("BARREL BLOCKED — MOVE CLEAR")
 		return false
@@ -322,7 +362,12 @@ func _shell_impact(point: Vector3, normal: Vector3, collider: Node, result: Dict
 		elif bool(result.get("ricochet", false)):
 			show_notice("RICOCHET • %.0f°" % angle)
 		else:
-			show_notice("%s • −%.0f HP • %.0f°" % [str(result.get("region", "ARMOR")).to_upper().replace("_", " "), float(result.get("damage", 0.0)), angle])
+			var feedback := "%s • −%.0f HP • %.0f°" % [str(result.get("region", "ARMOR")).to_upper().replace("_", " "), float(result.get("damage", 0.0)), angle]
+			var component := String(result.get("component", ""))
+			if not component.is_empty():
+				var labels := {"engine": "ENGINE OUT", "left_track": "LEFT TRACK DAMAGED", "right_track": "RIGHT TRACK DAMAGED", "barrel": "GUN DISABLED"}
+				feedback += "  /  %s %.0f s" % [labels.get(component, component.to_upper()), float(result.get("component_duration", 0))]
+			show_notice(feedback)
 	_emit_effect(point + normal * 0.2, Color("ffca67"), 1.25 if target_hit else 0.8, 0.18, Vector3.ZERO)
 	for i in 12:
 		var velocity := Vector3(randf_range(-3, 3), randf_range(0.4, 5), randf_range(-3, 3))
@@ -366,6 +411,7 @@ func show_notice(message: String, duration: float = 2.0) -> void:
 	notice_time = duration
 
 func reset_range() -> void:
+	set_component_panel(false)
 	set_first_person(false)
 	last_hit_result.clear()
 	for effect in effects:
@@ -390,4 +436,5 @@ func _notification(what: int) -> void:
 		paused = true
 		get_tree().paused = true
 		tank.controls_enabled = false
+		component_panel.visible = false
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE

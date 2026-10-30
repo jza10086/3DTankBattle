@@ -18,6 +18,8 @@ const RESISTANCE := {
 	"hull": {"front": 110.0, "side": 52.0, "rear": 24.0, "roof": 42.0, "underside": 32.0},
 	"turret": {"front": 145.0, "side": 85.0, "rear": 50.0, "roof": 58.0, "underside": 48.0},
 	"track": {"front": 200.0, "side": 200.0, "rear": 200.0, "roof": 200.0, "underside": 200.0},
+	# A barrel hit primarily disables the weapon; it does only 8 HP at normal incidence.
+	"barrel": {"front": 550.0, "side": 550.0, "rear": 550.0, "roof": 550.0, "underside": 550.0},
 }
 
 static func evaluate(part: StringName, target_basis: Basis, world_normal: Vector3, incoming_direction: Vector3) -> Dictionary:
@@ -36,7 +38,7 @@ static func evaluate(part: StringName, target_basis: Basis, world_normal: Vector
 	var ricochet := incidence_cos <= cos(deg_to_rad(RICOCHET_ANGLE)) + 0.000001
 	var base_damage := 100.0 * 50.0 / (50.0 + resistance)
 	var damage := 0.0 if ricochet else maxf(1.0, roundf(base_damage * pow(incidence_cos, ANGLE_POWER)))
-	var region := "TRACKS" if part_name == "track" else "%s %s" % [part_name.to_upper(), facing.to_upper()]
+	var region := "TRACKS" if part_name == "track" else ("BARREL" if part_name == "barrel" else "%s %s" % [part_name.to_upper(), facing.to_upper()])
 	return {"part": part_name, "facing": facing, "region": region, "damage": damage, "angle_degrees": angle, "ricochet": ricochet, "invalid": false, "ignored": false, "resistance": resistance, "incidence_cos": incidence_cos}
 
 static func classify_facing(local_normal: Vector3) -> String:
