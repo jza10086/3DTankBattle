@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://c7mutx0ijiexy"
-path="res://.godot/imported/tank_artillery_target.glb-e0beeb27713588d72b690276fdd1f904.scn"
+path="res://.godot/imported/tank_artillery_target.glb-819f696a7181111a6fd280a9251cfb9f.scn"
 
 [deps]
 
-source_file="res://assets/quaternius/tank_artillery_target.glb"
-dest_files=["res://.godot/imported/tank_artillery_target.glb-e0beeb27713588d72b690276fdd1f904.scn"]
+source_file="res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_artillery_target.glb"
+dest_files=["res://.godot/imported/tank_artillery_target.glb-819f696a7181111a6fd280a9251cfb9f.scn"]
 
 [params]
 

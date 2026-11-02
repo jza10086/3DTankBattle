@@ -3,12 +3,12 @@ extends StaticBody3D
 ## Static CC0 training tank: each connected visible mesh island gets its own
 ## convex collider. Wheels and tread meshes are track armor, not an empty plate.
 signal destroyed(target: RangeTarget)
-const DamageModel = preload("res://scripts/armor_damage.gd")
-const ComponentStatusScript = preload("res://scripts/component_status.gd")
+const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
+const ComponentStatusScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_status.gd")
 const MODEL_PATHS := [
-	"res://assets/quaternius/tank_olive_target.glb",
-	"res://assets/quaternius/tank_heavy_target.glb",
-	"res://assets/quaternius/tank_artillery_target.glb",
+	"res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_olive_target.glb",
+	"res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_heavy_target.glb",
+	"res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_artillery_target.glb",
 ]
 const MODEL_NAMES := ["FIELD TANK", "HEAVY TANK", "ASSAULT GUN"]
 # Immutable local-space convex resources survive range resets. Each vehicle

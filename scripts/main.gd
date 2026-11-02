@@ -1,16 +1,18 @@
 extends Node3D
 
-const TankScript = preload("res://scripts/tank_controller.gd")
-const WorldScript = preload("res://scripts/range_world.gd")
-const HudScript = preload("res://scripts/range_hud.gd")
-const TargetScript = preload("res://scripts/range_target.gd")
-const ShellScript = preload("res://scripts/shell.gd")
-const PanelScript = preload("res://scripts/component_panel.gd")
-var tank: TankController
+signal completed(metrics: Dictionary)
+
+const TankScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
+const WorldScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_world.gd")
+const HudScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_hud.gd")
+const TargetScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_target.gd")
+const ShellScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/shell.gd")
+const PanelScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_panel.gd")
+var tank: TankScript
 var world: Node3D
 var camera: Camera3D
 var hud: Control
-var targets: Array[RangeTarget] = []
+var targets: Array[TargetScript] = []
 var camera_yaw := 0.0
 var camera_pitch := -0.023
 var camera_position := Vector3.ZERO
@@ -40,12 +42,12 @@ var capture_mode := false
 var capture_guard := 0.0
 
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_ALWAYS
+	process_mode = Node.PROCESS_MODE_INHERIT
 	_seed_environment()
 	world = WorldScript.new()
 	add_child(world)
 	tank = TankScript.new()
-	tank.process_mode = Node.PROCESS_MODE_PAUSABLE
+	tank.process_mode = Node.PROCESS_MODE_INHERIT
 	tank.position = Vector3(0, 0.8, 18)
 	add_child(tank)
 	tank.controls_enabled = false
@@ -71,8 +73,7 @@ func _ready() -> void:
 	camera_position = tank.global_position + Vector3(0, 6.5, 13)
 	_update_camera(1.0)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	if "--autostart" in OS.get_cmdline_user_args():
-		start_game()
+	start_game()
 
 func _seed_environment() -> void:
 	var env := Environment.new()
@@ -115,7 +116,7 @@ func _create_targets() -> void:
 	var positions: Array = world.get_target_positions()
 	for i in positions.size():
 		var target := TargetScript.new()
-		target.process_mode = Node.PROCESS_MODE_PAUSABLE
+		target.process_mode = Node.PROCESS_MODE_INHERIT
 		target.index = i
 		target.position = positions[i]
 		# Present a mix of frontal, oblique and flank approaches around the course.
@@ -127,25 +128,25 @@ func _create_targets() -> void:
 
 func _make_audio() -> void:
 	engine_audio = AudioStreamPlayer.new()
-	engine_audio.stream = load("res://assets/audio/engine.wav")
+	engine_audio.stream = load("res://games/minigame/godot_party_default_tank_range/assets/audio/engine.wav")
 	engine_audio.stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	engine_audio.stream.loop_end = 44100
 	engine_audio.volume_db = -22
 	add_child(engine_audio)
 	engine_audio.play()
 	cannon_audio = AudioStreamPlayer.new()
-	cannon_audio.stream = load("res://assets/audio/cannon.wav")
+	cannon_audio.stream = load("res://games/minigame/godot_party_default_tank_range/assets/audio/cannon.wav")
 	cannon_audio.volume_db = -8
 	add_child(cannon_audio)
 	impact_audio = AudioStreamPlayer.new()
-	impact_audio.stream = load("res://assets/audio/impact.wav")
+	impact_audio.stream = load("res://games/minigame/godot_party_default_tank_range/assets/audio/impact.wav")
 	impact_audio.volume_db = -14
 	add_child(impact_audio)
 
 func start_game() -> void:
 	started = true
 	paused = false
-	get_tree().paused = false
+	_pause_objects(false)
 	tank.controls_enabled = not component_panel_open
 	component_panel.visible = component_panel_open
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if component_panel_open else Input.MOUSE_MODE_CAPTURED
@@ -159,7 +160,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif event.keycode == KEY_ESCAPE:
 			if started:
 				paused = not paused
-				get_tree().paused = paused
+				_pause_objects(paused)
 				tank.controls_enabled = not paused and not component_panel_open
 				component_panel.visible = component_panel_open and not paused
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused or component_panel_open else Input.MOUSE_MODE_CAPTURED
@@ -213,8 +214,8 @@ func _physics_process(delta: float) -> void:
 	shot_shake = maxf(0.0, shot_shake - delta * 3.0)
 	notice_time = maxf(0.0, notice_time - delta)
 	_update_effects(delta)
-	engine_audio.pitch_scale = lerpf(0.72, 1.65, absf(tank.speed) / TankController.MAX_FORWARD)
-	engine_audio.volume_db = -28.0 if paused or not started else lerpf(-24, -16, absf(tank.speed) / TankController.MAX_FORWARD)
+	engine_audio.pitch_scale = lerpf(0.72, 1.65, absf(tank.speed) / TankScript.MAX_FORWARD)
+	engine_audio.volume_db = -28.0 if paused or not started else lerpf(-24, -16, absf(tank.speed) / TankScript.MAX_FORWARD)
 	hud.queue_redraw()
 
 func set_component_panel(active: bool) -> void:
@@ -303,20 +304,20 @@ func _update_aim_point() -> void:
 
 func _predict_impact() -> void:
 	var point := tank.visual.muzzle.global_position
-	var velocity := tank.muzzle_direction() * TankController.SHELL_SPEED
+	var velocity := tank.muzzle_direction() * TankScript.SHELL_SPEED
 	actual_hit_target = false
 	actual_impact = point + velocity * 3
 	# Same integrator/gravity as real shells; sweep each segment to avoid tunneling.
 	for i in 130:
-		var next := point + velocity * 0.04 + Vector3.DOWN * TankController.SHELL_GRAVITY * 0.0008
+		var next := point + velocity * 0.04 + Vector3.DOWN * TankScript.SHELL_GRAVITY * 0.0008
 		var query := PhysicsRayQueryParameters3D.create(point, next, 1)
 		var hit := get_world_3d().direct_space_state.intersect_ray(query)
 		if not hit.is_empty():
 			actual_impact = hit.position
-			actual_hit_target = hit.collider is RangeTarget and not hit.collider.dead
+			actual_hit_target = hit.collider is TargetScript and not hit.collider.dead
 			return
 		point = next
-		velocity.y -= TankController.SHELL_GRAVITY * 0.04
+		velocity.y -= TankScript.SHELL_GRAVITY * 0.04
 	actual_impact = point
 
 func fire() -> bool:
@@ -331,10 +332,10 @@ func fire() -> bool:
 	if not tank.begin_fire():
 		return false
 	var shell := ShellScript.new()
-	shell.process_mode = Node.PROCESS_MODE_PAUSABLE
+	shell.process_mode = Node.PROCESS_MODE_INHERIT
 	add_child(shell)
 	shell.global_position = tank.visual.muzzle.global_position
-	shell.velocity = tank.muzzle_direction() * TankController.SHELL_SPEED
+	shell.velocity = tank.muzzle_direction() * TankScript.SHELL_SPEED
 	shell.impacted.connect(_shell_impact)
 	shot_shake = 1.0
 	cannon_audio.play()
@@ -348,7 +349,7 @@ func fire() -> bool:
 
 func _shell_impact(point: Vector3, normal: Vector3, collider: Node, result: Dictionary = {}) -> void:
 	impact_audio.play()
-	var target_hit := collider is RangeTarget and not bool(result.get("ignored", false))
+	var target_hit := collider is TargetScript and not bool(result.get("ignored", false))
 	if target_hit:
 		hits += 1
 		hit_flash = 0.5
@@ -401,9 +402,11 @@ func _update_effects(delta: float) -> void:
 		effect.velocity *= 1.0 - delta * 1.3
 		effect.node.scale = Vector3.ONE * (1.0 + (1.0 - effect.life / effect.total) * 1.3) * minf(1.0, effect.life * 5)
 
-func _target_destroyed(_target: RangeTarget) -> void:
+func _target_destroyed(_target: TargetScript) -> void:
 	destroyed_count += 1
 	if destroyed_count == total_targets:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		_finish_range.call_deferred()
 		show_notice("RANGE CLEAR — EXCELLENT SHOOTING", 6.0)
 
 func show_notice(message: String, duration: float = 2.0) -> void:
@@ -434,7 +437,19 @@ func reset_range() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and started and not paused:
 		paused = true
-		get_tree().paused = true
+		_pause_objects(true)
 		tank.controls_enabled = false
 		component_panel.visible = false
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func _pause_objects(value: bool) -> void:
+	for child: Node in get_children():
+		if child is Node3D and child != camera:
+			child.process_mode = Node.PROCESS_MODE_DISABLED if value else Node.PROCESS_MODE_INHERIT
+
+func _exit_tree() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+## The final shell records its hit after the target emits destroyed.
+func _finish_range() -> void:
+	completed.emit({"time": roundi(elapsed * 1000.0), "hits": hits})

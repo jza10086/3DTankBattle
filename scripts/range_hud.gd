@@ -1,6 +1,8 @@
 class_name RangeHud
 extends Control
 
+const TankControllerScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
+
 var game: Node3D
 var font: Font = ThemeDB.fallback_font
 const WHITE := Color("f3eedc")
@@ -21,7 +23,7 @@ func _draw() -> void:
 	sx = screen.x / 1600.0
 	sy = screen.y / 900.0
 	draw_set_transform(Vector2.ZERO, 0, Vector2(sx, sy))
-	var tank: TankController = game.tank
+	var tank: TankControllerScript = game.tank
 	# Slim framing, with the world occupying the entire display.
 	_rect(Rect2(34, 24, 300, 67), Color(0.06, 0.10, 0.09, 0.57))
 	_rect(Rect2(1324, 24, 240, 80), Color(0.06, 0.10, 0.09, 0.57))
@@ -152,7 +154,7 @@ func _draw_scope(center: Vector2) -> void:
 	_center("SHIFT  EXTERIOR VIEW", 800, 724, 11, MUTED)
 
 func _draw_dashboard() -> void:
-	var tank: TankController = game.tank
+	var tank: TankControllerScript = game.tank
 	# Navigation / gun status on the left; one clear large speed readout on the right.
 	_rect(Rect2(36, 766, 300, 83), DARK)
 	_rect(Rect2(36, 766, 3, 83), AMBER)
@@ -163,7 +165,7 @@ func _draw_dashboard() -> void:
 	var countdown: float = tank.components.barrel_remaining if damaged else tank.reload_remaining
 	_text("∞" if ready else "%.1f s" % countdown, Vector2(270, 820), 20, WHITE)
 	_rect(Rect2(54, 833, 264, 3), Color(1,1,1,0.15))
-	_rect(Rect2(54, 833, 264 * (1.0 - tank.reload_remaining / TankController.RELOAD_TIME), 3), AMBER)
+	_rect(Rect2(54, 833, 264 * (1.0 - tank.reload_remaining / TankControllerScript.RELOAD_TIME), 3), AMBER)
 	_text("%s  /  FLANK ARMOR FOR MORE DAMAGE" % _time(game.elapsed), Vector2(37, 745), 11, MUTED)
 	var v := absf(tank.speed) * 3.6
 	_rect(Rect2(1360, 750, 204, 99), DARK)

@@ -1,11 +1,11 @@
 class_name TankVisual
-extends "res://scripts/tank_visual_procedural.gd"
+extends "res://games/minigame/godot_party_default_tank_range/scripts/tank_visual_procedural.gd"
 ## Quaternius Animated Tanks (2019), Tank2, CC0. See assets/quaternius.
 ## Imported mesh has independent turret and gun pivots; original procedural fallback
 ## can be selected without changing the driving / ballistics interface.
 
 @export var use_procedural := false
-const MODEL := preload("res://assets/quaternius/tank_desert.glb")
+const MODEL := preload("res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_desert.glb")
 const MODEL_SCALE := 0.8136
 var _model: Node3D
 var _track_players: Array[AnimationPlayer] = []

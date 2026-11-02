@@ -1,0 +1,29 @@
+{
+  "manifest_version": 2,
+  "core_api_major": 4,
+  "package_version": "1.0.0",
+  "id": "godot_party_default_tank_range",
+  "name": "IRON RANGE · 坦克训练场",
+  "kind": "minigame",
+  "config_schema": "settings.gd",
+  "entry": "party_round.tscn",
+  "player_counts": [
+    1
+  ],
+  "introduction": "驾驶坦克，瞄准并击毁训练场全部六个目标。",
+  "dependencies": {
+    "godot_party_default_protocol": "1.0.0"
+  },
+  "adapters": [
+    {
+      "id": "standard",
+      "protocol": {
+        "id": "godot_party_default_protocol",
+        "api_major": 1,
+        "min_api_minor": 0
+      },
+      "config_schema": "settings.gd",
+  "entry": "adapter.gd"
+    }
+  ]
+}

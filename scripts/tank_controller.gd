@@ -1,6 +1,8 @@
 class_name TankController
 extends CharacterBody3D
 
+const TankVisualScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_visual.gd")
+
 ## Deliberately accessible tracked-vehicle model, not a full rigid-body simulator.
 ## Four suspension contacts tilt the rendered hull while a stable chassis handles collision.
 const MAX_FORWARD := 14.5
@@ -12,7 +14,7 @@ const ELEVATION_RATE := 0.38
 const GRAVITY := 20.0
 const SHELL_SPEED := 105.0
 const SHELL_GRAVITY := 9.8
-const ComponentState = preload("res://scripts/component_status.gd")
+const ComponentState = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_status.gd")
 const RELOAD_TIME := ComponentState.RELOAD_TIME
 var speed := 0.0
 var yaw_rate := 0.0
@@ -36,7 +38,7 @@ var ground_normal := Vector3.UP
 var contact_count := 0
 var left_track_speed := 0.0
 var right_track_speed := 0.0
-var visual: TankVisual
+var visual: TankVisualScript
 var start_transform := Transform3D.IDENTITY
 var ground_offsets: Array[float] = []
 var hull_pitch := 0.0
@@ -55,7 +57,7 @@ func _ready() -> void:
 	box.size = Vector3(3.0, 1.15, 4.5)
 	collider.shape = box
 	add_child(collider)
-	visual = TankVisual.new()
+	visual = TankVisualScript.new()
 	add_child(visual)
 	start_transform = global_transform
 
