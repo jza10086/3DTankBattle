@@ -1,0 +1,11 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_Hans\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "IRON RANGE · 坦克训练场"
+msgstr "IRON RANGE · 坦克训练场"
+
+msgid "驾驶坦克，瞄准并击毁训练场全部六个目标。"
+msgstr "驾驶坦克，瞄准并击毁训练场全部六个目标。"
