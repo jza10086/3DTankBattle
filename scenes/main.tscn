@@ -1,6 +1,347 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/main.gd" id="1"]
+[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/range_target.gd" id="target"]
+[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_olive_target.glb" id="target0"]
+[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_heavy_target.glb" id="target1"]
+[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_artillery_target.glb" id="target2"]
+[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/range.tscn" id="range"]
+[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/player_tank.tscn" id="tank"]
+[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/component_panel.tscn" id="panel"]
+[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/range_hud.gd" id="hud"]
 
-[node name="IronRange" type="Node3D"]
-script = ExtResource("1")
+[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/main.gd" id="1_048g3"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kmpm6"]
+sky_top_color = Color(0.41960785, 0.6117647, 0.6509804, 1)
+sky_horizon_color = Color(0.8666667, 0.8745098, 0.78431374, 1)
+sky_curve = 0.3
+ground_bottom_color = Color(0.627451, 0.5529412, 0.40784314, 1)
+ground_horizon_color = Color(0.8666667, 0.8745098, 0.78431374, 1)
+
+[sub_resource type="Sky" id="Sky_p0egy"]
+sky_material = SubResource("ProceduralSkyMaterial_kmpm6")
+
+[sub_resource type="Environment" id="Environment_2mdwx"]
+background_mode = 2
+sky = SubResource("Sky_p0egy")
+ambient_light_source = 2
+ambient_light_color = Color(0.70980394, 0.7921569, 0.8156863, 1)
+ambient_light_energy = 0.4
+fog_enabled = true
+fog_light_color = Color(0.8509804, 0.80784315, 0.6901961, 1)
+fog_light_energy = 0.7
+fog_density = 0.0012
+fog_sky_affect = 0.15
+
+[node name="IronRange" type="Node3D" unique_id=1924703324]
+script = ExtResource("1_048g3")
+
+[node name="WorldEnvironment1" type="WorldEnvironment" parent="." unique_id=1291464108]
+environment = SubResource("Environment_2mdwx")
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="." unique_id=1736273361]
+transform = Transform3D(0.88294756, 0.32017884, -0.34334978, 0, 0.7313537, 0.6819984, 0.46947157, -0.6021688, 0.64574695, 0, 0, 0)
+light_color = Color(1, 0.92941177, 0.78039217, 1)
+light_energy = 0.85
+shadow_enabled = true
+shadow_bias = 0.07
+directional_shadow_max_distance = 130.0
+
+[node name="TargetStations" type="Node3D" parent="." unique_id=307433488]
+
+[node name="Station1" type="StaticBody3D" parent="TargetStations" unique_id=516063391]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.06, -35)
+script = ExtResource("target")
+index = 0
+model_variant = 0
+
+[node name="VehicleVisual" type="Node3D" parent="TargetStations/Station1"]
+
+[node name="Model" parent="TargetStations/Station1/VehicleVisual" instance=ExtResource("target0")]
+
+[node name="Station2" type="StaticBody3D" parent="TargetStations" unique_id=291549899]
+transform = Transform3D(-0.9393727, 0, 0.34289786, 0, 1, 0, -0.34289786, 0, -0.9393727, 24, 0.06, -61)
+script = ExtResource("target")
+index = 1
+model_variant = 1
+
+[node name="VehicleVisual" type="Node3D" parent="TargetStations/Station2"]
+
+[node name="Model" parent="TargetStations/Station2/VehicleVisual" instance=ExtResource("target1")]
+
+[node name="Station3" type="StaticBody3D" parent="TargetStations" unique_id=1174623755]
+transform = Transform3D(-0.8525245, 0, -0.52268726, 0, 1, 0, 0.52268726, 0, -0.8525245, -24, 0.06, -82)
+script = ExtResource("target")
+index = 2
+model_variant = 2
+
+[node name="VehicleVisual" type="Node3D" parent="TargetStations/Station3"]
+
+[node name="Model" parent="TargetStations/Station3/VehicleVisual" instance=ExtResource("target2")]
+
+[node name="Station4" type="StaticBody3D" parent="TargetStations" unique_id=26728436]
+transform = Transform3D(0.0707372, 0, 0.997495, 0, 1, 0, -0.997495, 0, 0.0707372, -67, 0.06, -18)
+script = ExtResource("target")
+index = 3
+model_variant = 0
+
+[node name="VehicleVisual" type="Node3D" parent="TargetStations/Station4"]
+
+[node name="Model" parent="TargetStations/Station4/VehicleVisual" instance=ExtResource("target0")]
+
+[node name="Station5" type="StaticBody3D" parent="TargetStations" unique_id=187473776]
+transform = Transform3D(0.3623577, 0, -0.9320391, 0, 1, 0, 0.9320391, 0, 0.3623577, 60, 0.06, 25)
+script = ExtResource("target")
+index = 4
+model_variant = 1
+
+[node name="VehicleVisual" type="Node3D" parent="TargetStations/Station5"]
+
+[node name="Model" parent="TargetStations/Station5/VehicleVisual" instance=ExtResource("target1")]
+
+[node name="Station6" type="StaticBody3D" parent="TargetStations" unique_id=2133849143]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.06, 65)
+script = ExtResource("target")
+index = 5
+model_variant = 2
+
+[node name="VehicleVisual" type="Node3D" parent="TargetStations/Station6"]
+
+[node name="Model" parent="TargetStations/Station6/VehicleVisual" instance=ExtResource("target2")]
+
+[node name="Range" parent="." instance=ExtResource("range")]
+
+
+[node name="Tank" parent="." instance=ExtResource("tank")]
+position = Vector3(0,0.8,18)
+
+[node name="Camera" type="Camera3D" parent="."]
+current = true
+fov = 67.0
+far = 800.0
+near = 0.12
+position = Vector3(0,6.5,31)
+
+[node name="GameHUD" type="CanvasLayer" parent="."]
+layer = -2
+
+[node name="RangeHUD" type="Control" parent="GameHUD"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("hud")
+
+
+[node name="RangeTitle" type="Label" parent="GameHUD/RangeHUD"]
+unique_name_in_owner = true
+anchor_left = 0
+anchor_right = 0
+anchor_top = 0
+anchor_bottom = 0
+offset_left = 48
+offset_right = 448
+offset_top = 28
+offset_bottom = 74
+mouse_filter = 2
+text = "IRON RANGE"
+horizontal_alignment = 0
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="RangeSub" type="Label" parent="GameHUD/RangeHUD"]
+unique_name_in_owner = true
+anchor_left = 0
+anchor_right = 0
+anchor_top = 0
+anchor_bottom = 0
+offset_left = 49
+offset_right = 459
+offset_top = 75
+offset_bottom = 104
+mouse_filter = 2
+text = "07 / DESERT PROVING GROUND"
+horizontal_alignment = 0
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="Clearance" type="Label" parent="GameHUD/RangeHUD"]
+unique_name_in_owner = true
+anchor_left = 1
+anchor_right = 1
+anchor_top = 0
+anchor_bottom = 0
+offset_left = -375
+offset_right = -50
+offset_top = 25
+offset_bottom = 55
+mouse_filter = 2
+text = "RANGE CLEARANCE"
+horizontal_alignment = 2
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="Targets" type="Label" parent="GameHUD/RangeHUD"]
+unique_name_in_owner = true
+anchor_left = 1
+anchor_right = 1
+anchor_top = 0
+anchor_bottom = 0
+offset_left = -375
+offset_right = -50
+offset_top = 56
+offset_bottom = 110
+mouse_filter = 2
+text = "02 / 06"
+horizontal_alignment = 2
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 33
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="Dashboard" type="Control" parent="GameHUD/RangeHUD"]
+unique_name_in_owner = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="GunTitle" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
+unique_name_in_owner = true
+anchor_left = 0
+anchor_right = 0
+anchor_top = 1
+anchor_bottom = 1
+offset_left = 46
+offset_right = 426
+offset_top = -179
+offset_bottom = -149
+mouse_filter = 2
+text = "105 MM  /  PRACTICE AP"
+horizontal_alignment = 0
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="GunState" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
+unique_name_in_owner = true
+anchor_left = 0
+anchor_right = 0
+anchor_top = 1
+anchor_bottom = 1
+offset_left = 46
+offset_right = 426
+offset_top = -142
+offset_bottom = -100
+mouse_filter = 2
+text = "READY  ·  ∞"
+horizontal_alignment = 0
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 29
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="Elapsed" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
+unique_name_in_owner = true
+anchor_left = 0
+anchor_right = 0
+anchor_top = 1
+anchor_bottom = 1
+offset_left = 46
+offset_right = 556
+offset_top = -220
+offset_bottom = -188
+mouse_filter = 2
+text = "01:30 / FLANK ARMOR FOR MORE DAMAGE"
+horizontal_alignment = 0
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="VehicleSpeed" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
+unique_name_in_owner = true
+anchor_left = 1
+anchor_right = 1
+anchor_top = 1
+anchor_bottom = 1
+offset_left = -375
+offset_right = -48
+offset_top = -160
+offset_bottom = -98
+mouse_filter = 2
+text = "32 KM/H"
+horizontal_alignment = 2
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 45
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="Drive" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
+unique_name_in_owner = true
+anchor_left = 1
+anchor_right = 1
+anchor_top = 1
+anchor_bottom = 1
+offset_left = -375
+offset_right = -48
+offset_top = -100
+offset_bottom = -68
+mouse_filter = 2
+text = "DRIVE · TRACKED / 07"
+horizontal_alignment = 2
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="Keys" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
+unique_name_in_owner = true
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 1
+anchor_bottom = 1
+offset_left = -910
+offset_right = 910
+offset_top = -52
+offset_bottom = -10
+mouse_filter = 2
+text = "W S DRIVE    A D STEER    MOUSE AIM    LMB FIRE    SHIFT SIGHT    RMB ZOOM    SPACE BRAKE    C CENTER    F RECOVER    R RESTART    F3 EFFECTS    ESC PAUSE"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
+theme_override_constants/outline_size = 3
+
+[node name="Reload" type="ProgressBar" parent="GameHUD/RangeHUD/Dashboard"]
+unique_name_in_owner = true
+anchor_left = 0
+anchor_right = 0
+anchor_top = 1
+anchor_bottom = 1
+offset_left = 46
+offset_right = 391
+offset_top = -80
+offset_bottom = -69
+mouse_filter = 2
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="ComponentPanel" parent="GameHUD/RangeHUD" instance=ExtResource("panel")]
+visible = false

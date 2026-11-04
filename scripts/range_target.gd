@@ -15,8 +15,8 @@ const MODEL_NAMES := ["FIELD TANK", "HEAVY TANK", "ASSAULT GUN"]
 # still owns its collider nodes, transforms, material copies and damage state.
 # This is memory-only: no generated cache files are written into the project.
 static var _collision_mesh_cache: Dictionary = {}
-var index := 0
-var model_variant := -1
+@export var index: int = 0
+@export var model_variant: int = 0
 var model_name := ""
 var max_hp := 100.0
 var hp := 100.0
@@ -40,6 +40,9 @@ var last_hit_result: Dictionary = {}
 var _turret: Node3D
 var _aim_local := Vector3(0, 0.8, 0)
 var _materials: Array[StandardMaterial3D] = []
+var _colors: Array[Color] = []
+var _roughness: Array[float] = []
+var _turret_rest: Transform3D
 var _collision_bindings: Array[Dictionary] = []
 var _largest_hull_volume := 0.0
 var _shape_count := 0
@@ -50,18 +53,12 @@ func _ready() -> void:
 	collision_mask = 0
 	add_to_group("range_targets")
 	hp = max_hp
-	model_variant = posmod(index if model_variant < 0 else model_variant, MODEL_PATHS.size())
 	model_name = MODEL_NAMES[model_variant]
-	visual = Node3D.new()
-	visual.name = "VehicleVisual"
-	add_child(visual)
-	var resource := load(MODEL_PATHS[model_variant]) as PackedScene
-	if resource == null:
-		push_error("Missing target tank asset: " + MODEL_PATHS[model_variant])
-		return
-	var model := resource.instantiate() as Node3D
-	visual.add_child(model)
+	visual = $VehicleVisual
+	var model: Node3D = $VehicleVisual/Model
 	_turret = model.find_child("TurretPivot", true, false) as Node3D
+	if _turret != null:
+		_turret_rest = _turret.transform
 	_build_mesh_collisions(model)
 	_configure_engine_bounds()
 	# Station identity and HP are drawn once by the HUD at get_marker_point().
@@ -77,6 +74,8 @@ func _build_mesh_collisions(node: Node) -> void:
 				var material := source.duplicate() as StandardMaterial3D
 				mesh_node.set_surface_override_material(surface, material)
 				_materials.append(material)
+				_colors.append(material.albedo_color)
+				_roughness.append(material.roughness)
 		var mesh_to_body := global_transform.affine_inverse() * mesh_node.global_transform
 		var cache_key := "%d|%s|%s" % [model_variant, mesh_node.name, mesh_node.mesh.resource_path]
 		for cached in _cached_island_shapes(mesh_node.mesh, cache_key):
@@ -291,3 +290,17 @@ func damage(amount: float = 0.0) -> void:
 		for binding in _collision_bindings:
 			binding.shape.transform = global_transform.affine_inverse() * binding.mesh.global_transform
 		destroyed.emit(self)
+
+func reset_target() -> void:
+	dead = false
+	hp = max_hp
+	last_hit = 0.0
+	last_hit_result.clear()
+	components.clear()
+	if _turret != null:
+		_turret.transform = _turret_rest
+	for i: int in _materials.size():
+		_materials[i].albedo_color = _colors[i]
+		_materials[i].roughness = _roughness[i]
+	for binding: Dictionary in _collision_bindings:
+		binding.shape.transform = global_transform.affine_inverse() * binding.mesh.global_transform

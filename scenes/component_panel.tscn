@@ -1,0 +1,243 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/component_panel.gd" id="1_13mcq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ew2om"]
+content_margin_left = 18.0
+content_margin_top = 16.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
+bg_color = Color(0.09019608, 0.14509805, 0.12156863, 0.9254902)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8117647, 0.6509804, 0.37254903, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btc1u"]
+bg_color = Color(0.20392157, 0.27450982, 0.23137255, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_avyy2"]
+bg_color = Color(0.47058824, 0.3882353, 0.23921569, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eo0a8"]
+bg_color = Color(0.32156864, 0.3764706, 0.2901961, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_syjud"]
+bg_color = Color(0.20392157, 0.27450982, 0.23137255, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0fr3b"]
+bg_color = Color(0.47058824, 0.3882353, 0.23921569, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vn8jn"]
+bg_color = Color(0.32156864, 0.3764706, 0.2901961, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hv7pf"]
+bg_color = Color(0.20392157, 0.27450982, 0.23137255, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eum5r"]
+bg_color = Color(0.47058824, 0.3882353, 0.23921569, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o7lsl"]
+bg_color = Color(0.32156864, 0.3764706, 0.2901961, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u83fg"]
+bg_color = Color(0.20392157, 0.27450982, 0.23137255, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dkolf"]
+bg_color = Color(0.47058824, 0.3882353, 0.23921569, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ki8t"]
+bg_color = Color(0.32156864, 0.3764706, 0.2901961, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xpfxo"]
+bg_color = Color(0.20392157, 0.27450982, 0.23137255, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iykdj"]
+bg_color = Color(0.47058824, 0.3882353, 0.23921569, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1cjac"]
+bg_color = Color(0.32156864, 0.3764706, 0.2901961, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vbods"]
+bg_color = Color(0.20392157, 0.27450982, 0.23137255, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f1x5x"]
+bg_color = Color(0.47058824, 0.3882353, 0.23921569, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_liify"]
+bg_color = Color(0.32156864, 0.3764706, 0.2901961, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="ComponentPanel" type="PanelContainer" unique_id=112072729]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -360.0
+offset_top = 132.0
+offset_right = -36.0
+offset_bottom = 494.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ew2om")
+script = ExtResource("1_13mcq")
+
+[node name="VBoxContainer1" type="VBoxContainer" parent="." unique_id=1390566001]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label1" type="Label" parent="VBoxContainer1" unique_id=69235143]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.48235294, 1)
+theme_override_font_sizes/font_size = 17
+text = "COMPONENT EFFECT TEST"
+
+[node name="Label2" type="Label" parent="VBoxContainer1" unique_id=1703800291]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Apply to YOUR tank. Timers stay live."
+
+[node name="EngineButton" type="Button" parent="VBoxContainer1" unique_id=1829737604]
+custom_minimum_size = Vector2(288, 36)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.9529412, 0.93333334, 0.8627451, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btc1u")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_avyy2")
+theme_override_styles/hover = SubResource("StyleBoxFlat_eo0a8")
+text = "ENGINE OUT  /  4 s"
+metadata/component = &"engine"
+
+[node name="LeftTrackButton" type="Button" parent="VBoxContainer1" unique_id=1200859047]
+custom_minimum_size = Vector2(288, 36)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.9529412, 0.93333334, 0.8627451, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_syjud")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_0fr3b")
+theme_override_styles/hover = SubResource("StyleBoxFlat_vn8jn")
+text = "LEFT TRACK  /  5 s"
+metadata/component = &"left_track"
+
+[node name="RightTrackButton" type="Button" parent="VBoxContainer1" unique_id=1505633737]
+custom_minimum_size = Vector2(288, 36)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.9529412, 0.93333334, 0.8627451, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_hv7pf")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_eum5r")
+theme_override_styles/hover = SubResource("StyleBoxFlat_o7lsl")
+text = "RIGHT TRACK  /  5 s"
+metadata/component = &"right_track"
+
+[node name="BarrelButton" type="Button" parent="VBoxContainer1" unique_id=150655566]
+custom_minimum_size = Vector2(288, 36)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.9529412, 0.93333334, 0.8627451, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_u83fg")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_dkolf")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3ki8t")
+text = "BARREL + RELOAD  /  4 s"
+metadata/component = &"barrel"
+
+[node name="ClearButton" type="Button" parent="VBoxContainer1" unique_id=660274126]
+custom_minimum_size = Vector2(288, 36)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.9529412, 0.93333334, 0.8627451, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_xpfxo")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_iykdj")
+theme_override_styles/hover = SubResource("StyleBoxFlat_1cjac")
+text = "CLEAR EFFECTS + RELOAD"
+metadata/component = &"clear"
+
+[node name="CloseButton" type="Button" parent="VBoxContainer1" unique_id=930333951]
+custom_minimum_size = Vector2(288, 36)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.9529412, 0.93333334, 0.8627451, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_vbods")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_f1x5x")
+theme_override_styles/hover = SubResource("StyleBoxFlat_liify")
+text = "RETURN TO DRIVE  /  F3"
+metadata/component = &"close"

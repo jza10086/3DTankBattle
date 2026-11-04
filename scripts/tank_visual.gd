@@ -17,12 +17,10 @@ var _original_colors: Array[Color] = []
 
 func _build() -> void:
 	if use_procedural:
+		$Model.hide()
 		super._build()
 		return
-	_model = MODEL.instantiate()
-	add_child(_model)
-	_model.scale = Vector3.ONE * MODEL_SCALE
-	_model.position.y = -0.60
+	_model = $Model
 	turret = _model.get_node("TankDesert/TurretPivot")
 	barrel = turret.get_node("BarrelPivot")
 	muzzle = barrel.get_node("Muzzle")

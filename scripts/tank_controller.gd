@@ -52,13 +52,7 @@ func _ready() -> void:
 	floor_max_angle = deg_to_rad(43)
 	floor_stop_on_slope = true
 	floor_constant_speed = true
-	var collider := CollisionShape3D.new()
-	var box := BoxShape3D.new()
-	box.size = Vector3(3.0, 1.15, 4.5)
-	collider.shape = box
-	add_child(collider)
-	visual = TankVisualScript.new()
-	add_child(visual)
+	visual = $Visual
 	start_transform = global_transform
 
 func _physics_process(delta: float) -> void:

@@ -1,4 +1,5 @@
 extends Node3D
+const SoloRound = preload("res://games/protocols/godot_party_default_protocol/solo_round.gd")
 
 signal completed(metrics: Dictionary)
 
@@ -43,29 +44,19 @@ var capture_guard := 0.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
-	_seed_environment()
-	world = WorldScript.new()
-	add_child(world)
-	tank = TankScript.new()
-	tank.process_mode = Node.PROCESS_MODE_INHERIT
-	tank.position = Vector3(0, 0.8, 18)
-	add_child(tank)
+	world = $Range
+	tank = $Tank
 	tank.controls_enabled = false
-	camera = Camera3D.new()
-	camera.fov = 67
-	camera.far = 800
-	camera.near = 0.12
-	add_child(camera)
-	camera.current = true
-	_create_targets()
-	var canvas := CanvasLayer.new()
-	add_child(canvas)
-	hud = HudScript.new()
+	camera = $Camera
+	targets.assign($TargetStations.get_children())
+	for target: TargetScript in targets:
+		target.destroyed.connect(_target_destroyed)
+	total_targets = targets.size()
+	hud = $GameHUD/RangeHUD
 	hud.game = self
-	canvas.add_child(hud)
-	component_panel = PanelScript.new()
-	hud.add_child(component_panel)
-	component_panel.visible = false
+	if get_parent() is SoloRound:
+		hud.i18n = get_parent().api.i18n
+	component_panel = $GameHUD/RangeHUD/ComponentPanel
 	component_panel.component_requested.connect(_apply_player_component)
 	component_panel.clear_requested.connect(_clear_player_components)
 	component_panel.close_requested.connect(func(): set_component_panel(false))
@@ -74,57 +65,6 @@ func _ready() -> void:
 	_update_camera(1.0)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	start_game()
-
-func _seed_environment() -> void:
-	var env := Environment.new()
-	var sky := Sky.new()
-	var material := ProceduralSkyMaterial.new()
-	material.sky_top_color = Color("6b9ca6")
-	material.sky_horizon_color = Color("dddfc8")
-	material.ground_bottom_color = Color("a08d68")
-	material.ground_horizon_color = Color("dddfc8")
-	material.sky_curve = 0.3
-	sky.sky_material = material
-	env.background_mode = Environment.BG_SKY
-	env.sky = sky
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("b5cad0")
-	env.ambient_light_energy = 0.40
-	env.tonemap_mode = Environment.TONE_MAPPER_LINEAR
-	env.tonemap_exposure = 1.0
-	env.fog_enabled = true
-	env.fog_light_color = Color("d9ceb0")
-	env.fog_density = 0.0012
-	env.fog_sky_affect = 0.15
-	env.fog_light_energy = 0.70
-	var environment := WorldEnvironment.new()
-	environment.environment = env
-	add_child(environment)
-	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-43, -28, 0)
-	sun.light_color = Color("ffedc7")
-	sun.light_energy = 0.85
-	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 130
-	sun.shadow_bias = 0.07
-	add_child(sun)
-
-func _create_targets() -> void:
-	for old in targets:
-		old.queue_free()
-	targets.clear()
-	var positions: Array = world.get_target_positions()
-	for i in positions.size():
-		var target := TargetScript.new()
-		target.process_mode = Node.PROCESS_MODE_INHERIT
-		target.index = i
-		target.position = positions[i]
-		# Present a mix of frontal, oblique and flank approaches around the course.
-		target.rotation.y = [PI, PI - 0.35, PI + 0.55, 1.5, -1.2, 0.0][i % 6]
-		add_child(target)
-		target.destroyed.connect(_target_destroyed)
-		targets.append(target)
-	total_targets = targets.size()
 
 func _make_audio() -> void:
 	engine_audio = AudioStreamPlayer.new()
@@ -424,7 +364,8 @@ func reset_range() -> void:
 	shot_shake = 0.0
 	for shell in get_tree().get_nodes_in_group("shells"):
 		shell.queue_free()
-	_create_targets()
+	for target: TargetScript in targets:
+		target.reset_target()
 	tank.reset_vehicle()
 	tank.rounds_fired = 0
 	destroyed_count = 0

@@ -12,6 +12,12 @@ const DARK := Color(0.06, 0.10, 0.09, 0.82)
 var sx := 1.0
 var sy := 1.0
 
+const DefaultText: Translation = preload("res://games/minigame/godot_party_default_tank_range/i18n/zh_Hans.po")
+var i18n: RefCounted
+
+func hud_text(key: StringName, values: Dictionary) -> String:
+	return DefaultText.get_message(key).format(values) if i18n == null else i18n.text(key, values)
+
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -24,16 +30,8 @@ func _draw() -> void:
 	sy = screen.y / 900.0
 	draw_set_transform(Vector2.ZERO, 0, Vector2(sx, sy))
 	var tank: TankControllerScript = game.tank
-	# Slim framing, with the world occupying the entire display.
-	_rect(Rect2(34, 24, 300, 67), Color(0.06, 0.10, 0.09, 0.57))
-	_rect(Rect2(1324, 24, 240, 80), Color(0.06, 0.10, 0.09, 0.57))
-	_rect(Rect2(34, 32, 3, 54), AMBER)
-	_text("IRON RANGE", Vector2(52, 54), 23, WHITE)
-	_text("07 / DESERT PROVING GROUND", Vector2(53, 78), 11, MUTED)
-	_text("RANGE CLEARANCE", Vector2(1340, 47), 11, MUTED)
-	_text("%02d / %02d" % [game.destroyed_count, game.total_targets], Vector2(1340, 78), 28, WHITE)
-	for i in game.total_targets:
-		_rect(Rect2(1341 + i * 28, 91, 20, 3), AMBER if i < game.destroyed_count else Color(1, 1, 1, 0.25))
+	%Targets.text = hud_text(&"hud.targets", {"count":"%02d" % game.destroyed_count, "total":"%02d" % game.total_targets})
+	%Dashboard.visible = game.started
 	_draw_compass()
 	if game.started:
 		_draw_targets()
@@ -155,26 +153,16 @@ func _draw_scope(center: Vector2) -> void:
 
 func _draw_dashboard() -> void:
 	var tank: TankControllerScript = game.tank
-	# Navigation / gun status on the left; one clear large speed readout on the right.
-	_rect(Rect2(36, 766, 300, 83), DARK)
-	_rect(Rect2(36, 766, 3, 83), AMBER)
-	_text("105 MM  /  PRACTICE AP", Vector2(54, 790), 12, MUTED)
-	var damaged := tank.components.barrel_remaining > 0
-	var ready := tank.reload_remaining <= 0 and not damaged
-	_text("GUN REPAIR" if damaged else ("READY" if ready else "RELOADING"), Vector2(53, 820), 22, WHITE if ready else AMBER)
+	var damaged: bool = tank.components.barrel_remaining > 0
+	var ready: bool = tank.reload_remaining <= 0 and not damaged
 	var countdown: float = tank.components.barrel_remaining if damaged else tank.reload_remaining
-	_text("∞" if ready else "%.1f s" % countdown, Vector2(270, 820), 20, WHITE)
-	_rect(Rect2(54, 833, 264, 3), Color(1,1,1,0.15))
-	_rect(Rect2(54, 833, 264 * (1.0 - tank.reload_remaining / TankControllerScript.RELOAD_TIME), 3), AMBER)
-	_text("%s  /  FLANK ARMOR FOR MORE DAMAGE" % _time(game.elapsed), Vector2(37, 745), 11, MUTED)
-	var v := absf(tank.speed) * 3.6
-	_rect(Rect2(1360, 750, 204, 99), DARK)
-	_text("%02d" % roundi(v), Vector2(1380, 817), 54, WHITE)
-	_text("KM/H", Vector2(1492, 816), 13, MUTED)
-	_text("REVERSE" if tank.speed < -0.25 else ("PIVOT" if absf(tank.yaw_rate) > .2 and v < 2 else "DRIVE"), Vector2(1380, 839), 10, AMBER)
-	_text("BRAKE" if tank.brake else "TRACKED / 07", Vector2(1460, 839), 10, MUTED)
-	_rect(Rect2(0, 869, 1600, 31), Color(0.04,0.07,0.06,0.72))
-	_center("W S  DRIVE   A D  STEER   MOUSE  AIM   LMB  FIRE   SHIFT  SIGHT   RMB  ZOOM   SPACE  BRAKE   C  CENTER   F  RECOVER   R  RESTART   F3  EFFECTS   ESC  PAUSE", 800, 889, 11, MUTED)
+	%GunState.text = hud_text(&"hud.gun", {"state":"GUN REPAIR" if damaged else ("READY" if ready else "RELOADING"), "time":"∞" if ready else "%.1f s" % countdown})
+	%Reload.value = 1.0 - tank.reload_remaining / TankControllerScript.RELOAD_TIME
+	%Elapsed.text = hud_text(&"hud.elapsed", {"time":_time(game.elapsed)})
+	var speed: float = absf(tank.speed) * 3.6
+	%VehicleSpeed.text = hud_text(&"hud.speed", {"speed":"%02d" % roundi(speed)})
+	var gear: String = "REVERSE" if tank.speed < -0.25 else ("PIVOT" if absf(tank.yaw_rate) > 0.2 and speed < 2.0 else "DRIVE")
+	%Drive.text = hud_text(&"hud.drive", {"gear":gear, "brake":"BRAKE" if tank.brake else "TRACKED / 07"})
 
 func _component_lines(state, include_reload: bool = false) -> Array[String]:
 	var labels: Array[String] = []
