@@ -11,10 +11,8 @@ const BRAKING: float = 12.0
 const TURRET_RATE: float = 0.68
 const ELEVATION_RATE: float = 0.38
 const GRAVITY: float = 20.0
-const SHELL_SPEED: float = 105.0
 const SHELL_GRAVITY: float = 9.8
 const ComponentState = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_status.gd")
-const RELOAD_TIME: float = ComponentState.RELOAD_TIME
 var speed: float = 0.0
 var yaw_rate: float = 0.0
 var throttle: float = 0.0
@@ -30,6 +28,7 @@ var reload_remaining: float:
 		return components.reload_remaining
 	set(value):
 		components.reload_remaining = maxf(value, 0.0)
+var ammunition: int = DamageModel.Ammo.AP
 var rounds_fired: int = 0
 var recoil: float = 0.0
 var ground_normal: Vector3 = Vector3.UP
@@ -160,7 +159,8 @@ func _update_aim(delta: float) -> void:
 	# Third person solves a low ballistic arc to a requested world point.
 	# The first-person sight instead commands a bore direction directly: feeding
 	# the actual gun camera back into the arc solver would cause elevation drift.
-	var v2: float = SHELL_SPEED * SHELL_SPEED
+	var shell_speed: float = DamageModel.shell_speed(ammunition)
+	var v2: float = shell_speed * shell_speed
 	var discriminant: float = v2 * v2 - SHELL_GRAVITY * (SHELL_GRAVITY * horizontal * horizontal + 2.0 * local_barrel.y * v2)
 	var elevation: float = atan2(local_barrel.y, horizontal)
 	if not aim_direction_mode and horizontal > 1.0 and discriminant >= 0.0:
@@ -266,13 +266,14 @@ func get_marker_point() -> Vector3:
 	return global_position + Vector3(0, 2.8, 0)
 
 ## Shell contacts use the actual armor shape and surface angle. Health is host-owned.
-func apply_shell_hit(point: Vector3, normal: Vector3, incoming: Vector3, shape_index: int) -> Dictionary:
+func apply_shell_hit(point: Vector3, normal: Vector3, incoming: Vector3, shape_index: int, shell_ammunition: int = DamageModel.Ammo.AP) -> Dictionary:
 	var shape: CollisionShape3D = armor.shape_owner_get_owner(armor.shape_find_owner(shape_index))
 	var part: String = shape.get_meta("part")
-	var result: Dictionary = DamageModel.evaluate(&"track" if part.ends_with("track") else StringName(part), global_basis, normal, incoming)
+	var result: Dictionary = DamageModel.evaluate(&"track" if part.ends_with("track") else StringName(part), global_basis, normal, incoming, shell_ammunition)
 	result["ignored"] = dead
 	result["damage"] = 0.0 if dead else minf(hp, result.damage)
 	result["component"] = ""
+	result["disabled"] = false
 	result["component_duration"] = 0.0
 	hp -= result.damage
 	dead = hp <= 0.0
@@ -283,6 +284,7 @@ func apply_shell_hit(point: Vector3, normal: Vector3, incoming: Vector3, shape_i
 		elif part == "hull" and to_local(point).z > 1.2 and result.facing == "rear":
 			component = &"engine"
 		if not component.is_empty():
+			result.disabled = not components.is_disabled(component)
 			apply_component_hit(component)
 			result.component = component
 			result.component_duration = ComponentState.TRACK_DURATION if part.ends_with("track") else ComponentState.ENGINE_DURATION
@@ -294,14 +296,14 @@ func apply_shell_hit(point: Vector3, normal: Vector3, incoming: Vector3, shape_i
 	result["hp"] = hp
 	return result
 
-const SNAPSHOT_FLOATS: int = 21
+const SNAPSHOT_FLOATS: int = 22
 
 func make_snapshot() -> PackedFloat32Array:
-	# Fixed roster order and 21 floats keep all eight vehicles below ENet MTU.
+	# Fixed roster order and 22 floats keep all eight vehicles below ENet MTU.
 	return PackedFloat32Array([position.x, position.y, position.z, rotation.y, speed, yaw_rate,
 		visual.rotation.x, visual.rotation.z, visual.turret.rotation.y, visual.barrel.rotation.x, recoil,
 		hp, float(dead), damage_dealt, float(kills), float(rounds_fired), components.engine_remaining,
-		components.left_track_remaining, components.right_track_remaining, components.barrel_remaining, components.reload_remaining])
+		components.left_track_remaining, components.right_track_remaining, components.barrel_remaining, components.reload_remaining, float(ammunition)])
 
 func apply_snapshot(state: PackedFloat32Array, delta: float) -> void:
 	var target: Transform3D = Transform3D(Basis(Vector3.UP, state[3]), Vector3(state[0], state[1], state[2]))
@@ -322,6 +324,38 @@ func apply_snapshot(state: PackedFloat32Array, delta: float) -> void:
 	components.right_track_remaining = state[18]
 	components.barrel_remaining = state[19]
 	components.reload_remaining = state[20]
+	ammunition = int(state[21])
+	components.reload_duration = DamageModel.reload_duration(ammunition)
 	visual.set_destroyed(dead)
 	visual.animate_tracks(speed - yaw_rate * 1.3, speed + yaw_rate * 1.3, delta)
 	_update_armor()
+
+func switch_ammunition(value: int) -> void:
+	if dead or value == ammunition:
+		return
+	ammunition = value
+	components.reload_duration = DamageModel.reload_duration(ammunition)
+	components.begin_reload()
+
+func get_aim_point() -> Vector3:
+	return global_position + Vector3(0, 0.25, 0)
+
+## Blast pressure chips armor and disables the exposed track; cover is tested by the shell.
+func apply_blast_hit(origin: Vector3, amount: float) -> Dictionary:
+	var result: Dictionary = {"damage": 0.0, "destroyed": false, "component": "", "disabled": false}
+	if dead:
+		return result
+	result.damage = minf(hp, amount)
+	hp -= result.damage
+	dead = hp <= 0.0
+	result.destroyed = dead
+	if dead:
+		speed = 0.0
+		velocity = Vector3.ZERO
+		visual.set_destroyed(true)
+	elif amount >= 4.0:
+		var component: StringName = &"left_track" if to_local(origin).x < 0.0 else &"right_track"
+		result.disabled = not components.is_disabled(component)
+		apply_component_hit(component)
+		result.component = component
+	return result

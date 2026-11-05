@@ -1,10 +1,14 @@
 extends Control
-## Edge HUD and world-space markers; the framework owns menus and round pages.
+## Minimal combat instrumentation; camera intent and ballistic impact stay distinct.
 const Tank = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
-var game: Node3D
-var font: Font = ThemeDB.fallback_font
+const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
+const AP_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/shell_ap.svg")
+const HE_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/shell_he.svg")
 const WHITE: Color = Color("f3eedc")
 const AMBER: Color = Color("ffc66d")
+const RED: Color = Color("ff7668")
+var game: Node3D
+var font: Font = ThemeDB.fallback_font
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -14,64 +18,86 @@ func _draw() -> void:
 	if game == null or not game.started:
 		return
 	var tank: Tank = game.tank
-	var solo: bool = game.players.size() == 1
-	var alive: int = 0
-	for vehicle: Tank in game.vehicles.values():
-		if not vehicle.dead:
-			alive += 1
-	%Targets.text = "%d / %d 靶标" % [game.destroyed_count, game.total_targets] if solo else "%d / %d 存活" % [alive, game.players.size()]
-	%RangeSub.text = "M1 ABRAMS · 单人炮术训练" if solo else "M1 ABRAMS · 自由交战"
-	%Clearance.text = "清空全部靶标" if solo else "最后存活者获胜"
-	%Elapsed.text = "剩余 %02d:%02d" % [int(maxf(0.0, game.duration - game.elapsed)) / 60, int(maxf(0.0, game.duration - game.elapsed)) % 60]
-	%VehicleSpeed.text = "%02d km/h" % roundi(absf(tank.speed) * 3.6)
-	%Drive.text = "观战 · " + tank.player_name if game.local_id.is_empty() else ("已被击毁 · 等待本轮结束" if tank.dead else "生命 %d / 100 · 击毁 %d" % [roundi(tank.hp), tank.kills])
+	%Speed.text = "%02d" % roundi(absf(tank.speed) * 3.6)
+	%HullHealth.value = tank.hp
+	%HealthValue.text = str(roundi(tank.hp))
+	%HullHealth.modulate = RED if tank.hp <= 25.0 else WHITE
+	var condition: PackedStringArray = []
+	if tank.dead:
+		condition.append("坦克已被击毁")
+	elif game.local_id.is_empty():
+		condition.append("观战")
+	else:
+		if tank.components.engine_remaining > 0.0: condition.append("发动机瘫痪")
+		if tank.components.left_track_remaining > 0.0 or tank.components.right_track_remaining > 0.0:
+			condition.append("履带损毁")
+		if tank.muzzle_obstructed: condition.append("炮口受阻")
+	%VehicleCondition.text = " · ".join(condition)
 	var repairing: bool = tank.components.barrel_remaining > 0.0
-	var remaining: float = tank.components.barrel_remaining if repairing else tank.reload_remaining
-	%GunState.text = "已被击毁" if tank.dead else ("炮管维修 %.1f s" % remaining if repairing else ("装填 %.1f s" % remaining if remaining > 0.0 else "准备开火"))
-	%Reload.value = 1.0 - tank.reload_remaining / Tank.RELOAD_TIME
+	var remaining: float = tank.reload_remaining
+	var loaded: bool = remaining <= 0.0 and not repairing and not tank.dead
+	%AmmoName.text = "穿甲弹" if tank.ammunition == DamageModel.Ammo.AP else "高爆弹"
+	%AmmoState.text = "武器失效" if tank.dead else ("主炮维修中" if repairing else ("准备就绪" if loaded else "装填中  %.1f s" % remaining))
+	%AmmoState.modulate = WHITE if loaded else AMBER
+	var icon: Texture2D = AP_ICON if tank.ammunition == DamageModel.Ammo.AP else HE_ICON
+	%ShellFill.texture_under = icon
+	%ShellFill.texture_progress = icon
+	%ShellFill.value = 0.0 if repairing or tank.dead else 100.0 * (1.0 - remaining / tank.components.reload_duration)
+	%ShellFill.tint_progress = WHITE if loaded else AMBER
+	%AmmoSelector.text = "%s   %s" % [game.api.input.binding_text(&"tank_ammunition"), "[ AP ]   HE" if tank.ammunition == DamageModel.Ammo.AP else "AP   [ HE ]"]
 	var center: Vector2 = size * 0.5
+	if game.first_person:
+		_draw_optic(center)
+	# Thin ring = player intent. Smaller circle = the shell's predicted landing point.
+	draw_arc(center, 21.0, 0, TAU, 48, Color(0.95, 0.93, 0.86, 0.55), 1.0, true)
 	for axis: Vector2 in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
-		draw_line(center + axis * 14.0, center + axis * 26.0, WHITE, 1.5, true)
-	draw_circle(center, 2.0, WHITE)
+		draw_line(center + axis * 8.0, center + axis * 15.0, WHITE, 1.4, true)
+	draw_circle(center, 1.6, WHITE)
 	if not game.camera.is_position_behind(game.actual_impact):
 		var impact: Vector2 = game.camera.unproject_position(game.actual_impact)
-		draw_arc(impact, 11, 0, TAU, 24, Color("9fe0a8") if game.actual_hit_target else AMBER, 2.0, true)
-	if game.first_person:
-		draw_arc(center, 350, 0, TAU, 96, Color(0.1, 0.15, 0.1, 0.4), 2.0, true)
-		_caption("炮手瞄准镜 · %.1f×" % (4.2 if game.zooming else 2.1), Vector2(center.x, 145), AMBER)
+		if Rect2(Vector2.ZERO, size).has_point(impact):
+			var bore_color: Color = AMBER if tank.muzzle_obstructed else WHITE
+			draw_arc(impact, 9.0, 0, TAU, 32, Color(0.02, 0.03, 0.02, 0.8), 4.0, true)
+			draw_arc(impact, 9.0, 0, TAU, 32, bore_color, 1.5, true)
+			draw_circle(impact, 1.5, bore_color)
 	if game.hit_flash > 0.0:
 		for axis: Vector2 in [Vector2(1, 1), Vector2(-1, 1), Vector2(1, -1), Vector2(-1, -1)]:
-			draw_line(center + axis * 30.0, center + axis * 42.0, AMBER, 3.0, true)
-	if game.notice_time > 0.0:
-		_caption(game.notice, center + Vector2(0, 135), AMBER)
-	var statuses: PackedStringArray = []
-	if tank.components.engine_remaining > 0.0:
-		statuses.append("发动机维修 %.1fs" % tank.components.engine_remaining)
-	if tank.components.left_track_remaining > 0.0:
-		statuses.append("左履带维修 %.1fs" % tank.components.left_track_remaining)
-	if tank.components.right_track_remaining > 0.0:
-		statuses.append("右履带维修 %.1fs" % tank.components.right_track_remaining)
-	if tank.muzzle_obstructed:
-		statuses.append("炮口被阻挡")
-	_caption(" · ".join(statuses), Vector2(center.x, size.y - 95), AMBER)
-	for target: Node3D in game.targets:
-		_marker(target, "靶标 %d" % (target.index + 1))
-	for vehicle: Tank in game.vehicles.values():
-		if vehicle != tank:
-			_marker(vehicle, vehicle.player_name)
+			draw_line(center + axis * 24.0, center + axis * 32.0, WHITE, 2.0, true)
+	for i: int in game.feedbacks.size():
+		var entry: Dictionary = game.feedbacks[i]
+		var color: Color = RED if entry.kind == "kill" else (AMBER if entry.kind == "disabled" else WHITE)
+		color.a = minf(1.0, (1.6 - entry.age) / 0.4)
+		var point: Vector2 = center + Vector2(66, -24 + i * 28 - entry.age * 12)
+		_caption(entry.text, point, color, 23 if entry.kind == "kill" else 20)
 
-func _marker(target: Node3D, label: String) -> void:
-	if target.dead or game.camera.is_position_behind(target.global_position):
-		return
-	var point: Vector2 = game.camera.unproject_position(target.get_marker_point())
-	if not Rect2(50, 130, size.x - 100, size.y - 300).has_point(point):
-		return
-	_caption(label + " · %d HP" % roundi(target.hp), point - Vector2(0, 12), AMBER)
-	draw_rect(Rect2(point - Vector2(35, 0), Vector2(70, 5)), Color(0.03, 0.06, 0.05, 0.8))
-	draw_rect(Rect2(point - Vector2(35, 0), Vector2(70 * target.hp / target.max_hp, 5)), AMBER)
+func _draw_optic(center: Vector2) -> void:
+	var radius: float = size.y * 0.46
+	# Four annular quadrants mask the viewport outside the optic without covering HUD.
+	for quadrant: int in 4:
+		var polygon: PackedVector2Array = []
+		for step: int in 33:
+			var angle: float = (quadrant + step / 32.0) * PI * 0.5
+			polygon.append(center + Vector2(cos(angle), sin(angle)) * radius)
+		for step: int in range(32, -1, -1):
+			var angle: float = (quadrant + step / 32.0) * PI * 0.5
+			polygon.append(center + Vector2(cos(angle), sin(angle)) * size.length())
+		draw_colored_polygon(polygon, Color(0.015, 0.02, 0.018, 0.97))
+	draw_arc(center, radius, 0, TAU, 160, Color(0.16, 0.18, 0.15), 5.0, true)
+	var etched: Color = Color(0.08, 0.12, 0.08, 0.8)
+	for direction: Vector2 in [Vector2.LEFT, Vector2.RIGHT, Vector2.DOWN]:
+		draw_line(center + direction * 34.0, center + direction * radius * 0.88, etched, 1.0, true)
+	# Angular graduations expand with magnification; they are not range estimates.
+	var spacing: float = 35.0 * tan(deg_to_rad(16.0)) / tan(deg_to_rad(game.camera.fov * 0.5))
+	for i: int in range(1, 13):
+		var distance: float = i * spacing
+		if distance >= radius * 0.86: break
+		var length: float = 10.0 if i % 2 == 0 else 6.0
+		for side: float in [-1.0, 1.0]:
+			var at: Vector2 = center + Vector2(side * distance, 0)
+			draw_line(at - Vector2(0, length), at + Vector2(0, length), etched, 1.0, true)
+		var at: Vector2 = center + Vector2(0, distance)
+		draw_line(at - Vector2(length, 0), at + Vector2(length, 0), etched, 1.0, true)
 
-func _caption(value: String, point: Vector2, color: Color) -> void:
-	var width: float = font.get_string_size(value, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
-	var at: Vector2 = point - Vector2(width * 0.5, 0)
-	draw_string_outline(font, at, value, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, 4, Color(0.03, 0.05, 0.04, 0.9))
-	draw_string(font, at, value, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, color)
+func _caption(value: String, point: Vector2, color: Color, font_size: int) -> void:
+	draw_string_outline(font, point, value, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, 4, Color(0.03, 0.05, 0.04, color.a * 0.9))
+	draw_string(font, point, value, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, color)

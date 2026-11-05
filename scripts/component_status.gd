@@ -2,17 +2,18 @@ class_name ComponentStatus
 extends RefCounted
 ## Small deterministic damage/recovery state shared by player and training tanks.
 ## Durations are gameplay seconds; callers tick once per unpaused physics frame.
-const ENGINE_DURATION := 4.0
-const TRACK_DURATION := 5.0
-const BARREL_DURATION := 4.0
-const RELOAD_TIME := 3.2
-const DAMAGED_TRACK_MULTIPLIER := 0.25
+const ENGINE_DURATION: float = 4.0
+const TRACK_DURATION: float = 5.0
+const BARREL_DURATION: float = 4.0
+const RELOAD_TIME: float = 3.2
+const DAMAGED_TRACK_MULTIPLIER: float = 0.25
 
-var engine_remaining := 0.0
-var left_track_remaining := 0.0
-var right_track_remaining := 0.0
-var barrel_remaining := 0.0
-var reload_remaining := 0.0
+var engine_remaining: float = 0.0
+var left_track_remaining: float = 0.0
+var right_track_remaining: float = 0.0
+var barrel_remaining: float = 0.0
+var reload_remaining: float = 0.0
+var reload_duration: float = RELOAD_TIME
 
 ## Repeated hits refresh the relevant timer; they never add durations together.
 ## The canonical component names are engine, left_track, right_track and barrel.
@@ -33,15 +34,15 @@ func apply_component(component: StringName) -> bool:
 	return true
 
 func tick(delta: float) -> void:
-	var elapsed := maxf(delta, 0.0)
+	var elapsed: float = maxf(delta, 0.0)
 	engine_remaining = maxf(0.0, engine_remaining - elapsed)
 	left_track_remaining = maxf(0.0, left_track_remaining - elapsed)
 	right_track_remaining = maxf(0.0, right_track_remaining - elapsed)
 	# Reload is held at full duration during barrel repair. If this step crosses
 	# repair expiry, ONLY the remaining part of the step advances the new reload.
-	var blocked_time := minf(elapsed, barrel_remaining)
+	var blocked_time: float = minf(elapsed, barrel_remaining)
 	barrel_remaining = maxf(0.0, barrel_remaining - elapsed)
-	var reload_time := elapsed - blocked_time
+	var reload_time: float = elapsed - blocked_time
 	reload_remaining = maxf(0.0, reload_remaining - reload_time)
 
 func clear() -> void:
@@ -61,7 +62,7 @@ func begin_fire() -> bool:
 	return true
 
 func begin_reload() -> void:
-	reload_remaining = RELOAD_TIME
+	reload_remaining = reload_duration
 
 func get_left_track_multiplier() -> float:
 	if engine_remaining > 0.0:
@@ -75,3 +76,11 @@ func get_right_track_multiplier() -> float:
 
 func get_track_multipliers() -> Vector2:
 	return Vector2(get_left_track_multiplier(), get_right_track_multiplier())
+
+func is_disabled(component: StringName) -> bool:
+	match component:
+		&"engine": return engine_remaining > 0.0
+		&"left_track": return left_track_remaining > 0.0
+		&"right_track": return right_track_remaining > 0.0
+		&"barrel": return barrel_remaining > 0.0
+	return false

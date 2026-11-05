@@ -10,6 +10,10 @@
 
 [ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/main.gd" id="1_048g3"]
 
+[ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/m68_cannon.svg" id="gun_icon"]
+[ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/shell_ap.svg" id="ap_icon"]
+[ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/m1_silhouette.svg" id="tank_icon"]
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kmpm6"]
 sky_top_color = Color(0.41960785, 0.6117647, 0.6509804, 1)
 sky_horizon_color = Color(0.8666667, 0.8745098, 0.78431374, 1)
@@ -31,6 +35,26 @@ fog_light_color = Color(0.8509804, 0.80784315, 0.6901961, 1)
 fog_light_energy = 0.7
 fog_density = 0.0012
 fog_sky_affect = 0.15
+
+[sub_resource type="StyleBoxFlat" id="HealthBack"]
+bg_color = Color(0.02, 0.04, 0.04, 0.65)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.97, 0.94, 0.3)
+
+[sub_resource type="StyleBoxFlat" id="HealthFill"]
+bg_color = Color(0.8, 0.92, 0.88, 1)
+
+[sub_resource type="Theme" id="HudTheme"]
+default_font_size = 18
+Label/colors/font_color = Color(0.95, 0.97, 0.94, 1)
+Label/colors/font_shadow_color = Color(0.02, 0.03, 0.03, 0.85)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 2
+Label/constants/outline_size = 2
+Label/colors/font_outline_color = Color(0.02, 0.03, 0.03, 0.35)
 
 [node name="ThunderWar" type="Node3D" unique_id=1924703324]
 script = ExtResource("1_048g3")
@@ -128,217 +152,142 @@ layer = -2
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+theme = SubResource("HudTheme")
 script = ExtResource("hud")
 
-
-[node name="RangeTitle" type="Label" parent="GameHUD/RangeHUD"]
-unique_name_in_owner = true
-anchor_left = 0
-anchor_right = 0
-anchor_top = 0
-anchor_bottom = 0
-offset_left = 48
-offset_right = 448
-offset_top = 28
-offset_bottom = 74
-mouse_filter = 2
-text = "雷霆战争"
-horizontal_alignment = 0
-vertical_alignment = 1
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 28
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
-
-[node name="RangeSub" type="Label" parent="GameHUD/RangeHUD"]
-unique_name_in_owner = true
-anchor_left = 0
-anchor_right = 0
-anchor_top = 0
-anchor_bottom = 0
-offset_left = 49
-offset_right = 459
-offset_top = 75
-offset_bottom = 104
-mouse_filter = 2
-text = "07 / DESERT PROVING GROUND"
-horizontal_alignment = 0
-vertical_alignment = 1
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 16
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
-
-[node name="Clearance" type="Label" parent="GameHUD/RangeHUD"]
-unique_name_in_owner = true
-unique_name_in_owner = true
-anchor_left = 1
-anchor_right = 1
-anchor_top = 0
-anchor_bottom = 0
-offset_left = -375
-offset_right = -50
-offset_top = 25
-offset_bottom = 55
-mouse_filter = 2
-text = "RANGE CLEARANCE"
-horizontal_alignment = 2
-vertical_alignment = 1
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 17
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
-
-[node name="Targets" type="Label" parent="GameHUD/RangeHUD"]
-unique_name_in_owner = true
-anchor_left = 1
-anchor_right = 1
-anchor_top = 0
-anchor_bottom = 0
-offset_left = -375
-offset_right = -50
-offset_top = 56
-offset_bottom = 110
-mouse_filter = 2
-text = "02 / 06"
-horizontal_alignment = 2
-vertical_alignment = 1
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 33
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
-
-[node name="Dashboard" type="Control" parent="GameHUD/RangeHUD"]
-unique_name_in_owner = true
-anchor_right = 1.0
+[node name="VehicleStatus" type="VBoxContainer" parent="GameHUD/RangeHUD"]
+anchor_top = 1.0
 anchor_bottom = 1.0
+offset_left = 56.0
+offset_top = -174.0
+offset_right = 326.0
+offset_bottom = -52.0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="SpeedRow" type="HBoxContainer" parent="GameHUD/RangeHUD/VehicleStatus"]
+layout_mode = 2
+theme_override_constants/separation = 10
 mouse_filter = 2
 
-[node name="GunTitle" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
+[node name="Speed" type="Label" parent="GameHUD/RangeHUD/VehicleStatus/SpeedRow"]
 unique_name_in_owner = true
-anchor_left = 0
-anchor_right = 0
-anchor_top = 1
-anchor_bottom = 1
-offset_left = 46
-offset_right = 426
-offset_top = -179
-offset_bottom = -149
-mouse_filter = 2
-text = "105 MM  /  PRACTICE AP"
-horizontal_alignment = 0
-vertical_alignment = 1
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "00"
 
-[node name="GunState" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
-unique_name_in_owner = true
-anchor_left = 0
-anchor_right = 0
-anchor_top = 1
-anchor_bottom = 1
-offset_left = 46
-offset_right = 426
-offset_top = -142
-offset_bottom = -100
-mouse_filter = 2
-text = "READY  ·  ∞"
-horizontal_alignment = 0
-vertical_alignment = 1
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 29
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
-
-[node name="Elapsed" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
-unique_name_in_owner = true
-anchor_left = 0
-anchor_right = 0
-anchor_top = 1
-anchor_bottom = 1
-offset_left = 46
-offset_right = 556
-offset_top = -220
-offset_bottom = -188
-mouse_filter = 2
-text = "01:30 / FLANK ARMOR FOR MORE DAMAGE"
-horizontal_alignment = 0
-vertical_alignment = 1
-autowrap_mode = 3
+[node name="SpeedUnit" type="Label" parent="GameHUD/RangeHUD/VehicleStatus/SpeedRow"]
+layout_mode = 2
+size_flags_vertical = 8
 theme_override_font_sizes/font_size = 17
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
+text = "km/h"
 
-[node name="VehicleSpeed" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
-unique_name_in_owner = true
-anchor_left = 1
-anchor_right = 1
-anchor_top = 1
-anchor_bottom = 1
-offset_left = -375
-offset_right = -48
-offset_top = -160
-offset_bottom = -98
+[node name="HealthRow" type="HBoxContainer" parent="GameHUD/RangeHUD/VehicleStatus"]
+layout_mode = 2
+theme_override_constants/separation = 12
 mouse_filter = 2
-text = "32 KM/H"
-horizontal_alignment = 2
-vertical_alignment = 1
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 45
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
 
-[node name="Drive" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
-unique_name_in_owner = true
-anchor_left = 1
-anchor_right = 1
-anchor_top = 1
-anchor_bottom = 1
-offset_left = -375
-offset_right = -48
-offset_top = -100
-offset_bottom = -68
+[node name="VehicleIcon" type="TextureRect" parent="GameHUD/RangeHUD/VehicleStatus/HealthRow"]
+custom_minimum_size = Vector2(46, 26)
+layout_mode = 2
 mouse_filter = 2
-text = "DRIVE · TRACKED / 07"
-horizontal_alignment = 2
-vertical_alignment = 1
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
+texture = ExtResource("tank_icon")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Keys" type="Label" parent="GameHUD/RangeHUD/Dashboard"]
+[node name="HullHealth" type="ProgressBar" parent="GameHUD/RangeHUD/VehicleStatus/HealthRow"]
 unique_name_in_owner = true
-anchor_left = 0.5
-anchor_right = 0.5
-anchor_top = 1
-anchor_bottom = 1
-offset_left = -910
-offset_right = 910
-offset_top = -52
-offset_bottom = -10
+custom_minimum_size = Vector2(164, 10)
+layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
-text = "W/S 前后 · A/D 转向 · 鼠标瞄准 · 左键开火 · Shift 瞄准镜 · 右键放大 · 空格刹车 · C 回正 · F 单人复位 · Esc 菜单"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 15
-theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
-theme_override_constants/outline_size = 3
-
-[node name="Reload" type="ProgressBar" parent="GameHUD/RangeHUD/Dashboard"]
-unique_name_in_owner = true
-anchor_left = 0
-anchor_right = 0
-anchor_top = 1
-anchor_bottom = 1
-offset_left = 46
-offset_right = 391
-offset_top = -80
-offset_bottom = -69
-mouse_filter = 2
-max_value = 1.0
-value = 1.0
+theme_override_styles/background = SubResource("HealthBack")
+theme_override_styles/fill = SubResource("HealthFill")
+value = 100.0
 show_percentage = false
+
+[node name="HealthValue" type="Label" parent="GameHUD/RangeHUD/VehicleStatus/HealthRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "100"
+
+[node name="VehicleCondition" type="Label" parent="GameHUD/RangeHUD/VehicleStatus"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(1, 0.72, 0.4, 1)
+text = ""
+
+[node name="WeaponStatus" type="VBoxContainer" parent="GameHUD/RangeHUD"]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -404.0
+offset_top = -230.0
+offset_right = -56.0
+offset_bottom = -52.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 7
+
+[node name="WeaponName" type="Label" parent="GameHUD/RangeHUD/WeaponStatus"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "M68A1  /  105 mm"
+horizontal_alignment = 2
+
+[node name="WeaponIcon" type="TextureRect" parent="GameHUD/RangeHUD/WeaponStatus"]
+custom_minimum_size = Vector2(270, 48)
+layout_mode = 2
+size_flags_horizontal = 8
+mouse_filter = 2
+texture = ExtResource("gun_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AmmoRow" type="HBoxContainer" parent="GameHUD/RangeHUD/WeaponStatus"]
+layout_mode = 2
+alignment = 2
+theme_override_constants/separation = 18
+mouse_filter = 2
+
+[node name="AmmoInfo" type="VBoxContainer" parent="GameHUD/RangeHUD/WeaponStatus/AmmoRow"]
+layout_mode = 2
+theme_override_constants/separation = 1
+
+[node name="AmmoName" type="Label" parent="GameHUD/RangeHUD/WeaponStatus/AmmoRow/AmmoInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "穿甲弹"
+horizontal_alignment = 2
+
+[node name="AmmoState" type="Label" parent="GameHUD/RangeHUD/WeaponStatus/AmmoRow/AmmoInfo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "准备就绪"
+horizontal_alignment = 2
+
+[node name="ShellFill" type="TextureProgressBar" parent="GameHUD/RangeHUD/WeaponStatus/AmmoRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+value = 100.0
+texture_under = ExtResource("ap_icon")
+texture_progress = ExtResource("ap_icon")
+tint_under = Color(0.4, 0.45, 0.43, 0.5)
+tint_progress = Color(0.95, 0.97, 0.94, 1)
+
+[node name="AmmoSelector" type="Label" parent="GameHUD/RangeHUD/WeaponStatus"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Q    AP  /  HE"
+horizontal_alignment = 2

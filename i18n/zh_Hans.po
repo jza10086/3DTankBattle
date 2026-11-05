@@ -63,3 +63,27 @@ msgstr "镜头回正"
 
 msgid "驾驶与炮术"
 msgstr "驾驶与炮术"
+
+msgid "切换第一 / 第三人称"
+msgstr "切换第一 / 第三人称"
+
+msgid "放大镜头"
+msgstr "放大镜头"
+
+msgid "缩小镜头"
+msgstr "缩小镜头"
+
+msgid "缩小镜头 / 瞄准镜"
+msgstr "缩小镜头 / 瞄准镜"
+
+msgid "切换弹药"
+msgstr "切换弹药"
+
+msgid "切换穿甲弹 / 高爆弹"
+msgstr "切换穿甲弹 / 高爆弹"
+
+msgid "放大镜头 / 瞄准镜"
+msgstr "放大镜头 / 瞄准镜"
+
+msgid "第一 / 第三人称"
+msgstr "第一 / 第三人称"

@@ -238,12 +238,13 @@ func component_from_hit(world_point: Vector3, world_normal: Vector3, shape_index
 		return &"engine"
 	return &""
 
-func apply_shell_hit(world_point: Vector3, world_normal: Vector3, incoming_direction: Vector3, shape_index: int = -1) -> Dictionary:
-	var result := DamageModel.evaluate(_part_for_shape(shape_index), global_basis, world_normal, incoming_direction)
+func apply_shell_hit(world_point: Vector3, world_normal: Vector3, incoming_direction: Vector3, shape_index: int = -1, ammunition: int = DamageModel.Ammo.AP) -> Dictionary:
+	var result: Dictionary = DamageModel.evaluate(_part_for_shape(shape_index), global_basis, world_normal, incoming_direction, ammunition)
 	result["hp"] = hp
 	result["max_hp"] = max_hp
 	result["point"] = world_point
 	result["component"] = ""
+	result["disabled"] = false
 	result["component_duration"] = 0.0
 	if dead:
 		result["damage"] = 0.0
@@ -260,7 +261,9 @@ func apply_shell_hit(world_point: Vector3, world_normal: Vector3, incoming_direc
 	# Ricochets/invalid/dead contacts neither apply nor refresh component timers.
 	if applied > 0.0 and not dead and not bool(result.ricochet):
 		var component := component_from_hit(world_point, world_normal, shape_index)
-		if not String(component).is_empty() and components.apply_component(component):
+		if not component.is_empty():
+			result.disabled = not components.is_disabled(component)
+			components.apply_component(component)
 			result["component"] = String(component)
 			match component:
 				&"engine": result["component_duration"] = ComponentStatusScript.ENGINE_DURATION
@@ -304,3 +307,17 @@ func reset_target() -> void:
 		_materials[i].roughness = _roughness[i]
 	for binding: Dictionary in _collision_bindings:
 		binding.shape.transform = global_transform.affine_inverse() * binding.mesh.global_transform
+
+func apply_blast_hit(origin: Vector3, amount: float) -> Dictionary:
+	var result: Dictionary = {"damage": 0.0, "destroyed": false, "component": "", "disabled": false}
+	if dead:
+		return result
+	result.damage = minf(hp, amount)
+	damage(result.damage)
+	result.destroyed = dead
+	if not dead and amount >= 4.0:
+		var component: StringName = &"left_track" if to_local(origin).x < 0.0 else &"right_track"
+		result.disabled = not components.is_disabled(component)
+		components.apply_component(component)
+		result.component = component
+	return result

@@ -1,5 +1,5 @@
 extends RefCounted
-## Room rules and local logical actions.
+## Local combat input bindings and host round duration.
 
 static func schema() -> Dictionary:
 	return {
@@ -115,25 +115,6 @@ static func schema() -> Dictionary:
 	            },
 	            "max_items": 2
 	        },
-	        "tank_zoom": {
-	            "type": "array",
-	            "action": "tank_zoom",
-	            "default": [
-	                {
-	                    "kind": "mouse",
-	                    "code": 2
-	                }
-	            ],
-	            "title": "按住放大",
-	            "audience": "local",
-	            "apply": "immediate",
-	            "control": "binding",
-	            "items": {
-	                "type": "object",
-	                "format": "binding"
-	            },
-	            "max_items": 2
-	        },
 	        "tank_sight": {
 	            "type": "array",
 	            "action": "tank_sight",
@@ -144,7 +125,7 @@ static func schema() -> Dictionary:
 	                    "physical": true
 	                }
 	            ],
-	            "title": "切换炮手瞄准镜",
+	            "title": "第一 / 第三人称",
 	            "audience": "local",
 	            "apply": "immediate",
 	            "control": "binding",
@@ -213,6 +194,64 @@ static func schema() -> Dictionary:
 	                "format": "binding"
 	            },
 	            "max_items": 2
+	        },
+	        "tank_ammunition": {
+	            "type": "array",
+	            "action": "tank_ammunition",
+	            "default": [
+	                {
+	                    "kind": "key",
+	                    "code": 81,
+	                    "physical": true
+	                }
+	            ],
+	            "title": "切换弹药",
+	            "audience": "local",
+	            "apply": "immediate",
+	            "control": "binding",
+	            "items": {
+	                "type": "object",
+	                "format": "binding"
+	            },
+	            "max_items": 2
+	        },
+	        "tank_zoom_in": {
+	            "type": "array",
+	            "action": "tank_zoom_in",
+	            "default": [
+	                {
+	                    "kind": "mouse",
+	                    "code": 4
+	                }
+	            ],
+	            "title": "放大镜头",
+	            "audience": "local",
+	            "apply": "immediate",
+	            "control": "binding",
+	            "items": {
+	                "type": "object",
+	                "format": "binding"
+	            },
+	            "max_items": 2
+	        },
+	        "tank_zoom_out": {
+	            "type": "array",
+	            "action": "tank_zoom_out",
+	            "default": [
+	                {
+	                    "kind": "mouse",
+	                    "code": 5
+	                }
+	            ],
+	            "title": "缩小镜头",
+	            "audience": "local",
+	            "apply": "immediate",
+	            "control": "binding",
+	            "items": {
+	                "type": "object",
+	                "format": "binding"
+	            },
+	            "max_items": 2
 	        }
 	    },
 	    "layout": [
@@ -245,9 +284,6 @@ static func schema() -> Dictionary:
 	                    "field": "tank_fire"
 	                },
 	                {
-	                    "field": "tank_zoom"
-	                },
-	                {
 	                    "field": "tank_sight"
 	                },
 	                {
@@ -258,6 +294,15 @@ static func schema() -> Dictionary:
 	                },
 	                {
 	                    "field": "tank_recover"
+	                },
+	                {
+	                    "field": "tank_ammunition"
+	                },
+	                {
+	                    "field": "tank_zoom_in"
+	                },
+	                {
+	                    "field": "tank_zoom_out"
 	                }
 	            ]
 	        }
