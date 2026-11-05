@@ -6,7 +6,6 @@
 [ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_artillery_target.glb" id="target2"]
 [ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/range.tscn" id="range"]
 [ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/player_tank.tscn" id="tank"]
-[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/component_panel.tscn" id="panel"]
 [ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/range_hud.gd" id="hud"]
 
 [ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/main.gd" id="1_048g3"]
@@ -33,7 +32,7 @@ fog_light_energy = 0.7
 fog_density = 0.0012
 fog_sky_affect = 0.15
 
-[node name="IronRange" type="Node3D" unique_id=1924703324]
+[node name="ThunderWar" type="Node3D" unique_id=1924703324]
 script = ExtResource("1_048g3")
 
 [node name="WorldEnvironment1" type="WorldEnvironment" parent="." unique_id=1291464108]
@@ -143,7 +142,7 @@ offset_right = 448
 offset_top = 28
 offset_bottom = 74
 mouse_filter = 2
-text = "IRON RANGE"
+text = "雷霆战争"
 horizontal_alignment = 0
 vertical_alignment = 1
 autowrap_mode = 3
@@ -171,6 +170,7 @@ theme_override_colors/font_outline_color = Color(0.035,0.08,0.1,0.80)
 theme_override_constants/outline_size = 3
 
 [node name="Clearance" type="Label" parent="GameHUD/RangeHUD"]
+unique_name_in_owner = true
 unique_name_in_owner = true
 anchor_left = 1
 anchor_right = 1
@@ -320,7 +320,7 @@ offset_right = 910
 offset_top = -52
 offset_bottom = -10
 mouse_filter = 2
-text = "W S DRIVE    A D STEER    MOUSE AIM    LMB FIRE    SHIFT SIGHT    RMB ZOOM    SPACE BRAKE    C CENTER    F RECOVER    R RESTART    F3 EFFECTS    ESC PAUSE"
+text = "W/S 前后 · A/D 转向 · 鼠标瞄准 · 左键开火 · Shift 瞄准镜 · 右键放大 · 空格刹车 · C 回正 · F 单人复位 · Esc 菜单"
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
@@ -342,6 +342,3 @@ mouse_filter = 2
 max_value = 1.0
 value = 1.0
 show_percentage = false
-
-[node name="ComponentPanel" parent="GameHUD/RangeHUD" instance=ExtResource("panel")]
-visible = false

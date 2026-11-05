@@ -1,213 +1,77 @@
-class_name RangeHud
 extends Control
-
-const TankControllerScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
-
+## Edge HUD and world-space markers; the framework owns menus and round pages.
+const Tank = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
 var game: Node3D
 var font: Font = ThemeDB.fallback_font
-const WHITE := Color("f3eedc")
-const MUTED := Color("c7cbb8")
-const AMBER := Color("ffc66d")
-const DARK := Color(0.06, 0.10, 0.09, 0.82)
-var sx := 1.0
-var sy := 1.0
-
-const DefaultText: Translation = preload("res://games/minigame/godot_party_default_tank_range/i18n/zh_Hans.po")
-var i18n: RefCounted
-
-func hud_text(key: StringName, values: Dictionary) -> String:
-	return DefaultText.get_message(key).format(values) if i18n == null else i18n.text(key, values)
+const WHITE: Color = Color("f3eedc")
+const AMBER: Color = Color("ffc66d")
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _draw() -> void:
-	if not is_instance_valid(game.tank):
+	if game == null or not game.started:
 		return
-	var screen := get_viewport_rect().size
-	sx = screen.x / 1600.0
-	sy = screen.y / 900.0
-	draw_set_transform(Vector2.ZERO, 0, Vector2(sx, sy))
-	var tank: TankControllerScript = game.tank
-	%Targets.text = hud_text(&"hud.targets", {"count":"%02d" % game.destroyed_count, "total":"%02d" % game.total_targets})
-	%Dashboard.visible = game.started
-	_draw_compass()
-	if game.started:
-		_draw_targets()
-		_draw_reticle()
-		_draw_dashboard()
-		_draw_component_status()
-		if game.notice_time > 0:
-			var color := AMBER if game.hit_flash > 0 else WHITE
-			_center(game.notice, 800, 565, 16, color)
-		if game.destroyed_count == game.total_targets:
-			_rect(Rect2(540, 130, 520, 86), DARK)
-			_center("RANGE CLEAR", 800, 161, 23, AMBER)
-			var accuracy := int(round(float(game.hits) / maxi(tank.rounds_fired, 1) * 100))
-			_center("%s  /  %d SHOTS  /  %d%% HITS  •  R TO RESTART" % [_time(game.elapsed), tank.rounds_fired, accuracy], 800, 192, 13, WHITE)
-		if game.paused:
-			_draw_title(true)
-	else:
-		_draw_title(false)
-
-func _draw_compass() -> void:
-	var view_direction: Vector3 = -game.camera.global_basis.z
-	var heading := fposmod(rad_to_deg(atan2(view_direction.x, -view_direction.z)), 360.0)
-	var center := 800.0
-	for mark in range(-5, 6):
-		var value := floori(heading / 15.0) * 15 + mark * 15
-		var x := center + (value - heading) * 4
-		if x < 550 or x > 1050:
-			continue
-		draw_line(Vector2(x, 40), Vector2(x, 47), Color(1, 1, 1, 0.45), 1)
-		var cardinal := ""
-		match posmod(value, 360):
-			0: cardinal = "N"
-			90: cardinal = "E"
-			180: cardinal = "S"
-			270: cardinal = "W"
-		if not cardinal.is_empty():
-			_center(cardinal, x, 31, 13, WHITE)
-		elif posmod(value, 30) == 0:
-			_center(str(posmod(value, 360)), x, 31, 10, MUTED)
-	draw_colored_polygon(PackedVector2Array([Vector2(795, 53), Vector2(805, 53), Vector2(800, 58)]), AMBER)
-
-func _draw_targets() -> void:
-	for target in game.targets:
-		if target.dead or game.camera.is_position_behind(target.global_position):
-			continue
-		var point: Vector2 = game.camera.unproject_position(target.get_marker_point() + Vector3(0, 0.6, 0)) / Vector2(sx, sy)
-		if point.x < 65 or point.x > 1535 or point.y < 115 or point.y > 740:
-			continue
-		var distance: float = game.tank.global_position.distance_to(target.global_position)
-		if distance > 160:
-			continue
-		var color := Color("ffdb98")
-		var r := 5.0
-		draw_polyline(PackedVector2Array([point + Vector2(0,-r), point + Vector2(r,0), point + Vector2(0,r), point + Vector2(-r,0), point + Vector2(0,-r)]), color, 1.5, true)
-		_center("%02d  /  %d M" % [target.index + 1, roundi(distance)], point.x, point.y - 12, 10, color)
-		_rect(Rect2(point.x - 27, point.y + 11, 54, 4), Color(0.05, 0.09, 0.07, 0.75))
-		_rect(Rect2(point.x - 27, point.y + 11, 54 * clampf(target.hp / target.max_hp, 0, 1), 4), color)
-		_center("%d HP" % roundi(target.hp), point.x, point.y + 29, 10, WHITE)
-		var status_lines := _component_lines(target.components, true)
-		for line_index in status_lines.size():
-			var label_width := font.get_string_size(status_lines[line_index], HORIZONTAL_ALIGNMENT_LEFT, -1, 10).x
-			_rect(Rect2(point.x - label_width * 0.5 - 6, point.y + 34 + line_index * 14, label_width + 12, 15), DARK)
-			_center(status_lines[line_index], point.x, point.y + 45 + line_index * 14, 10, AMBER)
-
-func _draw_reticle() -> void:
-	var center := Vector2(800, 450)
-	var color := Color(1, 1, 0.93, 0.58)
-	for axis in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
-		draw_line(center + axis * 13, center + axis * 22, color, 1.4, true)
-	draw_circle(center, 1.7, color)
-	if game.first_person:
-		_draw_scope(center)
-	elif game.zooming:
-		draw_arc(center, 240, 0, TAU, 96, Color(1, 1, 1, 0.12), 1.0, true)
-		_text("EXTERIOR / 2.1×", Vector2(1032, 685), 11, MUTED)
-		for tick in range(-3, 4):
-			draw_line(Vector2(800 + tick * 40, 510), Vector2(800 + tick * 40, 516), Color(1,1,1,0.3), 1)
+	var tank: Tank = game.tank
+	var solo: bool = game.players.size() == 1
+	var alive: int = 0
+	for vehicle: Tank in game.vehicles.values():
+		if not vehicle.dead:
+			alive += 1
+	%Targets.text = "%d / %d 靶标" % [game.destroyed_count, game.total_targets] if solo else "%d / %d 存活" % [alive, game.players.size()]
+	%RangeSub.text = "M1 ABRAMS · 单人炮术训练" if solo else "M1 ABRAMS · 自由交战"
+	%Clearance.text = "清空全部靶标" if solo else "最后存活者获胜"
+	%Elapsed.text = "剩余 %02d:%02d" % [int(maxf(0.0, game.duration - game.elapsed)) / 60, int(maxf(0.0, game.duration - game.elapsed)) % 60]
+	%VehicleSpeed.text = "%02d km/h" % roundi(absf(tank.speed) * 3.6)
+	%Drive.text = "观战 · " + tank.player_name if game.local_id.is_empty() else ("已被击毁 · 等待本轮结束" if tank.dead else "生命 %d / 100 · 击毁 %d" % [roundi(tank.hp), tank.kills])
+	var repairing: bool = tank.components.barrel_remaining > 0.0
+	var remaining: float = tank.components.barrel_remaining if repairing else tank.reload_remaining
+	%GunState.text = "已被击毁" if tank.dead else ("炮管维修 %.1f s" % remaining if repairing else ("装填 %.1f s" % remaining if remaining > 0.0 else "准备开火"))
+	%Reload.value = 1.0 - tank.reload_remaining / Tank.RELOAD_TIME
+	var center: Vector2 = size * 0.5
+	for axis: Vector2 in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
+		draw_line(center + axis * 14.0, center + axis * 26.0, WHITE, 1.5, true)
+	draw_circle(center, 2.0, WHITE)
 	if not game.camera.is_position_behind(game.actual_impact):
-		var actual: Vector2 = game.camera.unproject_position(game.actual_impact) / Vector2(sx, sy)
-		if Rect2(25, 105, 1550, 640).has_point(actual):
-			var aim_color := Color("9fe0a8") if game.actual_hit_target else AMBER
-			if game.tank.muzzle_obstructed:
-				aim_color = Color("f18b61")
-			draw_arc(actual, 9, 0, TAU, 24, aim_color, 1.8, true)
-			draw_line(actual + Vector2(-14, 0), actual + Vector2(-11, 0), aim_color, 2)
-			draw_line(actual + Vector2(11, 0), actual + Vector2(14, 0), aim_color, 2)
-			if game.first_person:
-				_center("%d M" % roundi(game.tank.visual.muzzle.global_position.distance_to(game.actual_impact)), actual.x, actual.y + 26, 10, aim_color)
-			if actual.distance_to(center) > 38:
-				draw_line(center, actual, Color(1, 0.8, 0.5, 0.16), 1, true)
-	if game.hit_flash > 0:
-		for direction in [Vector2(1,1), Vector2(-1,1), Vector2(1,-1), Vector2(-1,-1)]:
-			draw_line(center + direction * 27, center + direction * 36, AMBER, 3, true)
-	if game.tank.muzzle_obstructed:
-		_center("BARREL BLOCKED", 800, 494, 12, Color("ffab80"))
+		var impact: Vector2 = game.camera.unproject_position(game.actual_impact)
+		draw_arc(impact, 11, 0, TAU, 24, Color("9fe0a8") if game.actual_hit_target else AMBER, 2.0, true)
+	if game.first_person:
+		draw_arc(center, 350, 0, TAU, 96, Color(0.1, 0.15, 0.1, 0.4), 2.0, true)
+		_caption("炮手瞄准镜 · %.1f×" % (4.2 if game.zooming else 2.1), Vector2(center.x, 145), AMBER)
+	if game.hit_flash > 0.0:
+		for axis: Vector2 in [Vector2(1, 1), Vector2(-1, 1), Vector2(1, -1), Vector2(-1, -1)]:
+			draw_line(center + axis * 30.0, center + axis * 42.0, AMBER, 3.0, true)
+	if game.notice_time > 0.0:
+		_caption(game.notice, center + Vector2(0, 135), AMBER)
+	var statuses: PackedStringArray = []
+	if tank.components.engine_remaining > 0.0:
+		statuses.append("发动机维修 %.1fs" % tank.components.engine_remaining)
+	if tank.components.left_track_remaining > 0.0:
+		statuses.append("左履带维修 %.1fs" % tank.components.left_track_remaining)
+	if tank.components.right_track_remaining > 0.0:
+		statuses.append("右履带维修 %.1fs" % tank.components.right_track_remaining)
+	if tank.muzzle_obstructed:
+		statuses.append("炮口被阻挡")
+	_caption(" · ".join(statuses), Vector2(center.x, size.y - 95), AMBER)
+	for target: Node3D in game.targets:
+		_marker(target, "靶标 %d" % (target.index + 1))
+	for vehicle: Tank in game.vehicles.values():
+		if vehicle != tank:
+			_marker(vehicle, vehicle.player_name)
 
-func _draw_scope(center: Vector2) -> void:
-	# Keep the optical circle round even in a tall / resized window.
-	var optical_center := Vector2(center.x, center.y * sy / sx)
-	draw_set_transform(Vector2.ZERO, 0, Vector2(sx, sx))
-	center = optical_center
-	# Etched sight overlay: center follows the actual barrel, not mouse demand.
-	var line := Color(0.07, 0.12, 0.09, 0.82)
-	var light := Color(0.94, 0.95, 0.82, 0.68)
-	for side in [-1, 1]:
-		draw_line(center + Vector2(side * 30, 0), center + Vector2(side * 280, 0), line, 2, true)
-		draw_line(center + Vector2(0, side * 30), center + Vector2(0, side * 215), line, 2, true)
-		for tick in range(1, 7):
-			var x: float = side * (40 + tick * 30)
-			draw_line(center + Vector2(x, -5), center + Vector2(x, 5), light, 1.4, true)
-		for tick in range(1, 5):
-			var y: float = side * (40 + tick * 30)
-			draw_line(center + Vector2(-5, y), center + Vector2(5, y), light, 1.4, true)
-	draw_arc(center, 292, 0, TAU, 96, Color(0.06, 0.1, 0.08, 0.26), 1.5, true)
-	draw_set_transform(Vector2.ZERO, 0, Vector2(sx, sy))
-	_rect(Rect2(670, 116, 260, 28), DARK)
-	_center("GUN SIGHT  /  %s" % ("4.2×" if game.zooming else "2.1×"), 800, 135, 12, WHITE)
-	_center("SHIFT  EXTERIOR VIEW", 800, 724, 11, MUTED)
+func _marker(target: Node3D, label: String) -> void:
+	if target.dead or game.camera.is_position_behind(target.global_position):
+		return
+	var point: Vector2 = game.camera.unproject_position(target.get_marker_point())
+	if not Rect2(50, 130, size.x - 100, size.y - 300).has_point(point):
+		return
+	_caption(label + " · %d HP" % roundi(target.hp), point - Vector2(0, 12), AMBER)
+	draw_rect(Rect2(point - Vector2(35, 0), Vector2(70, 5)), Color(0.03, 0.06, 0.05, 0.8))
+	draw_rect(Rect2(point - Vector2(35, 0), Vector2(70 * target.hp / target.max_hp, 5)), AMBER)
 
-func _draw_dashboard() -> void:
-	var tank: TankControllerScript = game.tank
-	var damaged: bool = tank.components.barrel_remaining > 0
-	var ready: bool = tank.reload_remaining <= 0 and not damaged
-	var countdown: float = tank.components.barrel_remaining if damaged else tank.reload_remaining
-	%GunState.text = hud_text(&"hud.gun", {"state":"GUN REPAIR" if damaged else ("READY" if ready else "RELOADING"), "time":"∞" if ready else "%.1f s" % countdown})
-	%Reload.value = 1.0 - tank.reload_remaining / TankControllerScript.RELOAD_TIME
-	%Elapsed.text = hud_text(&"hud.elapsed", {"time":_time(game.elapsed)})
-	var speed: float = absf(tank.speed) * 3.6
-	%VehicleSpeed.text = hud_text(&"hud.speed", {"speed":"%02d" % roundi(speed)})
-	var gear: String = "REVERSE" if tank.speed < -0.25 else ("PIVOT" if absf(tank.yaw_rate) > 0.2 and speed < 2.0 else "DRIVE")
-	%Drive.text = hud_text(&"hud.drive", {"gear":gear, "brake":"BRAKE" if tank.brake else "TRACKED / 07"})
-
-func _component_lines(state, include_reload: bool = false) -> Array[String]:
-	var labels: Array[String] = []
-	if state.engine_remaining > 0:
-		labels.append("ENGINE OUT  %.1f s" % state.engine_remaining)
-	if state.left_track_remaining > 0:
-		labels.append("L TRACK  %.1f s" % state.left_track_remaining)
-	if state.right_track_remaining > 0:
-		labels.append("R TRACK  %.1f s" % state.right_track_remaining)
-	if state.barrel_remaining > 0:
-		labels.append("GUN REPAIR  %.1f s" % state.barrel_remaining)
-	elif include_reload and state.reload_remaining > 0:
-		labels.append("RELOADING  %.1f s" % state.reload_remaining)
-	return labels
-
-func _draw_component_status() -> void:
-	var lines := _component_lines(game.tank.components)
-	if not lines.is_empty():
-		_rect(Rect2(600, 754, 400, lines.size() * 19 + 20), DARK)
-	for i in lines.size():
-		_center(lines[i], 800, 778 + i * 19, 14, AMBER)
-
-func _draw_title(is_pause: bool) -> void:
-	_rect(Rect2(0, 0, 1600, 900), Color(0.03, 0.07, 0.06, 0.43))
-	_rect(Rect2(490, 269, 620, 350), Color(0.06, 0.1, 0.09, 0.92))
-	_rect(Rect2(490, 269, 620, 3), AMBER)
-	_center("RANGE PAUSED" if is_pause else "IRON RANGE", 800, 334, 36, WHITE)
-	_center("A TRACKED DRIVING & GUNNERY PLAYGROUND", 800, 366, 12, AMBER)
-	_center("Drive the course. Flank enemy armor. Clear all six tanks.", 800, 409, 16, WHITE)
-	_center("W S  drive    /    A D  pivot & steer    /    Mouse  aim turret", 800, 445, 14, MUTED)
-	_center("SHIFT  first-person sight    /    Hold RMB  zoom    /    LMB  fire", 800, 473, 14, MUTED)
-	_center("Sight cross = gun bore  •  Amber ring = actual shell impact", 800, 510, 13, AMBER)
-	_center("ENTER TO RESUME" if is_pause else "ENTER TO DRIVE", 800, 563, 22, WHITE)
-	_center("F3  effect test panel     F  recover     R  restart", 800, 594, 12, MUTED)
-
-func _text(value: String, at: Vector2, size: int, color: Color) -> void:
-	draw_string(font, at + Vector2(0, 1), value, HORIZONTAL_ALIGNMENT_LEFT, -1, size, Color(0.04,0.07,0.05,0.8))
-	draw_string(font, at, value, HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
-
-func _center(value: String, x: float, y: float, size: int, color: Color) -> void:
-	var width := font.get_string_size(value, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
-	_text(value, Vector2(x - width * 0.5, y), size, color)
-
-func _rect(rect: Rect2, color: Color) -> void:
-	draw_rect(rect, color)
-
-func _time(seconds: float) -> String:
-	return "%02d:%02d" % [int(seconds) / 60, int(seconds) % 60]
+func _caption(value: String, point: Vector2, color: Color) -> void:
+	var width: float = font.get_string_size(value, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
+	var at: Vector2 = point - Vector2(width * 0.5, 0)
+	draw_string_outline(font, at, value, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, 4, Color(0.03, 0.05, 0.04, 0.9))
+	draw_string(font, at, value, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, color)

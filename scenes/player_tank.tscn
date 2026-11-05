@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd" id="control"]
 [ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/tank_visual.gd" id="visual"]
-[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_desert.glb" id="model"]
+[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/assets/m1_abrams/m1_abrams.glb" id="model"]
 
 [sub_resource type="BoxShape3D" id="Body"]
-size = Vector3(3,1.15,4.5)
+size = Vector3(2.6,1.15,5.5)
 
 [node name="Tank" type="CharacterBody3D"]
 script = ExtResource("control")
@@ -18,4 +18,3 @@ script = ExtResource("visual")
 
 [node name="Model" parent="Visual" instance=ExtResource("model")]
 position = Vector3(0,-0.60,0)
-scale = Vector3(0.8136,0.8136,0.8136)

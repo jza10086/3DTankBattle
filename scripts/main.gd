@@ -1,79 +1,157 @@
 extends Node3D
-const SoloRound = preload("res://games/protocols/godot_party_default_protocol/solo_round.gd")
-
-signal completed(metrics: Dictionary)
-
+## Thunder War: host simulation, scope-bound inputs/snapshots and local camera/HUD.
 const TankScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
-const WorldScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_world.gd")
-const HudScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_hud.gd")
 const TargetScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_target.gd")
 const ShellScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/shell.gd")
-const PanelScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_panel.gd")
+const TankScene: PackedScene = preload("res://games/minigame/godot_party_default_tank_range/scenes/player_tank.tscn")
+const Pages = preload("res://games/protocols/godot_party_default_protocol/round_pages.gd")
+const INPUT_INTERVAL: float = 0.05
+const SNAPSHOT_INTERVAL: float = 0.05
+const INPUT_EXPIRY: float = 0.5
+var api: PartyAPI
+var request: Dictionary
+var pages: Pages
+var players: Array[Dictionary] = []
+var vehicles: Dictionary[String, TankScript] = {}
+var commands: Dictionary[String, Dictionary] = {}
+var withdrawn: Dictionary[String, bool] = {}
+var remote_states: Dictionary = {}
+var shells: Dictionary[int, ShellScript] = {}
+var local_id: String = ""
 var tank: TankScript
-var world: Node3D
+var targets: Array[TargetScript] = []
 var camera: Camera3D
 var hud: Control
-var targets: Array[TargetScript] = []
-var camera_yaw := 0.0
-var camera_pitch := -0.023
-var camera_position := Vector3.ZERO
-var started := false
-var paused := false
-var zooming := false
-var first_person := false
-var component_panel_open := false
-var component_panel: PanelContainer
-var last_hit_result: Dictionary = {}
-var destroyed_count := 0
-var total_targets := 6
-var elapsed := 0.0
-var hits := 0
-var hit_flash := 0.0
-var shot_shake := 0.0
-var actual_impact := Vector3.ZERO
-var actual_hit_target := false
-var trajectory_timer := 0.0
-var notice := ""
-var notice_time := 0.0
+var camera_yaw: float = 0.0
+var camera_pitch: float = -0.023
+var camera_position: Vector3 = Vector3.ZERO
+var started: bool = false
+var finished: bool = false
+var zooming: bool = false
+var first_person: bool = false
+var elapsed: float = 0.0
+var duration: float
+var hits: int = 0
+var destroyed_count: int = 0
+var total_targets: int = 6
+var hit_flash: float = 0.0
+var shot_shake: float = 0.0
+var actual_impact: Vector3 = Vector3.ZERO
+var actual_hit_target: bool = false
+var trajectory_timer: float = 0.0
+var notice: String = ""
+var notice_time: float = 0.0
 var effects: Array[Dictionary] = []
 var engine_audio: AudioStreamPlayer
 var cannon_audio: AudioStreamPlayer
 var impact_audio: AudioStreamPlayer
-var capture_mode := false
-var capture_guard := 0.0
+var _input_clock: float = 0.0
+var _snapshot_clock: float = 0.0
+var _input_sequence: int = 0
+var _state_sequence: int = 0
+var _received_state: int = -1
+var _shot_id: int = 0
+var _focused: bool = true
+var _blocked: bool = true
+var _pending_fire: bool = false
+var _pending_recover: bool = false
+
+func party_setup(value: PartyAPI, config: Dictionary) -> void:
+	api = value
+	request = config.duplicate(true)
+	players = api.get_players()
+	duration = float(api.get_settings().duration)
+	for player: Dictionary in players:
+		if player.is_local:
+			local_id = player.player_id
+	api.net.message_received.connect(_message)
+	api.players_changed.connect(_players_changed)
 
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_INHERIT
-	world = $Range
-	tank = $Tank
-	tank.controls_enabled = false
+	if api == null:
+		push_error("请从 GodotParty 大厅启动雷霆战争")
+		set_physics_process(false)
+		set_process_unhandled_input(false)
+		return
+	add_to_group("party_minimal_hud")
 	camera = $Camera
-	targets.assign($TargetStations.get_children())
-	for target: TargetScript in targets:
-		target.destroyed.connect(_target_destroyed)
-	total_targets = targets.size()
 	hud = $GameHUD/RangeHUD
 	hud.game = self
-	if get_parent() is SoloRound:
-		hud.i18n = get_parent().api.i18n
-	component_panel = $GameHUD/RangeHUD/ComponentPanel
-	component_panel.component_requested.connect(_apply_player_component)
-	component_panel.clear_requested.connect(_clear_player_components)
-	component_panel.close_requested.connect(func(): set_component_panel(false))
-	_make_audio()
-	camera_position = tank.global_position + Vector3(0, 6.5, 13)
+	for index: int in players.size():
+		var vehicle: TankScript = $Tank if index == 0 else TankScene.instantiate()
+		if index > 0:
+			vehicle.name = "Tank%d" % index
+			add_child(vehicle)
+		var id: String = players[index].player_id
+		vehicle.player_id = id
+		vehicle.player_name = players[index].name
+		vehicles[id] = vehicle
+		if players.size() > 1:
+			var angle: float = TAU * index / players.size()
+			vehicle.position = Vector3(sin(angle) * 48.0, 0.8, cos(angle) * 48.0)
+			vehicle.rotation.y = angle
+		vehicle.start_transform = vehicle.transform
+		vehicle.nameplate.text = vehicle.player_name
+		vehicle.nameplate.modulate = Color(api.get_appearance(id).color)
+		commands[id] = {"sequence": 0, "age": INPUT_EXPIRY, "fire": false}
+	if players.size() == 1:
+		targets.assign($TargetStations.get_children())
+	else:
+		# The same authored map becomes the arena; training dummies are solo-only.
+		for target: Node in $TargetStations.get_children():
+			$TargetStations.remove_child(target)
+			target.queue_free()
+	tank = vehicles[local_id] if not local_id.is_empty() else vehicles[players[0].player_id]
+	tank.nameplate.visible = local_id.is_empty()
+	camera_yaw = tank.rotation.y
+	camera_position = tank.position + Basis(Vector3.UP, camera_yaw) * Vector3(0, 6.5, 13)
 	_update_camera(1.0)
+	_make_audio()
+	pages = Pages.new()
+	var error: Error = pages.prepare(self, api, request, _start_game)
+	if error != OK:
+		_network_failure(error)
+
+func godot_party_graphics_targets() -> Dictionary:
+	return {"world": $WorldEnvironment1, "sun": $DirectionalLight3D2, "materials_root": self}
+
+func party_start() -> void:
+	pages.transport_started()
+
+func _start_game() -> void:
+	started = true
+	for vehicle: TankScript in vehicles.values():
+		vehicle.simulation_enabled = api.is_host()
+	_players_changed()
+	engine_audio.play()
+	if api.is_host():
+		_publish()
+
+func party_stop(_reason: StringName) -> void:
+	started = false
+	set_physics_process(false)
+	set_process(false)
+	set_process_unhandled_input(false)
+	for vehicle: TankScript in vehicles.values():
+		vehicle.simulation_enabled = false
+	for shell: ShellScript in shells.values():
+		if is_instance_valid(shell):
+			shell.set_physics_process(false)
+	if api.net.message_received.is_connected(_message):
+		api.net.message_received.disconnect(_message)
+	if api.players_changed.is_connected(_players_changed):
+		api.players_changed.disconnect(_players_changed)
+	engine_audio.stop()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	start_game()
 
 func _make_audio() -> void:
 	engine_audio = AudioStreamPlayer.new()
-	engine_audio.stream = load("res://games/minigame/godot_party_default_tank_range/assets/audio/engine.wav")
-	engine_audio.stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-	engine_audio.stream.loop_end = 44100
-	engine_audio.volume_db = -22
+	var engine_stream: AudioStreamWAV = load("res://games/minigame/godot_party_default_tank_range/assets/audio/engine.wav").duplicate()
+	engine_stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	engine_stream.loop_end = 44100
+	engine_audio.stream = engine_stream
+	engine_audio.volume_db = -24
 	add_child(engine_audio)
-	engine_audio.play()
 	cannon_audio = AudioStreamPlayer.new()
 	cannon_audio.stream = load("res://games/minigame/godot_party_default_tank_range/assets/audio/cannon.wav")
 	cannon_audio.volume_db = -8
@@ -83,125 +161,312 @@ func _make_audio() -> void:
 	impact_audio.volume_db = -14
 	add_child(impact_audio)
 
-func start_game() -> void:
-	started = true
-	paused = false
-	_pause_objects(false)
-	tank.controls_enabled = not component_panel_open
-	component_panel.visible = component_panel_open
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if component_panel_open else Input.MOUSE_MODE_CAPTURED
-	capture_guard = 0.18
-
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_ENTER:
-			if not started or paused:
-				start_game()
-		elif event.keycode == KEY_ESCAPE:
-			if started:
-				paused = not paused
-				_pause_objects(paused)
-				tank.controls_enabled = not paused and not component_panel_open
-				component_panel.visible = component_panel_open and not paused
-				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused or component_panel_open else Input.MOUSE_MODE_CAPTURED
-				capture_guard = 0.18 if not paused else 0.0
-		elif event.keycode == KEY_F3 and started and not paused:
-			set_component_panel(not component_panel_open)
-		elif event.keycode == KEY_SHIFT and started and not paused:
-			set_first_person(not first_person)
-		elif event.keycode == KEY_R and started:
-			reset_range()
-		elif event.keycode == KEY_F and started:
-			tank.reset_vehicle()
-			camera_yaw = 0
-			camera_pitch = -0.023
-			show_notice("VEHICLE RECOVERED")
-		elif event.keycode == KEY_C and started:
-			camera_yaw = tank.rotation.y
-			camera_pitch = -0.023
-	if event is InputEventMouseMotion and started and not paused and not component_panel_open and capture_guard <= 0:
-		var sensitivity := (0.00065 if zooming else 0.0013) if first_person else (0.00135 if zooming else 0.0025)
+	if not started or finished or api.input.input_blocked or not _focused:
+		return
+	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		var sensitivity: float = (0.00065 if zooming else 0.0013) if first_person else (0.00135 if zooming else 0.0025)
 		camera_yaw -= event.relative.x * sensitivity
 		camera_pitch = clampf(camera_pitch - event.relative.y * sensitivity, -0.58, 0.50 if first_person else 0.30)
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and not component_panel_open:
-		if not started:
-			start_game()
-		elif not paused:
-			fire()
+	if local_id.is_empty() or tank.dead:
+		return
+	if api.input.event_matches(event, &"tank_sight"):
+		set_first_person(not first_person)
+	elif api.input.event_matches(event, &"tank_fire"):
+		_pending_fire = true
+	elif api.input.event_matches(event, &"tank_recover") and players.size() == 1:
+		_pending_recover = true
+	elif api.input.event_matches(event, &"tank_center"):
+		camera_yaw = tank.rotation.y
+		camera_pitch = -0.023
 
 func _physics_process(delta: float) -> void:
-	capture_guard = maxf(0, capture_guard - delta)
-	if not is_instance_valid(tank):
+	if not started or finished:
 		return
-	if paused:
-		engine_audio.volume_db = -40
-		hud.queue_redraw()
-		return
-	if not started or paused:
-		tank.throttle = 0
-		tank.steering = 0
-		tank.brake = true
-	if started and not paused and destroyed_count < total_targets:
+	var blocked: bool = api.input.input_blocked or not _focused
+	if blocked != _blocked:
+		_blocked = blocked
+		_pending_fire = false
+		_pending_recover = false
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if blocked else Input.MOUSE_MODE_CAPTURED
+		_input_clock = INPUT_INTERVAL
+	zooming = not blocked and api.input.is_pressed(&"tank_zoom")
+	if api.is_host():
 		elapsed += delta
-	zooming = started and not paused and not component_panel_open and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+	else:
+		for id: String in remote_states:
+			vehicles[id].apply_snapshot(remote_states[id], delta)
 	_update_camera(delta)
 	_update_aim_point()
+	_input_clock += delta
+	if _input_clock >= INPUT_INTERVAL and not local_id.is_empty():
+		_input_clock = 0.0
+		_send_input(blocked)
+	if api.is_host():
+		for id: String in vehicles:
+			var vehicle: TankScript = vehicles[id]
+			commands[id].age += delta
+			if commands[id].age > INPUT_EXPIRY or vehicle.dead:
+				vehicle.throttle = 0.0
+				vehicle.steering = 0.0
+				vehicle.brake = true
+			if commands[id].fire:
+				commands[id].fire = false
+				_fire_vehicle(id)
+		_snapshot_clock += delta
+		if _snapshot_clock >= SNAPSHOT_INTERVAL:
+			_snapshot_clock = 0.0
+			_publish()
+		_check_finish()
 	trajectory_timer -= delta
-	if trajectory_timer <= 0:
+	if trajectory_timer <= 0.0:
 		_predict_impact()
-		trajectory_timer = 0.06
+		trajectory_timer = 0.08
 	hit_flash = maxf(0.0, hit_flash - delta)
 	shot_shake = maxf(0.0, shot_shake - delta * 3.0)
 	notice_time = maxf(0.0, notice_time - delta)
 	_update_effects(delta)
 	engine_audio.pitch_scale = lerpf(0.72, 1.65, absf(tank.speed) / TankScript.MAX_FORWARD)
-	engine_audio.volume_db = -28.0 if paused or not started else lerpf(-24, -16, absf(tank.speed) / TankScript.MAX_FORWARD)
+	engine_audio.volume_db = -40.0 if tank.dead else lerpf(-24.0, -16.0, absf(tank.speed) / TankScript.MAX_FORWARD)
 	hud.queue_redraw()
 
-func set_component_panel(active: bool) -> void:
-	component_panel_open = active
-	component_panel.visible = active and not paused
-	tank.controls_enabled = started and not paused and not active
-	if active:
-		tank.throttle = 0.0
-		tank.steering = 0.0
-		tank.brake = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if active or paused else Input.MOUSE_MODE_CAPTURED
-	capture_guard = 0.18
+func _send_input(blocked: bool) -> void:
+	_input_sequence += 1
+	var drive: float = 0.0
+	var steer: float = 0.0
+	if not blocked and not tank.dead:
+		drive = float(api.input.is_pressed(&"move_up")) - float(api.input.is_pressed(&"move_down"))
+		steer = float(api.input.is_pressed(&"move_left")) - float(api.input.is_pressed(&"move_right"))
+	var data: Dictionary = {"seq": _input_sequence, "drive": drive, "steer": steer,
+		"brake": blocked or api.input.is_pressed(&"tank_brake"), "aim": tank.aim_point,
+		"direction_mode": first_person, "direction": tank.requested_gun_direction,
+		"fire": _pending_fire and not blocked, "recover": _pending_recover and not blocked}
+	_pending_fire = false
+	_pending_recover = false
+	if api.is_host():
+		_accept_input(local_id, data)
+	else:
+		_network_failure(api.net.send_to_host(&"tank_input", data))
 
-func _apply_player_component(component: StringName) -> void:
-	if not started or paused:
+## Authenticate ownership before consuming logical actions. Never accept client poses or damage.
+func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
+	if not started or finished or not payload is Dictionary:
 		return
-	tank.apply_component_hit(component)
-	show_notice("PLAYER %s • REPAIR TIMER STARTED" % String(component).to_upper().replace("_", " "))
+	if topic == &"tank_input" and api.is_host():
+		for player: Dictionary in api.get_players():
+			if player.connected and player.player_id in sender.player_ids and not withdrawn.has(player.player_id):
+				_accept_input(player.player_id, payload)
+				return
+	elif sender.peer_id == 1 and not api.is_host():
+		if topic == &"tank_state":
+			if payload.sequence <= _received_state:
+				return
+			_received_state = payload.sequence
+			elapsed = payload.elapsed
+			var packed: PackedFloat32Array = payload.vehicles
+			if packed.size() != players.size() * TankScript.SNAPSHOT_FLOATS:
+				_network_failure(ERR_INVALID_DATA)
+				return
+			for i: int in players.size():
+				remote_states[players[i].player_id] = packed.slice(i * TankScript.SNAPSHOT_FLOATS, (i + 1) * TankScript.SNAPSHOT_FLOATS)
+			destroyed_count = payload.destroyed
+			hits = payload.hits
+			for i: int in targets.size():
+				var target: TargetScript = targets[i]
+				var state: Dictionary = payload.targets[i]
+				if state.hp < target.hp:
+					target.damage(target.hp - state.hp)
+		elif topic == &"tank_events":
+			if payload.kind == "shot":
+				_spawn_shell(payload.id, payload.player, payload.position, payload.velocity, false)
+			elif payload.kind == "impact":
+				if shells.has(payload.id) and is_instance_valid(shells[payload.id]):
+					shells[payload.id].queue_free()
+				shells.erase(payload.id)
+				_impact_effect(payload.position, payload.normal, payload.player, payload.damage)
 
-func _clear_player_components() -> void:
-	if not paused:
-		tank.components.clear()
-		show_notice("PLAYER COMPONENTS RESTORED")
+func _accept_input(id: String, data: Dictionary) -> void:
+	if not data.get("seq") is int or data.seq <= commands[id].sequence:
+		return
+	for key: String in ["drive", "steer"]:
+		if not (data.get(key) is float or data.get(key) is int) or not is_finite(float(data[key])) or absf(data[key]) > 1.0:
+			return
+	for key: String in ["brake", "direction_mode", "fire", "recover"]:
+		if not data.get(key) is bool:
+			return
+	for key: String in ["aim", "direction"]:
+		if not data.get(key) is Vector3 or not data[key].is_finite():
+			return
+	if data.aim.length() > 2000.0 or data.direction.length_squared() < 0.5 or data.direction.length_squared() > 1.5:
+		return
+	var vehicle: TankScript = vehicles[id]
+	commands[id].sequence = data.seq
+	commands[id].age = 0.0
+	if vehicle.dead or withdrawn.has(id):
+		return
+	vehicle.throttle = data.drive
+	vehicle.steering = data.steer
+	vehicle.brake = data.brake
+	vehicle.aim_point = data.aim
+	vehicle.aim_direction_mode = data.direction_mode
+	vehicle.requested_gun_direction = data.direction.normalized()
+	commands[id].fire = commands[id].fire or data.fire
+	if data.recover and players.size() == 1:
+		vehicle.reset_vehicle()
+
+func _fire_vehicle(id: String) -> void:
+	var vehicle: TankScript = vehicles[id]
+	if not vehicle.begin_fire():
+		return
+	_shot_id += 1
+	var origin: Vector3 = vehicle.visual.muzzle.global_position
+	var velocity: Vector3 = vehicle.muzzle_direction() * TankScript.SHELL_SPEED
+	_spawn_shell(_shot_id, id, origin, velocity, true)
+	_network_failure(api.net.broadcast_stream(&"tank_events", {"kind": "shot", "id": _shot_id, "player": id, "position": origin, "velocity": velocity}, "instance", true))
+
+func _spawn_shell(id: int, player: String, origin: Vector3, velocity: Vector3, authoritative: bool) -> void:
+	var shell: ShellScript = ShellScript.new()
+	shell.authoritative = authoritative
+	shell.shooter = vehicles[player]
+	shell.velocity = velocity
+	add_child(shell)
+	shell.global_position = origin
+	shells[id] = shell
+	if authoritative:
+		shell.impacted.connect(_shell_impact.bind(id, player))
+	shell.tree_exited.connect(func() -> void: shells.erase(id))
+	if player == local_id:
+		shot_shake = 1.0
+	cannon_audio.play()
+	_emit_effect(origin, Color("ffdb7c"), 0.3 if first_person and player == local_id else 0.9, 0.12, Vector3.ZERO)
+
+func _shell_impact(point: Vector3, normal: Vector3, collider: Node, result: Dictionary, id: int, player: String) -> void:
+	var damage: float = float(result.get("damage", 0.0))
+	if damage > 0.0:
+		vehicles[player].damage_dealt += damage
+		hits += 1
+		if collider is TankScript and collider.dead:
+			collider.death_time = elapsed
+			vehicles[player].kills += 1
+		elif collider is TargetScript and collider.dead:
+			destroyed_count += 1
+	_impact_effect(point, normal, player, damage)
+	_network_failure(api.net.broadcast_stream(&"tank_events", {"kind": "impact", "id": id, "position": point, "normal": normal, "player": player, "damage": damage}, "instance", true))
+
+func _impact_effect(point: Vector3, normal: Vector3, player: String, damage: float) -> void:
+	impact_audio.play()
+	if player == local_id:
+		hit_flash = 0.5 if damage > 0.0 else 0.0
+		show_notice("命中 · −%d HP" % roundi(damage) if damage > 0.0 else "跳弹或未穿透")
+	_emit_effect(point + normal * 0.2, Color("ffca67"), 1.0, 0.18, Vector3.ZERO)
+	for i: int in 8:
+		_emit_effect(point, Color("746e57"), randf_range(0.2, 0.65), randf_range(0.7, 1.5), Vector3(randf_range(-3, 3), randf_range(0.4, 5), randf_range(-3, 3)))
+
+func _publish() -> void:
+	var states: PackedFloat32Array = []
+	for player: Dictionary in players:
+		states.append_array(vehicles[player.player_id].make_snapshot())
+	var target_states: Array[Dictionary] = []
+	for target: TargetScript in targets:
+		target_states.append({"hp": target.hp})
+	_state_sequence += 1
+	_network_failure(api.net.broadcast_stream(&"tank_state", {"sequence": _state_sequence, "elapsed": elapsed,
+		"vehicles": states, "targets": target_states, "destroyed": destroyed_count, "hits": hits}, "instance", true))
+
+func _players_changed() -> void:
+	if not api.is_host() or not started or finished:
+		return
+	for player: Dictionary in api.get_players():
+		if not player.connected and not withdrawn.has(player.player_id):
+			withdrawn[player.player_id] = true
+			var vehicle: TankScript = vehicles[player.player_id]
+			vehicle.dead = true
+			vehicle.hp = 0.0
+			vehicle.speed = 0.0
+			vehicle.visual.set_destroyed(true)
+
+func _check_finish() -> void:
+	var alive: int = 0
+	for vehicle: TankScript in vehicles.values():
+		if not vehicle.dead:
+			alive += 1
+	if (players.size() > 1 and alive <= 1) or (players.size() == 1 and destroyed_count == total_targets) or elapsed >= duration:
+		_finish_round()
+
+## Survival ranks first; simultaneous eliminations tie unless damage separates them.
+func _better(a: TankScript, b: TankScript) -> bool:
+	if a.dead != b.dead:
+		return not a.dead
+	if not a.dead and a.hp != b.hp:
+		return a.hp > b.hp
+	if a.dead and not is_equal_approx(a.death_time, b.death_time):
+		return a.death_time > b.death_time
+	return a.damage_dealt > b.damage_dealt
+
+func _finish_round() -> void:
+	if finished:
+		return
+	finished = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	engine_audio.stop()
+	var rankings: Array[Dictionary] = []
+	for id: String in vehicles:
+		var vehicle: TankScript = vehicles[id]
+		var rank_value: int = 1
+		for other: String in vehicles:
+			if not withdrawn.has(other) and _better(vehicles[other], vehicle):
+				rank_value += 1
+		rankings.append({"player_id": id, "rank": 0 if withdrawn.has(id) else rank_value,
+			"status": "withdrawn" if withdrawn.has(id) else "completed",
+			"metrics": {"damage": roundi(vehicle.damage_dealt), "kills": vehicle.kills if players.size() > 1 else destroyed_count,
+				"hp": roundi(vehicle.hp), "time": roundi(elapsed * 1000.0)}})
+	var result: Dictionary = {"request_id": request.request_id, "reason": "completed", "rankings": rankings,
+		"columns": [{"key": "kills", "title": "击毁", "format": "integer"}, {"key": "damage", "title": "伤害", "format": "integer"},
+			{"key": "hp", "title": "剩余生命", "format": "integer"}, {"key": "time", "title": "用时", "format": "time"}]}
+	_network_failure(pages.present(result))
+
+func _network_failure(error: Error) -> void:
+	if error == OK:
+		return
+	push_error("雷霆战争：" + error_string(error))
+	started = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+	api.fail("tank_round_failed", error_string(error))
+
+func show_notice(message: String, duration_seconds: float = 2.0) -> void:
+	notice = message
+	notice_time = duration_seconds
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_focused = false
+	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		_focused = true
+
+func _exit_tree() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _process(_delta: float) -> void:
 	# Camera follows the final gun pose AFTER the vehicle physics step, avoiding
 	# a one-frame disagreement between the bore reticle and the visible gun.
-	if first_person and is_instance_valid(tank):
+	if started and first_person:
 		_update_sight_camera()
 
 func set_first_person(active: bool) -> void:
 	first_person = active
 	tank.visual.visible = not active
 	tank.aim_direction_mode = active
-	var direction := tank.muzzle_direction()
+	var direction: Vector3 = tank.muzzle_direction()
 	camera_yaw = atan2(-direction.x, -direction.z)
 	camera_pitch = asin(clampf(direction.y, -1, 1))
 	tank.requested_gun_direction = direction
-	capture_guard = 0.12
 	if active:
 		_update_sight_camera()
 	else:
 		_update_camera(1.0)
 
 func _update_sight_camera() -> void:
-	var bore_basis := tank.visual.muzzle.global_basis.orthonormalized()
+	var bore_basis: Basis = tank.visual.muzzle.global_basis.orthonormalized()
 	# An optical mount near the breech, not a camera teleported through cover
 	# to the muzzle. Its 28 cm vertical offset is reflected by the impact ring.
 	camera.global_position = tank.visual.barrel.global_position + bore_basis.y * 0.28 - bore_basis.z * 0.10
@@ -213,116 +478,69 @@ func _update_camera(delta: float) -> void:
 	if first_person:
 		_update_sight_camera()
 		return
-	var aim_basis := Basis(Vector3.UP, camera_yaw)
-	var focus := tank.global_position + Vector3(0, 1.6, 0)
-	var distance := 6.2 if zooming else 12.8
-	var pitch := camera_pitch
-	var offset := aim_basis * Vector3(0, -sin(pitch) * distance + (1.0 if zooming else 1.0), cos(pitch) * distance)
-	var desired := focus + offset
-	var query := PhysicsRayQueryParameters3D.create(focus, desired, 1)
-	var collision := get_world_3d().direct_space_state.intersect_ray(query)
+	var aim_basis: Basis = Basis(Vector3.UP, camera_yaw)
+	var focus: Vector3 = tank.global_position + Vector3(0, 1.6, 0)
+	var distance: float = 6.2 if zooming else 12.8
+	var pitch: float = camera_pitch
+	var offset: Vector3 = aim_basis * Vector3(0, -sin(pitch) * distance + (1.0 if zooming else 1.0), cos(pitch) * distance)
+	var desired: Vector3 = focus + offset
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(focus, desired, 1)
+	var collision: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
 	if not collision.is_empty():
 		desired = collision.position + collision.normal * 0.4
 	camera_position = camera_position.lerp(desired, 1.0 - exp(-delta * 9.0))
 	camera.global_position = camera_position + Vector3(sin(elapsed * 70), cos(elapsed * 90), 0) * shot_shake * 0.07
-	var direction := aim_basis * Vector3(0, sin(pitch), -cos(pitch))
+	var direction: Vector3 = aim_basis * Vector3(0, sin(pitch), -cos(pitch))
 	# Orbit camera orientation is input-driven, not auto-centered on the hull.
 	camera.look_at(camera.global_position + direction * 200, Vector3.UP)
 	camera.fov = lerpf(camera.fov, 32.0 if zooming else 67.0, 1.0 - exp(-delta * 10))
 
 func _update_aim_point() -> void:
+	if local_id.is_empty() or tank.dead:
+		return
 	if first_person:
 		tank.requested_gun_direction = Basis(Vector3.UP, camera_yaw) * Vector3(0, sin(camera_pitch), -cos(camera_pitch))
 		tank.aim_point = tank.visual.barrel.global_position + tank.requested_gun_direction * 500
 		return
-	var center := get_viewport().get_visible_rect().size * 0.5
-	var origin := camera.project_ray_origin(center)
-	var end := origin + camera.project_ray_normal(center) * 500
-	var query := PhysicsRayQueryParameters3D.create(origin, end, 1)
-	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	var center: Vector2 = get_viewport().get_visible_rect().size * 0.5
+	var origin: Vector3 = camera.project_ray_origin(center)
+	var end: Vector3 = origin + camera.project_ray_normal(center) * 500
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(origin, end, 5)
+	query.collide_with_areas = true
+	query.exclude = [tank.get_rid(), tank.armor.get_rid()]
+	var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
 	tank.aim_point = end if hit.is_empty() else hit.position
 
 func _predict_impact() -> void:
-	var point := tank.visual.muzzle.global_position
-	var velocity := tank.muzzle_direction() * TankScript.SHELL_SPEED
+	var point: Vector3 = tank.visual.muzzle.global_position
+	var velocity: Vector3 = tank.muzzle_direction() * TankScript.SHELL_SPEED
 	actual_hit_target = false
 	actual_impact = point + velocity * 3
 	# Same integrator/gravity as real shells; sweep each segment to avoid tunneling.
-	for i in 130:
-		var next := point + velocity * 0.04 + Vector3.DOWN * TankScript.SHELL_GRAVITY * 0.0008
-		var query := PhysicsRayQueryParameters3D.create(point, next, 1)
-		var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	for i: int in 130:
+		var next: Vector3 = point + velocity * 0.04 + Vector3.DOWN * TankScript.SHELL_GRAVITY * 0.0008
+		var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(point, next, 5)
+		query.collide_with_areas = true
+		query.exclude = [tank.get_rid(), tank.armor.get_rid()]
+		var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
 		if not hit.is_empty():
 			actual_impact = hit.position
-			actual_hit_target = hit.collider is TargetScript and not hit.collider.dead
+			actual_hit_target = hit.collider is Area3D or (hit.collider is TargetScript and not hit.collider.dead)
 			return
 		point = next
 		velocity.y -= TankScript.SHELL_GRAVITY * 0.04
 	actual_impact = point
 
-func fire() -> bool:
-	if component_panel_open:
-		return false
-	if tank.components.barrel_remaining > 0:
-		show_notice("GUN REPAIR • %.1f s" % tank.components.barrel_remaining)
-		return false
-	if tank.muzzle_obstructed:
-		show_notice("BARREL BLOCKED — MOVE CLEAR")
-		return false
-	if not tank.begin_fire():
-		return false
-	var shell := ShellScript.new()
-	shell.process_mode = Node.PROCESS_MODE_INHERIT
-	add_child(shell)
-	shell.global_position = tank.visual.muzzle.global_position
-	shell.velocity = tank.muzzle_direction() * TankScript.SHELL_SPEED
-	shell.impacted.connect(_shell_impact)
-	shot_shake = 1.0
-	cannon_audio.play()
-	# Keep near-muzzle effects brief and small through the magnified optic.
-	# The external view retains the broader stylized plume.
-	var plume_scale := 0.22 if first_person else 1.0
-	_emit_effect(shell.global_position, Color("ffdb7c"), 1.2 * plume_scale, 0.12, Vector3.ZERO)
-	for i in (3 if first_person else 7):
-		_emit_effect(shell.global_position, Color("d1bd96"), randf_range(0.35, 0.65) * plume_scale, randf_range(0.22, 0.4) if first_person else randf_range(0.6, 1.0), tank.muzzle_direction() * randf_range(2, 6) + Vector3.UP)
-	return true
-
-func _shell_impact(point: Vector3, normal: Vector3, collider: Node, result: Dictionary = {}) -> void:
-	impact_audio.play()
-	var target_hit := collider is TargetScript and not bool(result.get("ignored", false))
-	if target_hit:
-		hits += 1
-		hit_flash = 0.5
-		last_hit_result = result
-		var angle := float(result.get("angle_degrees", 0.0))
-		if collider.dead:
-			if destroyed_count == total_targets:
-				show_notice("RANGE CLEAR — EXCELLENT SHOOTING", 6.0)
-			else:
-				show_notice("TANK DESTROYED", 2.5)
-		elif bool(result.get("ricochet", false)):
-			show_notice("RICOCHET • %.0f°" % angle)
-		else:
-			var feedback := "%s • −%.0f HP • %.0f°" % [str(result.get("region", "ARMOR")).to_upper().replace("_", " "), float(result.get("damage", 0.0)), angle]
-			var component := String(result.get("component", ""))
-			if not component.is_empty():
-				var labels := {"engine": "ENGINE OUT", "left_track": "LEFT TRACK DAMAGED", "right_track": "RIGHT TRACK DAMAGED", "barrel": "GUN DISABLED"}
-				feedback += "  /  %s %.0f s" % [labels.get(component, component.to_upper()), float(result.get("component_duration", 0))]
-			show_notice(feedback)
-	_emit_effect(point + normal * 0.2, Color("ffca67"), 1.25 if target_hit else 0.8, 0.18, Vector3.ZERO)
-	for i in 12:
-		var velocity := Vector3(randf_range(-3, 3), randf_range(0.4, 5), randf_range(-3, 3))
-		_emit_effect(point, Color("d0b58b") if not target_hit else Color("746e57"), randf_range(0.2, 0.65), randf_range(0.7, 1.5), velocity)
 
 func _emit_effect(at: Vector3, color: Color, size: float, duration: float, velocity: Vector3) -> void:
-	var node := MeshInstance3D.new()
-	var mesh := SphereMesh.new()
+	var node: MeshInstance3D = MeshInstance3D.new()
+	var mesh: SphereMesh = SphereMesh.new()
 	mesh.radius = size * 0.5
 	mesh.height = size
 	mesh.radial_segments = 6
 	mesh.rings = 3
 	node.mesh = mesh
-	var mat := StandardMaterial3D.new()
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
 	mat.albedo_color = color
 	mat.roughness = 1.0
 	node.material_override = mat
@@ -331,7 +549,7 @@ func _emit_effect(at: Vector3, color: Color, size: float, duration: float, veloc
 	effects.append({"node": node, "life": duration, "total": duration, "velocity": velocity})
 
 func _update_effects(delta: float) -> void:
-	for i in range(effects.size() - 1, -1, -1):
+	for i: int in range(effects.size() - 1, -1, -1):
 		var effect: Dictionary = effects[i]
 		effect.life -= delta
 		if effect.life <= 0:
@@ -341,56 +559,3 @@ func _update_effects(delta: float) -> void:
 		effect.node.position += effect.velocity * delta
 		effect.velocity *= 1.0 - delta * 1.3
 		effect.node.scale = Vector3.ONE * (1.0 + (1.0 - effect.life / effect.total) * 1.3) * minf(1.0, effect.life * 5)
-
-func _target_destroyed(_target: TargetScript) -> void:
-	destroyed_count += 1
-	if destroyed_count == total_targets:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		_finish_range.call_deferred()
-		show_notice("RANGE CLEAR — EXCELLENT SHOOTING", 6.0)
-
-func show_notice(message: String, duration: float = 2.0) -> void:
-	notice = message
-	notice_time = duration
-
-func reset_range() -> void:
-	set_component_panel(false)
-	set_first_person(false)
-	last_hit_result.clear()
-	for effect in effects:
-		effect.node.queue_free()
-	effects.clear()
-	hit_flash = 0.0
-	shot_shake = 0.0
-	for shell in get_tree().get_nodes_in_group("shells"):
-		shell.queue_free()
-	for target: TargetScript in targets:
-		target.reset_target()
-	tank.reset_vehicle()
-	tank.rounds_fired = 0
-	destroyed_count = 0
-	hits = 0
-	elapsed = 0
-	camera_yaw = 0
-	camera_pitch = -0.023
-	show_notice("FRESH RANGE • SIX TARGETS")
-
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and started and not paused:
-		paused = true
-		_pause_objects(true)
-		tank.controls_enabled = false
-		component_panel.visible = false
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
-func _pause_objects(value: bool) -> void:
-	for child: Node in get_children():
-		if child is Node3D and child != camera:
-			child.process_mode = Node.PROCESS_MODE_DISABLED if value else Node.PROCESS_MODE_INHERIT
-
-func _exit_tree() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
-## The final shell records its hit after the target emits destroyed.
-func _finish_range() -> void:
-	completed.emit({"time": roundi(elapsed * 1000.0), "hits": hits})

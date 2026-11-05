@@ -1,5 +1,5 @@
 extends RefCounted
-## Only the standard ranking contract is implemented by this blank template.
+## Thunder War publishes standard-round rankings; no economy or item effects.
 
 func check_request(request: Dictionary) -> Dictionary:
 	if request.get("mode") != "standard":

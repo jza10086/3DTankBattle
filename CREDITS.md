@@ -33,3 +33,7 @@ These target variants bake the original rest-pose meshes, retain separate hull/t
 - [AnderHominem/Code-for-animating-tank-tracks](https://github.com/AnderHominem/Code-for-animating-tank-tracks), MIT: studied articulated tread animation approaches. The shipped default instead uses the CC0 model's original skeletal tread animation split by side.
 
 All procedural environment geometry, fallback tank geometry, HUD, gameplay code and synthesized WAV sound effects were authored for this project. No third-party example code was copied into the repository.
+
+## 雷霆战争 M1 Abrams
+
+玩家车辆来自用户提供的原创 `F:/AstraBlender/Projects/1_Blender工程/MainBattleTanks/M1_Abrams.blend`。运行时导出见 `assets/m1_abrams/`，保留炮塔、炮管、后坐与左右独立履带；原始 Blender 文件未修改。旧 Quaternius 车辆仅用于单人训练靶标。

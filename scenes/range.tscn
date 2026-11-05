@@ -5748,7 +5748,7 @@ mesh = SubResource("BoxMesh_1jvkk")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 3.95, -50.75)
 pixel_size = 0.018
 modulate = Color(0.90588236, 0.8666667, 0.7490196, 1)
-text = "IRON RANGE"
+text = "雷霆战争"
 font_size = 70
 outline_size = 0
 

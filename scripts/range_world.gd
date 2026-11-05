@@ -265,7 +265,7 @@ func _build_base() -> void:
 	_box(Vector3(-17, 3.5, -51), Vector3(13, 3.6, 0.4), dark, true)
 	for x in [-21, -13]:
 		_box(Vector3(x, 1.4, -51), Vector3(0.35, 2.8, 0.35), dark, true)
-	_label("IRON RANGE", Vector3(-17, 3.95, -50.75), 70)
+	_label("雷霆战争", Vector3(-17, 3.95, -50.75), 70)
 	_label("DRIVE   /   AIM   /   FIRE", Vector3(-17, 2.65, -50.74), 27, Color("d19c3d"))
 	for i in range(8):
 		var p := Vector3(-87 + i % 4 * 3.6, 0.7, 42 + int(i / 4) * 3)

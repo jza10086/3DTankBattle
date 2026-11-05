@@ -1,16 +1,23 @@
 {
   "manifest_version": 2,
   "core_api_major": 4,
-  "package_version": "1.0.0",
+  "package_version": "1.1.0",
   "id": "godot_party_default_tank_range",
-  "name": "IRON RANGE · 坦克训练场",
+  "name": "雷霆战争",
   "kind": "minigame",
   "config_schema": "settings.gd",
   "entry": "party_round.tscn",
   "player_counts": [
-    1
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
   ],
-  "introduction": "驾驶坦克，瞄准并击毁训练场全部六个目标。",
+  "introduction": "1 人驾驶 M1 Abrams 击毁六个靶标；2–8 人同场坦克淘汰赛，最后存活者获胜。超时依次比较存活、剩余生命和造成伤害。Esc 打开菜单，比赛继续。",
   "dependencies": {
     "godot_party_default_protocol": "1.0.0"
   },
@@ -34,5 +41,27 @@
     "translations": {
       "zh_Hans": "i18n/zh_Hans.po"
     }
+  },
+  "streams": {
+    "tank_state": {
+      "mode": "ordered",
+      "audience": "instance"
+    },
+    "tank_events": {
+      "mode": "reliable",
+      "audience": "instance"
+    }
+  },
+  "controls": {
+    "move_up": "前进",
+    "move_down": "倒车",
+    "move_left": "左转",
+    "move_right": "右转",
+    "tank_fire": "开炮",
+    "tank_zoom": "按住放大",
+    "tank_sight": "切换炮手瞄准镜",
+    "tank_brake": "刹车",
+    "tank_center": "镜头回正",
+    "tank_recover": "单人回正车辆"
   }
 }

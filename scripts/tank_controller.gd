@@ -1,78 +1,76 @@
-class_name TankController
 extends CharacterBody3D
 
 const TankVisualScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_visual.gd")
 
 ## Deliberately accessible tracked-vehicle model, not a full rigid-body simulator.
 ## Four suspension contacts tilt the rendered hull while a stable chassis handles collision.
-const MAX_FORWARD := 14.5
-const MAX_REVERSE := 5.5
-const ACCELERATION := 4.2
-const BRAKING := 12.0
-const TURRET_RATE := 0.68
-const ELEVATION_RATE := 0.38
-const GRAVITY := 20.0
-const SHELL_SPEED := 105.0
-const SHELL_GRAVITY := 9.8
+const MAX_FORWARD: float = 14.5
+const MAX_REVERSE: float = 5.5
+const ACCELERATION: float = 4.2
+const BRAKING: float = 12.0
+const TURRET_RATE: float = 0.68
+const ELEVATION_RATE: float = 0.38
+const GRAVITY: float = 20.0
+const SHELL_SPEED: float = 105.0
+const SHELL_GRAVITY: float = 9.8
 const ComponentState = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_status.gd")
-const RELOAD_TIME := ComponentState.RELOAD_TIME
-var speed := 0.0
-var yaw_rate := 0.0
-var throttle := 0.0
-var steering := 0.0
-var brake := false
-var controls_enabled := true
-var aim_point := Vector3(0, 1.6, -100)
-var aim_direction_mode := false
-var requested_gun_direction := Vector3.FORWARD
-var components := ComponentState.new()
-# Compatibility for existing HUD, scenario scripts and tests.
+const RELOAD_TIME: float = ComponentState.RELOAD_TIME
+var speed: float = 0.0
+var yaw_rate: float = 0.0
+var throttle: float = 0.0
+var steering: float = 0.0
+var brake: bool = false
+var aim_point: Vector3 = Vector3(0, 1.6, -100)
+var aim_direction_mode: bool = false
+var requested_gun_direction: Vector3 = Vector3.FORWARD
+var components: ComponentState = ComponentState.new()
+# The HUD reads the same component reload timer as the simulation.
 var reload_remaining: float:
 	get:
 		return components.reload_remaining
 	set(value):
 		components.reload_remaining = maxf(value, 0.0)
-var rounds_fired := 0
-var recoil := 0.0
-var ground_normal := Vector3.UP
-var contact_count := 0
-var left_track_speed := 0.0
-var right_track_speed := 0.0
+var rounds_fired: int = 0
+var recoil: float = 0.0
+var ground_normal: Vector3 = Vector3.UP
+var contact_count: int = 0
+var left_track_speed: float = 0.0
+var right_track_speed: float = 0.0
 var visual: TankVisualScript
-var start_transform := Transform3D.IDENTITY
+var start_transform: Transform3D = Transform3D.IDENTITY
 var ground_offsets: Array[float] = []
-var hull_pitch := 0.0
-var hull_roll := 0.0
-var muzzle_obstructed := false
+var hull_pitch: float = 0.0
+var hull_roll: float = 0.0
+var muzzle_obstructed: bool = false
 
 func _ready() -> void:
 	collision_layer = 2
-	collision_mask = 1
+	collision_mask = 3
 	floor_snap_length = 0.95
 	floor_max_angle = deg_to_rad(43)
 	floor_stop_on_slope = true
 	floor_constant_speed = true
 	visual = $Visual
 	start_transform = global_transform
+	_build_armor()
 
 func _physics_process(delta: float) -> void:
+	if not simulation_enabled or dead:
+		return
 	components.tick(delta)
-	if controls_enabled:
-		throttle = float(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP)) - float(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN))
-		steering = float(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)) - float(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT))
-		brake = Input.is_physical_key_pressed(KEY_SPACE)
 	integrate_drive(delta)
 	recoil = move_toward(recoil, 0.0, delta * 1.7)
 	visual.set_recoil(recoil)
 	_update_aim(delta)
+	_update_armor()
 
 func integrate_drive(delta: float) -> void:
 	_update_ground(delta)
-	var mobility := components.get_track_multipliers()
-	var drive_factor := (mobility.x + mobility.y) * 0.5
-	var engine_disabled := components.engine_remaining > 0.0
-	var requested_speed := throttle * (MAX_FORWARD if throttle >= 0 else MAX_REVERSE) * drive_factor
-	var deceleration := BRAKING if brake or throttle * speed < -0.1 else ACCELERATION * drive_factor
+	var mobility: Vector2 = components.get_track_multipliers()
+	var drive_factor: float = (mobility.x + mobility.y) * 0.5
+	var engine_disabled: bool = components.engine_remaining > 0.0
+	var requested_speed: float = throttle * (MAX_FORWARD if throttle >= 0 else MAX_REVERSE) * drive_factor
+	var deceleration: float = BRAKING if brake or throttle * speed < -0.1 else ACCELERATION * drive_factor
 	if brake:
 		requested_speed = 0.0
 	elif is_zero_approx(throttle):
@@ -89,17 +87,17 @@ func integrate_drive(delta: float) -> void:
 		speed = move_toward(speed, requested_speed, deceleration * delta)
 	# Healthy movement is unchanged. Damaged tracks reduce propulsion and turn
 	# authority; a single weak track also pulls toward that side while rolling.
-	var turn_authority := lerpf(1.08, 0.54, clampf(absf(speed) / MAX_FORWARD, 0, 1))
-	var requested_yaw := steering * turn_authority * (0.32 if brake else 1.0) * drive_factor
-	var track_pull := (mobility.y - mobility.x) * clampf(speed / MAX_FORWARD, -1.0, 1.0) * 0.85
+	var turn_authority: float = lerpf(1.08, 0.54, clampf(absf(speed) / MAX_FORWARD, 0, 1))
+	var requested_yaw: float = steering * turn_authority * (0.32 if brake else 1.0) * drive_factor
+	var track_pull: float = (mobility.y - mobility.x) * clampf(speed / MAX_FORWARD, -1.0, 1.0) * 0.85
 	requested_yaw += track_pull
 	if contact_count < 2:
 		requested_yaw *= 0.15
 	if not engine_disabled:
 		yaw_rate = move_toward(yaw_rate, requested_yaw, delta * 2.4)
 	rotate_y(yaw_rate * delta)
-	var forward := -global_basis.z
-	var direction := forward.slide(ground_normal).normalized() if contact_count >= 2 else forward
+	var forward: Vector3 = -global_basis.z
+	var direction: Vector3 = forward.slide(ground_normal).normalized() if contact_count >= 2 else forward
 	if contact_count >= 2:
 		velocity.x = direction.x * speed
 		velocity.z = direction.z * speed
@@ -107,11 +105,11 @@ func integrate_drive(delta: float) -> void:
 		velocity.y = direction.y * speed - 1.5
 	else:
 		velocity.y -= GRAVITY * delta
-	var before := global_position
+	var before: Vector3 = global_position
 	move_and_slide()
 	# A collision must not keep the speedometer / tracks accelerating into a wall.
 	if is_on_wall():
-		var realized := Vector2(global_position.x - before.x, global_position.z - before.z).length() / maxf(delta, 0.001)
+		var realized: float = Vector2(global_position.x - before.x, global_position.z - before.z).length() / maxf(delta, 0.001)
 		speed = signf(speed) * minf(absf(speed), realized + 0.08)
 	left_track_speed = speed - yaw_rate * 1.8
 	right_track_speed = speed + yaw_rate * 1.8
@@ -120,14 +118,14 @@ func integrate_drive(delta: float) -> void:
 		reset_vehicle()
 
 func _update_ground(delta: float) -> void:
-	var normal_sum := Vector3.ZERO
+	var normal_sum: Vector3 = Vector3.ZERO
 	var heights: Array[float] = []
 	contact_count = 0
 	ground_offsets.clear()
-	for point in [Vector3(-1.2, 1.5, -1.8), Vector3(1.2, 1.5, -1.8), Vector3(-1.2, 1.5, 1.8), Vector3(1.2, 1.5, 1.8)]:
+	for point: Vector3 in [Vector3(-1.2, 1.5, -1.8), Vector3(1.2, 1.5, -1.8), Vector3(-1.2, 1.5, 1.8), Vector3(1.2, 1.5, 1.8)]:
 		var origin: Vector3 = global_transform * point
-		var query := PhysicsRayQueryParameters3D.create(origin, origin + Vector3.DOWN * 4.3, 1)
-		var hit := get_world_3d().direct_space_state.intersect_ray(query)
+		var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(origin, origin + Vector3.DOWN * 4.3, 1)
+		var hit: Dictionary = get_world_3d().direct_space_state.intersect_ray(query)
 		if not hit.is_empty() and origin.y - hit.position.y <= 2.8:
 			normal_sum += hit.normal
 			heights.append(hit.position.y)
@@ -138,8 +136,8 @@ func _update_ground(delta: float) -> void:
 			ground_offsets.append(-0.15)
 	if contact_count >= 3:
 		# Height differences capture chassis pitch while crossing a ramp seam.
-		var pitch := atan2((heights[0] + heights[1] - heights[2] - heights[3]) * 0.5, 3.6)
-		var roll := atan2((heights[1] + heights[3] - heights[0] - heights[2]) * 0.5, 2.4)
+		var pitch: float = atan2((heights[0] + heights[1] - heights[2] - heights[3]) * 0.5, 3.6)
+		var roll: float = atan2((heights[1] + heights[3] - heights[0] - heights[2]) * 0.5, 2.4)
 		hull_pitch = lerpf(hull_pitch, clampf(pitch, -0.55, 0.55), 1.0 - exp(-delta * 9))
 		hull_roll = lerpf(hull_roll, clampf(roll, -0.45, 0.45), 1.0 - exp(-delta * 9))
 		ground_normal = ground_normal.lerp((normal_sum / contact_count).normalized(), 1.0 - exp(-delta * 12)).normalized()
@@ -151,26 +149,26 @@ func _update_ground(delta: float) -> void:
 func _update_aim(delta: float) -> void:
 	# Solve world-space convergence from turret pivot, then use the ACTUAL muzzle
 	# for the displayed trajectory. The camera cross is a request, not a hit promise.
-	var pivot := visual.turret.global_position
-	var direction := requested_gun_direction if aim_direction_mode else aim_point - pivot
-	var local_direction := visual.global_basis.orthonormalized().inverse() * direction
-	var target_yaw := atan2(-local_direction.x, -local_direction.z)
+	var pivot: Vector3 = visual.turret.global_position
+	var direction: Vector3 = requested_gun_direction if aim_direction_mode else aim_point - pivot
+	var local_direction: Vector3 = visual.global_basis.orthonormalized().inverse() * direction
+	var target_yaw: float = atan2(-local_direction.x, -local_direction.z)
 	visual.turret.rotation.y = rotate_toward(visual.turret.rotation.y, target_yaw, TURRET_RATE * delta)
-	var barrel_target := requested_gun_direction if aim_direction_mode else aim_point - visual.barrel.global_position
-	var local_barrel := visual.turret.global_basis.orthonormalized().inverse() * barrel_target
-	var horizontal := Vector2(local_barrel.x, local_barrel.z).length()
+	var barrel_target: Vector3 = requested_gun_direction if aim_direction_mode else aim_point - visual.barrel.global_position
+	var local_barrel: Vector3 = visual.turret.global_basis.orthonormalized().inverse() * barrel_target
+	var horizontal: float = Vector2(local_barrel.x, local_barrel.z).length()
 	# Third person solves a low ballistic arc to a requested world point.
 	# The first-person sight instead commands a bore direction directly: feeding
 	# the actual gun camera back into the arc solver would cause elevation drift.
-	var v2 := SHELL_SPEED * SHELL_SPEED
-	var discriminant := v2 * v2 - SHELL_GRAVITY * (SHELL_GRAVITY * horizontal * horizontal + 2.0 * local_barrel.y * v2)
-	var elevation := atan2(local_barrel.y, horizontal)
+	var v2: float = SHELL_SPEED * SHELL_SPEED
+	var discriminant: float = v2 * v2 - SHELL_GRAVITY * (SHELL_GRAVITY * horizontal * horizontal + 2.0 * local_barrel.y * v2)
+	var elevation: float = atan2(local_barrel.y, horizontal)
 	if not aim_direction_mode and horizontal > 1.0 and discriminant >= 0.0:
 		elevation = atan((v2 - sqrt(discriminant)) / (SHELL_GRAVITY * horizontal))
 	elevation = clampf(elevation, deg_to_rad(-9), deg_to_rad(23))
 	visual.barrel.rotation.x = move_toward(visual.barrel.rotation.x, elevation, ELEVATION_RATE * delta)
-	var breech := visual.barrel.global_position
-	var query := PhysicsRayQueryParameters3D.create(breech, visual.muzzle.global_position + muzzle_direction() * 0.2, 1)
+	var breech: Vector3 = visual.barrel.global_position
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(breech, visual.muzzle.global_position + muzzle_direction() * 0.2, 1)
 	query.hit_from_inside = true
 	muzzle_obstructed = not get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
@@ -178,7 +176,7 @@ func muzzle_direction() -> Vector3:
 	return -visual.muzzle.global_basis.z.normalized()
 
 func can_fire() -> bool:
-	return components.can_fire() and not muzzle_obstructed
+	return not dead and components.can_fire() and not muzzle_obstructed
 
 func begin_fire() -> bool:
 	if not can_fire() or not components.begin_fire():
@@ -214,3 +212,116 @@ func reset_vehicle() -> void:
 	visual.rotation = Vector3.ZERO
 	visual.turret.rotation = Vector3.ZERO
 	visual.barrel.rotation = Vector3.ZERO
+
+var simulation_enabled: bool = false
+var player_id: String = ""
+var player_name: String = ""
+var hp: float = 100.0
+var max_hp: float = 100.0
+var dead: bool = false
+var damage_dealt: float = 0.0
+var kills: int = 0
+var death_time: float = 0.0
+var armor: Area3D
+var _turret_shape: CollisionShape3D
+var _barrel_shape: CollisionShape3D
+var nameplate: Label3D
+const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
+
+func _build_armor() -> void:
+	armor = Area3D.new()
+	armor.name = "Armor"
+	armor.collision_layer = 4
+	armor.collision_mask = 0
+	armor.monitoring = false
+	add_child(armor)
+	_add_armor_box("hull", Vector3(2.4, 0.8, 5.5), Vector3(0, 0.15, 0))
+	_add_armor_box("left_track", Vector3(0.45, 0.85, 4.9), Vector3(-1.03, -0.13, 0))
+	_add_armor_box("right_track", Vector3(0.45, 0.85, 4.9), Vector3(1.03, -0.13, 0))
+	_turret_shape = _add_armor_box("turret", Vector3(2.15, 0.65, 2.65), Vector3.ZERO)
+	_barrel_shape = _add_armor_box("barrel", Vector3(0.18, 0.18, 2.9), Vector3.ZERO)
+	nameplate = Label3D.new()
+	nameplate.position = Vector3(0, 2.8, 0)
+	nameplate.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	nameplate.font_size = 40
+	nameplate.pixel_size = 0.008
+	add_child(nameplate)
+	_update_armor()
+
+func _add_armor_box(part: String, dimensions: Vector3, center: Vector3) -> CollisionShape3D:
+	var collider: CollisionShape3D = CollisionShape3D.new()
+	var box: BoxShape3D = BoxShape3D.new()
+	box.size = dimensions
+	collider.shape = box
+	collider.position = center
+	collider.set_meta("part", part)
+	armor.add_child(collider)
+	return collider
+
+func _update_armor() -> void:
+	_turret_shape.global_transform = visual.turret.global_transform.translated_local(Vector3(0, 0.3, 0.25))
+	_barrel_shape.global_transform = visual.barrel.global_transform.translated_local(Vector3(0, 0, -1.45))
+
+func get_marker_point() -> Vector3:
+	return global_position + Vector3(0, 2.8, 0)
+
+## Shell contacts use the actual armor shape and surface angle. Health is host-owned.
+func apply_shell_hit(point: Vector3, normal: Vector3, incoming: Vector3, shape_index: int) -> Dictionary:
+	var shape: CollisionShape3D = armor.shape_owner_get_owner(armor.shape_find_owner(shape_index))
+	var part: String = shape.get_meta("part")
+	var result: Dictionary = DamageModel.evaluate(&"track" if part.ends_with("track") else StringName(part), global_basis, normal, incoming)
+	result["ignored"] = dead
+	result["damage"] = 0.0 if dead else minf(hp, result.damage)
+	result["component"] = ""
+	result["component_duration"] = 0.0
+	hp -= result.damage
+	dead = hp <= 0.0
+	if result.damage > 0.0 and not dead:
+		var component: StringName = &""
+		if part.ends_with("track") or part == "barrel":
+			component = StringName(part)
+		elif part == "hull" and to_local(point).z > 1.2 and result.facing == "rear":
+			component = &"engine"
+		if not component.is_empty():
+			apply_component_hit(component)
+			result.component = component
+			result.component_duration = ComponentState.TRACK_DURATION if part.ends_with("track") else ComponentState.ENGINE_DURATION
+	if dead:
+		speed = 0.0
+		velocity = Vector3.ZERO
+		visual.set_destroyed(true)
+	result["destroyed"] = dead
+	result["hp"] = hp
+	return result
+
+const SNAPSHOT_FLOATS: int = 21
+
+func make_snapshot() -> PackedFloat32Array:
+	# Fixed roster order and 21 floats keep all eight vehicles below ENet MTU.
+	return PackedFloat32Array([position.x, position.y, position.z, rotation.y, speed, yaw_rate,
+		visual.rotation.x, visual.rotation.z, visual.turret.rotation.y, visual.barrel.rotation.x, recoil,
+		hp, float(dead), damage_dealt, float(kills), float(rounds_fired), components.engine_remaining,
+		components.left_track_remaining, components.right_track_remaining, components.barrel_remaining, components.reload_remaining])
+
+func apply_snapshot(state: PackedFloat32Array, delta: float) -> void:
+	var target: Transform3D = Transform3D(Basis(Vector3.UP, state[3]), Vector3(state[0], state[1], state[2]))
+	transform = transform.interpolate_with(target, minf(1.0, delta * 18.0))
+	speed = state[4]
+	yaw_rate = state[5]
+	visual.rotation = Vector3(state[6], 0, state[7])
+	visual.turret.rotation.y = lerp_angle(visual.turret.rotation.y, state[8], minf(1.0, delta * 18.0))
+	visual.barrel.rotation.x = lerpf(visual.barrel.rotation.x, state[9], minf(1.0, delta * 18.0))
+	visual.set_recoil(state[10])
+	hp = state[11]
+	dead = state[12] > 0.5
+	damage_dealt = state[13]
+	kills = int(state[14])
+	rounds_fired = int(state[15])
+	components.engine_remaining = state[16]
+	components.left_track_remaining = state[17]
+	components.right_track_remaining = state[18]
+	components.barrel_remaining = state[19]
+	components.reload_remaining = state[20]
+	visual.set_destroyed(dead)
+	visual.animate_tracks(speed - yaw_rate * 1.3, speed + yaw_rate * 1.3, delta)
+	_update_armor()
