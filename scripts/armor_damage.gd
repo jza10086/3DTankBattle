@@ -35,9 +35,15 @@ static func evaluate(part: StringName, target_basis: Basis, world_normal: Vector
 	var incidence_cos: float = clampf(-incoming_direction.normalized().dot(normal), 0.0, 1.0)
 	var angle: float = rad_to_deg(acos(incidence_cos))
 	# A tiny tolerance makes the exactly-75 degree boundary stable in float32.
-	var ricochet: bool = ammunition == Ammo.AP and incidence_cos <= cos(deg_to_rad(RICOCHET_ANGLE)) + 0.000001
-	var base_damage: float = 100.0 * 50.0 / (50.0 + resistance) if ammunition == Ammo.AP else 70.0 * 35.0 / (35.0 + resistance * 1.8)
-	var damage: float = 0.0 if ricochet else maxf(1.0, roundf(base_damage * (pow(incidence_cos, ANGLE_POWER) if ammunition == Ammo.AP else 1.0)))
+	var ricochet: bool = not is_explosive(ammunition) and incidence_cos <= cos(deg_to_rad(RICOCHET_ANGLE)) + 0.000001
+	var base_damage: float
+	match ammunition:
+		Ammo.AP: base_damage = 100.0 * 50.0 / (50.0 + resistance)
+		Ammo.HE: base_damage = 70.0 * 35.0 / (35.0 + resistance * 1.8)
+		Ammo.AUTO30: base_damage = 11.0 * 50.0 / (50.0 + resistance)
+		Ammo.AUTO25: base_damage = 13.0 * 50.0 / (50.0 + resistance)
+		Ammo.ATAKA, Ammo.TOW: base_damage = 140.0 * 85.0 / (85.0 + resistance)
+	var damage: float = 0.0 if ricochet else maxf(1.0, roundf(base_damage * (pow(incidence_cos, ANGLE_POWER) if not is_explosive(ammunition) else 1.0)))
 	var region: String = "TRACKS" if part_name == "track" else ("BARREL" if part_name == "barrel" else "%s %s" % [part_name.to_upper(), facing.to_upper()])
 	return {"part": part_name, "facing": facing, "region": region, "damage": damage, "angle_degrees": angle, "ricochet": ricochet, "invalid": false, "ignored": false, "resistance": resistance, "incidence_cos": incidence_cos}
 
@@ -49,14 +55,32 @@ static func classify_facing(local_normal: Vector3) -> String:
 		return "front" if n.z < 0 else "rear"
 	return "side"
 
-enum Ammo { AP, HE }
+enum Ammo { AP, HE, AUTO30, AUTO25, ATAKA, TOW }
 const BLAST_RADIUS: float = 4.0
 
 static func shell_speed(ammunition: int) -> float:
-	return 145.0 if ammunition == Ammo.AP else 85.0
+	return [145.0, 85.0, 180.0, 160.0, 55.0, 48.0][ammunition]
 
 static func reload_duration(ammunition: int) -> float:
-	return 3.2 if ammunition == Ammo.AP else 4.0
+	return [3.2, 4.0, 0.16, 0.24, 7.5, 8.5][ammunition]
+
+static func is_missile(ammunition: int) -> bool:
+	return ammunition in [Ammo.ATAKA, Ammo.TOW]
+
+static func is_automatic(ammunition: int) -> bool:
+	return ammunition in [Ammo.AUTO30, Ammo.AUTO25]
+
+static func is_explosive(ammunition: int) -> bool:
+	return ammunition == Ammo.HE or is_missile(ammunition)
+
+static func gravity(ammunition: int) -> float:
+	return 0.0 if is_missile(ammunition) else 9.8
 
 static func blast_damage(distance: float) -> float:
 	return roundf(32.0 * maxf(0.0, 1.0 - distance / BLAST_RADIUS))
+
+static func weapon_name(ammunition: int) -> String:
+	return ["M68A1  /  105 mm", "M68A1  /  105 mm", "双联 2A42  /  30 mm", "M242  /  25 mm", "Ataka  /  反坦克导弹", "TOW  /  反坦克导弹"][ammunition]
+
+static func ammo_name(ammunition: int) -> String:
+	return ["穿甲弹", "高爆弹", "30 mm 机炮弹", "25 mm 机炮弹", "Ataka 导弹", "TOW 导弹"][ammunition]

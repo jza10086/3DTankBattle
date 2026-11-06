@@ -37,3 +37,7 @@ All procedural environment geometry, fallback tank geometry, HUD, gameplay code 
 ## 雷霆战争 M1 Abrams
 
 玩家车辆来自用户提供的原创 `F:/AstraBlender/Projects/1_Blender工程/MainBattleTanks/M1_Abrams.blend`。运行时导出见 `assets/m1_abrams/`，保留炮塔、炮管、后坐与左右独立履带；原始 Blender 文件未修改。旧 Quaternius 车辆仅用于单人训练靶标。
+
+## 雷霆战争支援载具
+
+BMPT 与布拉德利来自用户提供的原创 `F:/AstraBlender/Projects/1_Blender工程/MainBattleTanks/BMPT_Terminator.blend` 和 `M2A2_Bradley.blend`。导出见 `assets/bmpt/` 和 `assets/bradley/`；保留炮塔、炮管、导弹发射口、车轮和独立履带。原 Blender 文件未修改，演示用烟雾、曳光弹与摄影棚不导入游戏。新增 HUD 剪影为本项目绘制的 SVG。

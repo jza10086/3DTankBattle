@@ -26,6 +26,9 @@ var hud: Control
 var camera_yaw: float = 0.0
 var camera_pitch: float = -0.023
 var camera_position: Vector3 = Vector3.ZERO
+var selecting: bool = false
+var selection_sent: bool = false
+var vehicle_choices: Dictionary[String, int] = {}
 var started: bool = false
 var finished: bool = false
 var third_person_zoom: float = 0.25
@@ -110,9 +113,14 @@ func _ready() -> void:
 	camera_yaw = tank.rotation.y
 	camera_position = tank.position + Basis(Vector3.UP, camera_yaw) * Vector3(0, 6.5, 13)
 	_update_camera(1.0)
+	for index: int in TankScript.SPECS.size():
+		var button: Button = %VehicleCards.get_child(index)
+		button.text = "\n\n" + TankScript.SPECS[index].display_name + "\n" + TankScript.SPECS[index].description.replace(" · ", "\n")
+		button.get_node("Silhouette").texture = TankScript.SPECS[index].silhouette
+		button.pressed.connect(select_vehicle.bind(index))
 	_make_audio()
 	pages = Pages.new()
-	var error: Error = pages.prepare(self, api, request, _start_game)
+	var error: Error = pages.prepare(self, api, request, _begin_selection)
 	if error != OK:
 		_network_failure(error)
 
@@ -146,6 +154,8 @@ func party_stop(_reason: StringName) -> void:
 	if api.players_changed.is_connected(_players_changed):
 		api.players_changed.disconnect(_players_changed)
 	engine_audio.stop()
+	cannon_audio.stop()
+	impact_audio.stop()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _make_audio() -> void:
@@ -181,7 +191,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if api.input.event_matches(event, &"tank_sight"):
 		set_first_person(not first_person)
 	elif api.input.event_matches(event, &"tank_ammunition"):
-		_requested_ammunition = DamageModel.Ammo.HE if _requested_ammunition == DamageModel.Ammo.AP else DamageModel.Ammo.AP
+		_requested_ammunition = tank.spec.weapons[1] if _requested_ammunition == tank.spec.weapons[0] else tank.spec.weapons[0]
 		_input_clock = INPUT_INTERVAL
 	elif api.input.event_matches(event, &"tank_fire"):
 		_pending_fire = true
@@ -245,8 +255,8 @@ func _physics_process(delta: float) -> void:
 	while not feedbacks.is_empty() and feedbacks[0].age >= 1.6:
 		feedbacks.pop_front()
 	_update_effects(delta)
-	engine_audio.pitch_scale = lerpf(0.72, 1.65, absf(tank.speed) / TankScript.MAX_FORWARD)
-	engine_audio.volume_db = -40.0 if tank.dead else lerpf(-24.0, -16.0, absf(tank.speed) / TankScript.MAX_FORWARD)
+	engine_audio.pitch_scale = lerpf(0.72, 1.65, absf(tank.speed) / tank.spec.max_speed)
+	engine_audio.volume_db = -40.0 if tank.dead else lerpf(-24.0, -16.0, absf(tank.speed) / tank.spec.max_speed)
 	hud.queue_redraw()
 
 func _send_input(blocked: bool) -> void:
@@ -259,7 +269,7 @@ func _send_input(blocked: bool) -> void:
 	var data: Dictionary = {"seq": _input_sequence, "drive": drive, "steer": steer,
 		"brake": blocked or api.input.is_pressed(&"tank_brake"), "aim": tank.aim_point,
 		"direction_mode": first_person, "direction": tank.requested_gun_direction,
-		"fire": _pending_fire and not blocked, "recover": _pending_recover and not blocked, "ammunition": _requested_ammunition}
+		"fire": (_pending_fire or (DamageModel.is_automatic(_requested_ammunition) and api.input.is_pressed(&"tank_fire"))) and not blocked, "recover": _pending_recover and not blocked, "ammunition": _requested_ammunition}
 	_pending_fire = false
 	_pending_recover = false
 	if api.is_host():
@@ -269,6 +279,9 @@ func _send_input(blocked: bool) -> void:
 
 ## Authenticate ownership before consuming logical actions. Never accept client poses or damage.
 func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
+	if topic == &"tank_selection" and not started and not finished:
+		_selection_message(sender, payload)
+		return
 	if not started or finished or not payload is Dictionary:
 		return
 	if topic == &"tank_input" and api.is_host():
@@ -296,6 +309,10 @@ func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
 				var state: Dictionary = payload.targets[i]
 				if state.hp < target.hp:
 					target.damage(target.hp - state.hp)
+		elif topic == &"tank_missiles":
+			if shells.has(payload.id) and is_instance_valid(shells[payload.id]):
+				shells[payload.id].global_position = payload.position
+				shells[payload.id].velocity = payload.velocity
 		elif topic == &"tank_events":
 			if payload.kind == "shot":
 				_spawn_shell(payload.id, payload.player, payload.position, payload.velocity, false, payload.ammunition)
@@ -308,7 +325,7 @@ func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
 func _accept_input(id: String, data: Dictionary) -> void:
 	if combat_ended:
 		return
-	if not data.get("ammunition") is int or data.ammunition not in [DamageModel.Ammo.AP, DamageModel.Ammo.HE]:
+	if not data.get("ammunition") is int or data.ammunition not in vehicles[id].spec.weapons:
 		return
 	if not data.get("seq") is int or data.seq <= commands[id].sequence:
 		return
@@ -346,7 +363,7 @@ func _fire_vehicle(id: String) -> void:
 	if not vehicle.begin_fire():
 		return
 	_shot_id += 1
-	var origin: Vector3 = vehicle.visual.muzzle.global_position
+	var origin: Vector3 = vehicle.shot_muzzle().global_position
 	var velocity: Vector3 = vehicle.muzzle_direction() * DamageModel.shell_speed(vehicle.ammunition)
 	_spawn_shell(_shot_id, id, origin, velocity, true, vehicle.ammunition)
 	_network_failure(api.net.broadcast_stream(&"tank_events", {"kind": "shot", "id": _shot_id, "player": id, "position": origin, "velocity": velocity, "ammunition": vehicle.ammunition}, "instance", true))
@@ -365,8 +382,11 @@ func _spawn_shell(id: int, player: String, origin: Vector3, velocity: Vector3, a
 	if authoritative:
 		shell.impacted.connect(_shell_impact.bind(id, player, ammunition))
 	shell.tree_exited.connect(func() -> void: shells.erase(id))
+	var automatic: bool = DamageModel.is_automatic(ammunition)
 	if player == local_id:
-		shot_shake = 1.0
+		shot_shake = 0.18 if automatic else 1.0
+	cannon_audio.pitch_scale = 1.8 if automatic else 1.0
+	cannon_audio.volume_db = -16.0 if automatic else -8.0
 	cannon_audio.play()
 	_emit_effect(origin, Color("ffdb7c"), 0.3 if first_person and player == local_id else 0.9, 0.12, Vector3.ZERO)
 
@@ -411,7 +431,7 @@ func _impact_effect(point: Vector3, normal: Vector3, player: String, feedback: A
 			if entry.kind != "ricochet": hit_flash = 0.4
 		while feedbacks.size() > 4:
 			feedbacks.pop_front()
-	var explosive: bool = ammunition == DamageModel.Ammo.HE
+	var explosive: bool = DamageModel.is_explosive(ammunition)
 	_emit_effect(point + normal * 0.2, Color("ffca67"), 2.8 if explosive else 0.8, 0.25 if explosive else 0.12, Vector3.ZERO)
 	for i: int in (14 if explosive else 6):
 		_emit_effect(point, Color("746e57"), randf_range(0.4, 1.1) if explosive else randf_range(0.15, 0.4), randf_range(0.7, 1.5), Vector3(randf_range(-3, 3), randf_range(0.4, 5), randf_range(-3, 3)))
@@ -420,6 +440,10 @@ func _publish() -> void:
 	var states: PackedFloat32Array = []
 	for player: Dictionary in players:
 		states.append_array(vehicles[player.player_id].make_snapshot())
+	for id: int in shells:
+		var shell: ShellScript = shells[id]
+		if is_instance_valid(shell) and DamageModel.is_missile(shell.ammunition):
+			_network_failure(api.net.broadcast_stream(&"tank_missiles", {"id": id, "position": shell.global_position, "velocity": shell.velocity}, "instance", true))
 	var target_states: Array[Dictionary] = []
 	for target: TargetScript in targets:
 		target_states.append({"hp": target.hp})
@@ -428,7 +452,7 @@ func _publish() -> void:
 		"vehicles": states, "targets": target_states, "destroyed": destroyed_count, "hits": hits}, "instance", true))
 
 func _players_changed() -> void:
-	if not api.is_host() or not started or finished:
+	if not api.is_host() or (not started and not selecting) or finished:
 		return
 	for player: Dictionary in api.get_players():
 		if not player.connected and not withdrawn.has(player.player_id):
@@ -438,6 +462,7 @@ func _players_changed() -> void:
 			vehicle.hp = 0.0
 			vehicle.speed = 0.0
 			vehicle.visual.set_destroyed(true)
+	if selecting: _publish_selection()
 
 func _check_finish() -> void:
 	if combat_ended:
@@ -571,13 +596,14 @@ func _update_aim_point() -> void:
 	tank.aim_point = end if hit.is_empty() else hit.position
 
 func _predict_impact() -> void:
-	var point: Vector3 = tank.visual.muzzle.global_position
+	var point: Vector3 = tank.shot_muzzle().global_position
+	var gravity: float = DamageModel.gravity(tank.ammunition)
 	var velocity: Vector3 = tank.muzzle_direction() * DamageModel.shell_speed(tank.ammunition)
 	actual_hit_target = false
 	actual_impact = point + velocity * 3
 	# Same integrator/gravity as real shells; sweep each segment to avoid tunneling.
 	for i: int in 130:
-		var next: Vector3 = point + velocity * 0.04 + Vector3.DOWN * TankScript.SHELL_GRAVITY * 0.0008
+		var next: Vector3 = point + velocity * 0.04 + Vector3.DOWN * gravity * 0.0008
 		var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(point, next, 5)
 		query.collide_with_areas = true
 		query.exclude = [tank.get_rid(), tank.armor.get_rid()]
@@ -587,7 +613,7 @@ func _predict_impact() -> void:
 			actual_hit_target = hit.collider is Area3D or (hit.collider is TargetScript and not hit.collider.dead)
 			return
 		point = next
-		velocity.y -= TankScript.SHELL_GRAVITY * 0.04
+		velocity.y -= gravity * 0.04
 	actual_impact = point
 
 
@@ -618,3 +644,71 @@ func _update_effects(delta: float) -> void:
 		effect.node.position += effect.velocity * delta
 		effect.velocity *= 1.0 - delta * 1.3
 		effect.node.scale = Vector3.ONE * (1.0 + (1.0 - effect.life / effect.total) * 1.3) * minf(1.0, effect.life * 5)
+
+func _begin_selection() -> void:
+	if started:
+		return
+	selecting = true
+	$GameHUD.hide()
+	%VehicleSelection.show()
+	%SelectionStatus.text = "%s 切换武器 · %s 切换瞄准镜 · 滚轮缩放" % [api.input.binding_text(&"tank_ammunition"), api.input.binding_text(&"tank_sight")]
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	if local_id.is_empty():
+		for button: Button in %VehicleCards.get_children(): button.disabled = true
+		%SelectionStatus.text = "等待参战玩家选择载具"
+	if api.is_host(): _players_changed()
+
+## Selection is immutable after confirmation and owned by the sending participant.
+func select_vehicle(index: int) -> void:
+	if not selecting or selection_sent or local_id.is_empty():
+		return
+	selection_sent = true
+	for button: Button in %VehicleCards.get_children(): button.disabled = true
+	%SelectionStatus.text = "已选择 %s · 等待其他玩家" % TankScript.SPECS[index].display_name
+	_network_failure(api.net.send_to_host(&"tank_selection", {"kind": "choose", "vehicle": index}))
+
+func _selection_message(sender: Dictionary, payload: Variant) -> void:
+	if not payload is Dictionary:
+		return
+	if api.is_host() and payload.get("kind") == "choose":
+		if not payload.get("vehicle") is int or payload.vehicle < 0 or payload.vehicle >= TankScript.SPECS.size():
+			return
+		for player: Dictionary in api.get_players():
+			if player.connected and player.peer_id == sender.peer_id and player.player_id in sender.player_ids and not vehicle_choices.has(player.player_id):
+				vehicle_choices[player.player_id] = payload.vehicle
+				_publish_selection()
+				return
+	elif sender.peer_id == 1 and not api.is_host() and payload.get("kind") == "deploy":
+		if not payload.get("choices") is Dictionary or payload.choices.size() != players.size():
+			_network_failure(ERR_INVALID_DATA)
+			return
+		for player: Dictionary in players:
+			var value: Variant = payload.choices.get(player.player_id)
+			if not value is int or value < 0 or value >= TankScript.SPECS.size():
+				_network_failure(ERR_INVALID_DATA)
+				return
+		vehicle_choices.assign(payload.choices)
+		_deploy_vehicles()
+
+func _publish_selection() -> void:
+	if not selecting:
+		return
+	for player: Dictionary in api.get_players():
+		if not player.connected:
+			vehicle_choices[player.player_id] = 0
+		elif not vehicle_choices.has(player.player_id):
+			return
+	var error: Error = api.net.broadcast(&"tank_selection", {"kind": "deploy", "choices": vehicle_choices})
+	if error != OK:
+		_network_failure(error)
+		return
+	_deploy_vehicles()
+
+func _deploy_vehicles() -> void:
+	for id: String in vehicles:
+		vehicles[id].configure_vehicle(vehicle_choices[id])
+	_requested_ammunition = tank.ammunition
+	selecting = false
+	%VehicleSelection.hide()
+	$GameHUD.show()
+	_start_game()

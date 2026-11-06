@@ -56,6 +56,30 @@ Label/constants/shadow_offset_y = 2
 Label/constants/outline_size = 2
 Label/colors/font_outline_color = Color(0.02, 0.03, 0.03, 0.35)
 
+[sub_resource type="StyleBoxFlat" id="VehicleCard"]
+bg_color = Color(0.08,0.12,0.10,0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.24,0.32,0.27,1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+
+[sub_resource type="StyleBoxFlat" id="VehicleCardHover"]
+bg_color = Color(0.13,0.19,0.15,1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.92,0.72,0.39,1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_left = 4
+corner_radius_bottom_right = 4
+
 [node name="ThunderWar" type="Node3D" unique_id=1924703324]
 script = ExtResource("1_048g3")
 
@@ -189,6 +213,7 @@ theme_override_constants/separation = 12
 mouse_filter = 2
 
 [node name="VehicleIcon" type="TextureRect" parent="GameHUD/RangeHUD/VehicleStatus/HealthRow"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(46, 26)
 layout_mode = 2
 mouse_filter = 2
@@ -235,12 +260,14 @@ mouse_filter = 2
 theme_override_constants/separation = 7
 
 [node name="WeaponName" type="Label" parent="GameHUD/RangeHUD/WeaponStatus"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "M68A1  /  105 mm"
 horizontal_alignment = 2
 
 [node name="WeaponIcon" type="TextureRect" parent="GameHUD/RangeHUD/WeaponStatus"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(270, 48)
 layout_mode = 2
 size_flags_horizontal = 8
@@ -291,3 +318,124 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Q    AP  /  HE"
 horizontal_alignment = 2
+
+[node name="SelectionLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="VehicleSelection" type="Control" parent="SelectionLayer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("HudTheme")
+
+[node name="Backdrop" type="ColorRect" parent="SelectionLayer/VehicleSelection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.025,0.045,0.04,0.96)
+mouse_filter = 2
+
+[node name="Center" type="CenterContainer" parent="SelectionLayer/VehicleSelection"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Content" type="VBoxContainer" parent="SelectionLayer/VehicleSelection/Center"]
+layout_mode = 2
+theme_override_constants/separation = 28
+
+[node name="Title" type="Label" parent="SelectionLayer/VehicleSelection/Center/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "选择载具"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="SelectionLayer/VehicleSelection/Center/Content"]
+layout_mode = 2
+text = "每人一条生命 · 点击载具确认出战"
+horizontal_alignment = 1
+
+[node name="VehicleCards" type="HBoxContainer" parent="SelectionLayer/VehicleSelection/Center/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Abrams" type="Button" parent="SelectionLayer/VehicleSelection/Center/Content/VehicleCards"]
+custom_minimum_size = Vector2(344, 300)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "M1 Abrams\n\n主战坦克\n穿甲弹 / 高爆弹"
+theme_override_styles/normal = SubResource("VehicleCard")
+theme_override_styles/hover = SubResource("VehicleCardHover")
+theme_override_styles/focus = SubResource("VehicleCardHover")
+
+[node name="Silhouette" type="TextureRect" parent="SelectionLayer/VehicleSelection/Center/Content/VehicleCards/Abrams"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -64.0
+offset_top = 18.0
+offset_right = 64.0
+offset_bottom = 82.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+
+[node name="BMPT" type="Button" parent="SelectionLayer/VehicleSelection/Center/Content/VehicleCards"]
+custom_minimum_size = Vector2(344, 300)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "BMPT 终结者\n\n火力支援\n双联 30 mm 机炮 / Ataka 导弹"
+theme_override_styles/normal = SubResource("VehicleCard")
+theme_override_styles/hover = SubResource("VehicleCardHover")
+theme_override_styles/focus = SubResource("VehicleCardHover")
+
+[node name="Silhouette" type="TextureRect" parent="SelectionLayer/VehicleSelection/Center/Content/VehicleCards/BMPT"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -64.0
+offset_top = 18.0
+offset_right = 64.0
+offset_bottom = 82.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+
+[node name="Bradley" type="Button" parent="SelectionLayer/VehicleSelection/Center/Content/VehicleCards"]
+custom_minimum_size = Vector2(344, 300)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "M2A2 布拉德利\n\n步兵战车\n25 mm 机炮 / TOW 导弹"
+theme_override_styles/normal = SubResource("VehicleCard")
+theme_override_styles/hover = SubResource("VehicleCardHover")
+theme_override_styles/focus = SubResource("VehicleCardHover")
+
+[node name="Silhouette" type="TextureRect" parent="SelectionLayer/VehicleSelection/Center/Content/VehicleCards/Bradley"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -64.0
+offset_top = 18.0
+offset_right = 64.0
+offset_bottom = 82.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+
+[node name="SelectionStatus" type="Label" parent="SelectionLayer/VehicleSelection/Center/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Q 切换武器 · Shift 切换瞄准镜 · 滚轮缩放"
+horizontal_alignment = 1

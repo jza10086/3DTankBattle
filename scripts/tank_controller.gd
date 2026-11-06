@@ -4,14 +4,13 @@ const TankVisualScript = preload("res://games/minigame/godot_party_default_tank_
 
 ## Deliberately accessible tracked-vehicle model, not a full rigid-body simulator.
 ## Four suspension contacts tilt the rendered hull while a stable chassis handles collision.
-const MAX_FORWARD: float = 14.5
-const MAX_REVERSE: float = 5.5
-const ACCELERATION: float = 4.2
+const Spec = preload("res://games/minigame/godot_party_default_tank_range/scripts/vehicle_spec.gd")
+const SPECS: Array[Spec] = [preload("res://games/minigame/godot_party_default_tank_range/vehicles/m1_abrams.tres"), preload("res://games/minigame/godot_party_default_tank_range/vehicles/bmpt.tres"), preload("res://games/minigame/godot_party_default_tank_range/vehicles/bradley.tres")]
+var vehicle_index: int = 0
+var spec: Spec = SPECS[0]
 const BRAKING: float = 12.0
-const TURRET_RATE: float = 0.68
 const ELEVATION_RATE: float = 0.38
 const GRAVITY: float = 20.0
-const SHELL_GRAVITY: float = 9.8
 const ComponentState = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_status.gd")
 var speed: float = 0.0
 var yaw_rate: float = 0.0
@@ -68,8 +67,8 @@ func integrate_drive(delta: float) -> void:
 	var mobility: Vector2 = components.get_track_multipliers()
 	var drive_factor: float = (mobility.x + mobility.y) * 0.5
 	var engine_disabled: bool = components.engine_remaining > 0.0
-	var requested_speed: float = throttle * (MAX_FORWARD if throttle >= 0 else MAX_REVERSE) * drive_factor
-	var deceleration: float = BRAKING if brake or throttle * speed < -0.1 else ACCELERATION * drive_factor
+	var requested_speed: float = throttle * (spec.max_speed if throttle >= 0 else spec.reverse_speed) * drive_factor
+	var deceleration: float = BRAKING if brake or throttle * speed < -0.1 else spec.acceleration * drive_factor
 	if brake:
 		requested_speed = 0.0
 	elif is_zero_approx(throttle):
@@ -82,13 +81,13 @@ func integrate_drive(delta: float) -> void:
 		velocity.x = 0.0
 		velocity.z = 0.0
 	elif contact_count >= 2:
-		speed = clampf(speed, -MAX_REVERSE * drive_factor, MAX_FORWARD * drive_factor)
+		speed = clampf(speed, -spec.reverse_speed * drive_factor, spec.max_speed * drive_factor)
 		speed = move_toward(speed, requested_speed, deceleration * delta)
 	# Healthy movement is unchanged. Damaged tracks reduce propulsion and turn
 	# authority; a single weak track also pulls toward that side while rolling.
-	var turn_authority: float = lerpf(1.08, 0.54, clampf(absf(speed) / MAX_FORWARD, 0, 1))
+	var turn_authority: float = lerpf(1.08, 0.54, clampf(absf(speed) / spec.max_speed, 0, 1))
 	var requested_yaw: float = steering * turn_authority * (0.32 if brake else 1.0) * drive_factor
-	var track_pull: float = (mobility.y - mobility.x) * clampf(speed / MAX_FORWARD, -1.0, 1.0) * 0.85
+	var track_pull: float = (mobility.y - mobility.x) * clampf(speed / spec.max_speed, -1.0, 1.0) * 0.85
 	requested_yaw += track_pull
 	if contact_count < 2:
 		requested_yaw *= 0.15
@@ -152,7 +151,7 @@ func _update_aim(delta: float) -> void:
 	var direction: Vector3 = requested_gun_direction if aim_direction_mode else aim_point - pivot
 	var local_direction: Vector3 = visual.global_basis.orthonormalized().inverse() * direction
 	var target_yaw: float = atan2(-local_direction.x, -local_direction.z)
-	visual.turret.rotation.y = rotate_toward(visual.turret.rotation.y, target_yaw, TURRET_RATE * delta)
+	visual.turret.rotation.y = rotate_toward(visual.turret.rotation.y, target_yaw, spec.traverse_rate * delta)
 	var barrel_target: Vector3 = requested_gun_direction if aim_direction_mode else aim_point - visual.barrel.global_position
 	var local_barrel: Vector3 = visual.turret.global_basis.orthonormalized().inverse() * barrel_target
 	var horizontal: float = Vector2(local_barrel.x, local_barrel.z).length()
@@ -160,20 +159,22 @@ func _update_aim(delta: float) -> void:
 	# The first-person sight instead commands a bore direction directly: feeding
 	# the actual gun camera back into the arc solver would cause elevation drift.
 	var shell_speed: float = DamageModel.shell_speed(ammunition)
+	var gravity: float = DamageModel.gravity(ammunition)
 	var v2: float = shell_speed * shell_speed
-	var discriminant: float = v2 * v2 - SHELL_GRAVITY * (SHELL_GRAVITY * horizontal * horizontal + 2.0 * local_barrel.y * v2)
+	var discriminant: float = v2 * v2 - gravity * (gravity * horizontal * horizontal + 2.0 * local_barrel.y * v2)
 	var elevation: float = atan2(local_barrel.y, horizontal)
-	if not aim_direction_mode and horizontal > 1.0 and discriminant >= 0.0:
-		elevation = atan((v2 - sqrt(discriminant)) / (SHELL_GRAVITY * horizontal))
+	if gravity > 0.0 and not aim_direction_mode and horizontal > 1.0 and discriminant >= 0.0:
+		elevation = atan((v2 - sqrt(discriminant)) / (gravity * horizontal))
 	elevation = clampf(elevation, deg_to_rad(-9), deg_to_rad(23))
 	visual.barrel.rotation.x = move_toward(visual.barrel.rotation.x, elevation, ELEVATION_RATE * delta)
+	visual.aim_launcher()
 	var breech: Vector3 = visual.barrel.global_position
-	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(breech, visual.muzzle.global_position + muzzle_direction() * 0.2, 1)
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(breech, shot_muzzle().global_position + muzzle_direction() * 0.2, 1)
 	query.hit_from_inside = true
 	muzzle_obstructed = not get_world_3d().direct_space_state.intersect_ray(query).is_empty()
 
 func muzzle_direction() -> Vector3:
-	return -visual.muzzle.global_basis.z.normalized()
+	return -shot_muzzle().global_basis.z.normalized()
 
 func can_fire() -> bool:
 	return not dead and components.can_fire() and not muzzle_obstructed
@@ -182,7 +183,7 @@ func begin_fire() -> bool:
 	if not can_fire() or not components.begin_fire():
 		return false
 	rounds_fired += 1
-	recoil = 1.0
+	recoil = 0.24 if DamageModel.is_automatic(ammunition) else 1.0
 	return true
 
 func apply_component_hit(component: StringName) -> bool:
@@ -235,11 +236,11 @@ func _build_armor() -> void:
 	armor.collision_mask = 0
 	armor.monitoring = false
 	add_child(armor)
-	_add_armor_box("hull", Vector3(2.4, 0.8, 5.5), Vector3(0, 0.15, 0))
-	_add_armor_box("left_track", Vector3(0.45, 0.85, 4.9), Vector3(-1.03, -0.13, 0))
-	_add_armor_box("right_track", Vector3(0.45, 0.85, 4.9), Vector3(1.03, -0.13, 0))
-	_turret_shape = _add_armor_box("turret", Vector3(2.15, 0.65, 2.65), Vector3.ZERO)
-	_barrel_shape = _add_armor_box("barrel", Vector3(0.18, 0.18, 2.9), Vector3.ZERO)
+	_add_armor_box("hull", spec.hull_size, spec.hull_center)
+	_add_armor_box("left_track", Vector3(0.45, 0.85, spec.track_length), Vector3(-spec.track_width, -0.13, 0))
+	_add_armor_box("right_track", Vector3(0.45, 0.85, spec.track_length), Vector3(spec.track_width, -0.13, 0))
+	_turret_shape = _add_armor_box("turret", spec.turret_size, Vector3.ZERO)
+	_barrel_shape = _add_armor_box("barrel", Vector3(spec.barrel_width, 0.18, spec.barrel_length), Vector3.ZERO)
 	nameplate = Label3D.new()
 	nameplate.position = Vector3(0, 2.8, 0)
 	nameplate.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -259,8 +260,8 @@ func _add_armor_box(part: String, dimensions: Vector3, center: Vector3) -> Colli
 	return collider
 
 func _update_armor() -> void:
-	_turret_shape.global_transform = visual.turret.global_transform.translated_local(Vector3(0, 0.3, 0.25))
-	_barrel_shape.global_transform = visual.barrel.global_transform.translated_local(Vector3(0, 0, -1.45))
+	_turret_shape.global_transform = visual.turret.global_transform.translated_local(spec.turret_center)
+	_barrel_shape.global_transform = visual.barrel.global_transform.translated_local(Vector3(0, 0, -spec.barrel_length * 0.5))
 
 func get_marker_point() -> Vector3:
 	return global_position + Vector3(0, 2.8, 0)
@@ -271,7 +272,7 @@ func apply_shell_hit(point: Vector3, normal: Vector3, incoming: Vector3, shape_i
 	var part: String = shape.get_meta("part")
 	var result: Dictionary = DamageModel.evaluate(&"track" if part.ends_with("track") else StringName(part), global_basis, normal, incoming, shell_ammunition)
 	result["ignored"] = dead
-	result["damage"] = 0.0 if dead else minf(hp, result.damage)
+	result["damage"] = 0.0 if dead else minf(hp, result.damage * spec.damage_multiplier)
 	result["component"] = ""
 	result["disabled"] = false
 	result["component_duration"] = 0.0
@@ -328,6 +329,7 @@ func apply_snapshot(state: PackedFloat32Array, delta: float) -> void:
 	components.reload_duration = DamageModel.reload_duration(ammunition)
 	visual.set_destroyed(dead)
 	visual.animate_tracks(speed - yaw_rate * 1.3, speed + yaw_rate * 1.3, delta)
+	visual.aim_launcher()
 	_update_armor()
 
 func switch_ammunition(value: int) -> void:
@@ -345,7 +347,7 @@ func apply_blast_hit(origin: Vector3, amount: float) -> Dictionary:
 	var result: Dictionary = {"damage": 0.0, "destroyed": false, "component": "", "disabled": false}
 	if dead:
 		return result
-	result.damage = minf(hp, amount)
+	result.damage = minf(hp, amount * spec.damage_multiplier)
 	hp -= result.damage
 	dead = hp <= 0.0
 	result.destroyed = dead
@@ -359,3 +361,27 @@ func apply_blast_hit(origin: Vector3, amount: float) -> Dictionary:
 		apply_component_hit(component)
 		result.component = component
 	return result
+
+## Called exactly once after the host locks the pre-round vehicle selection.
+func configure_vehicle(index: int) -> void:
+	vehicle_index = index
+	spec = SPECS[index]
+	visual.configure(spec)
+	visual.set_destroyed(dead)
+	ammunition = spec.weapons[0]
+	components.reload_duration = DamageModel.reload_duration(ammunition)
+	var body: BoxShape3D = BoxShape3D.new()
+	body.size = Vector3(spec.hull_size.x + 0.2, 1.15, spec.hull_size.z)
+	$Collision.shape = body
+	var shapes: Array = armor.get_children()
+	shapes[0].shape.size = spec.hull_size
+	shapes[0].position = spec.hull_center
+	for side: int in 2:
+		shapes[side + 1].shape.size.z = spec.track_length
+		shapes[side + 1].position.x = (-1.0 if side == 0 else 1.0) * spec.track_width
+	_turret_shape.shape.size = spec.turret_size
+	_barrel_shape.shape.size = Vector3(spec.barrel_width, 0.18, spec.barrel_length)
+	_update_armor()
+
+func shot_muzzle() -> Node3D:
+	return visual.firing_muzzle(DamageModel.is_missile(ammunition), rounds_fired)

@@ -1,5 +1,9 @@
 extends Node3D
-## M1 Abrams presentation. Gameplay owns traverse, elevation and tread speeds.
+## Tracked vehicle presentation. Gameplay owns traverse, elevation and tread speeds.
+const Spec = preload("res://games/minigame/godot_party_default_tank_range/scripts/vehicle_spec.gd")
+var missile_muzzle: Node3D
+var second_muzzle: Node3D
+var launcher: Node3D
 var turret: Node3D
 var barrel: Node3D
 var muzzle: Node3D
@@ -15,12 +19,37 @@ var _material_copies: Dictionary[Material, StandardMaterial3D] = {}
 var _destroyed: bool = false
 
 func _ready() -> void:
-	var model: Node3D = $Model/M1Abrams
+	_bind_model("res://games/minigame/godot_party_default_tank_range/assets/m1_abrams/track_paths.json", false, false)
+
+func configure(spec: Spec) -> void:
+	var previous: Node = $Model
+	remove_child(previous)
+	previous.queue_free()
+	_paths.clear()
+	_lengths.clear()
+	_phases = [0.0, 0.0]
+	_shoes.clear()
+	_wheels = [[], []]
+	_materials.clear()
+	_colors.clear()
+	_material_copies.clear()
+	_destroyed = false
+	var instance: Node3D = spec.model.instantiate()
+	instance.name = "Model"
+	instance.position.y = -0.60
+	add_child(instance)
+	_bind_model(spec.track_path, spec.weapons[0] == 2, spec.weapons[0] == 3)
+
+func _bind_model(track_path: String, twin: bool, bradley: bool) -> void:
+	var model: Node3D = $Model.get_child(0)
 	turret = model.get_node("TurretPivot")
 	barrel = turret.get_node("BarrelPivot")
 	_recoil = barrel.get_node("Recoil")
 	muzzle = _recoil.get_node("Muzzle")
-	var data: Array = JSON.parse_string(FileAccess.get_file_as_string("res://games/minigame/godot_party_default_tank_range/assets/m1_abrams/track_paths.json"))
+	second_muzzle = _recoil.get_node("Muzzle2") if twin else muzzle
+	launcher = turret.get_node("LauncherPivot") if bradley else barrel
+	missile_muzzle = launcher.get_node("MissileMuzzle") if twin or bradley else muzzle
+	var data: Array = JSON.parse_string(FileAccess.get_file_as_string(track_path))
 	for side: int in 2:
 		var path: PackedVector3Array = []
 		for point: Array in data[side]:
@@ -89,3 +118,10 @@ func set_destroyed(value: bool) -> void:
 	_destroyed = value
 	for i: int in _materials.size():
 		_materials[i].albedo_color = _colors[i].darkened(0.65) if value else _colors[i]
+
+func aim_launcher() -> void:
+	if launcher != barrel:
+		launcher.rotation.x = barrel.rotation.x
+
+func firing_muzzle(missile: bool, shot: int) -> Node3D:
+	return missile_muzzle if missile else (muzzle if shot % 2 == 0 else second_muzzle)

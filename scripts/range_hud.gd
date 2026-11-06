@@ -4,6 +4,10 @@ const Tank = preload("res://games/minigame/godot_party_default_tank_range/script
 const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
 const AP_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/shell_ap.svg")
 const HE_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/shell_he.svg")
+const AUTO_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/shell_auto.svg")
+const MISSILE_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/missile.svg")
+const GUN_ICONS: Array[Texture2D] = [preload("res://games/minigame/godot_party_default_tank_range/assets/ui/m68_cannon.svg"), preload("res://games/minigame/godot_party_default_tank_range/assets/ui/twin_cannon.svg"), preload("res://games/minigame/godot_party_default_tank_range/assets/ui/autocannon.svg")]
+const LAUNCHER_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/missile_launcher.svg")
 const WHITE: Color = Color("f3eedc")
 const AMBER: Color = Color("ffc66d")
 const RED: Color = Color("ff7668")
@@ -36,15 +40,18 @@ func _draw() -> void:
 	var repairing: bool = tank.components.barrel_remaining > 0.0
 	var remaining: float = tank.reload_remaining
 	var loaded: bool = remaining <= 0.0 and not repairing and not tank.dead
-	%AmmoName.text = "穿甲弹" if tank.ammunition == DamageModel.Ammo.AP else "高爆弹"
+	%AmmoName.text = DamageModel.ammo_name(tank.ammunition)
+	%WeaponName.text = DamageModel.weapon_name(tank.ammunition)
+	%WeaponIcon.texture = LAUNCHER_ICON if DamageModel.is_missile(tank.ammunition) else GUN_ICONS[tank.vehicle_index]
+	%VehicleIcon.texture = tank.spec.silhouette
 	%AmmoState.text = "武器失效" if tank.dead else ("主炮维修中" if repairing else ("准备就绪" if loaded else "装填中  %.1f s" % remaining))
 	%AmmoState.modulate = WHITE if loaded else AMBER
-	var icon: Texture2D = AP_ICON if tank.ammunition == DamageModel.Ammo.AP else HE_ICON
+	var icon: Texture2D = MISSILE_ICON if DamageModel.is_missile(tank.ammunition) else (AUTO_ICON if DamageModel.is_automatic(tank.ammunition) else (AP_ICON if tank.ammunition == DamageModel.Ammo.AP else HE_ICON))
 	%ShellFill.texture_under = icon
 	%ShellFill.texture_progress = icon
 	%ShellFill.value = 0.0 if repairing or tank.dead else 100.0 * (1.0 - remaining / tank.components.reload_duration)
 	%ShellFill.tint_progress = WHITE if loaded else AMBER
-	%AmmoSelector.text = "%s   %s" % [game.api.input.binding_text(&"tank_ammunition"), "[ AP ]   HE" if tank.ammunition == DamageModel.Ammo.AP else "AP   [ HE ]"]
+	%AmmoSelector.text = "%s   %s" % [game.api.input.binding_text(&"tank_ammunition"), ("[ AP ]   HE" if tank.ammunition == DamageModel.Ammo.AP else "AP   [ HE ]") if tank.vehicle_index == 0 else ("[ 机炮 ]   导弹" if DamageModel.is_automatic(tank.ammunition) else "机炮   [ 导弹 ]")]
 	var center: Vector2 = size * 0.5
 	if game.first_person:
 		_draw_optic(center)

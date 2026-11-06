@@ -205,7 +205,7 @@ static func schema() -> Dictionary:
 	                    "physical": true
 	                }
 	            ],
-	            "title": "切换弹药",
+	            "title": "切换武器 / 弹药",
 	            "audience": "local",
 	            "apply": "immediate",
 	            "control": "binding",
