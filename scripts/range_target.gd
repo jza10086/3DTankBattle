@@ -1,124 +1,58 @@
 class_name RangeTarget
 extends StaticBody3D
-## Static CC0 training tank: each connected visible mesh island gets its own
-## convex collider. Wheels and tread meshes are track armor, not an empty plate.
+## Static training target. Authored island colliders identify armor and damageable components.
 signal destroyed(target: RangeTarget)
 const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
 const ComponentStatusScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_status.gd")
-const MODEL_PATHS := [
-	"res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_olive_target.glb",
-	"res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_heavy_target.glb",
-	"res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_artillery_target.glb",
-]
-const MODEL_NAMES := ["FIELD TANK", "HEAVY TANK", "ASSAULT GUN"]
-# Immutable local-space convex resources survive range resets. Each vehicle
-# still owns its collider nodes, transforms, material copies and damage state.
-# This is memory-only: no generated cache files are written into the project.
-static var _collision_mesh_cache: Dictionary = {}
+const Collider = preload("res://games/minigame/godot_party_default_tank_range/scripts/target_collider.gd")
+@export var colliders: Array[Collider]
 @export var index: int = 0
-@export var model_variant: int = 0
-var model_name := ""
-var max_hp := 100.0
-var hp := 100.0
-var components = ComponentStatusScript.new()
+@export var model_name: String = ""
+var max_hp: float = 100.0
+var hp: float = 100.0
+var components: ComponentStatusScript = ComponentStatusScript.new()
 var reload_remaining: float:
 	get:
 		return components.reload_remaining
 	set(value):
 		components.reload_remaining = maxf(0.0, value)
 # Model-relative compartment in target-local coordinates, not world-axis guesses.
-var hull_bounds := AABB()
-var engine_bounds := AABB()
+@export var hull_bounds: AABB = AABB()
+@export var engine_bounds: AABB = AABB()
 var hit_points: int:
 	get:
 		return ceili(hp)
-var dead := false
-var visual: Node3D
-var last_hit := 0.0
-var marker_height := 3.3
+var dead: bool = false
+@export var visual: Node3D
+var last_hit: float = 0.0
+@export var marker_height: float = 3.3
 var last_hit_result: Dictionary = {}
-var _turret: Node3D
-var _aim_local := Vector3(0, 0.8, 0)
+@export var _turret: Node3D
+@export var _aim_local: Vector3 = Vector3(0, 0.8, 0)
 var _materials: Array[StandardMaterial3D] = []
 var _colors: Array[Color] = []
 var _roughness: Array[float] = []
 var _turret_rest: Transform3D
-var _collision_bindings: Array[Dictionary] = []
-var _largest_hull_volume := 0.0
-var _shape_count := 0
-
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_PAUSABLE
-	collision_layer = 1
-	collision_mask = 0
+	assert(visual != null and _turret != null and not colliders.is_empty(), "Target requires its authored visual, turret and armor colliders.")
 	add_to_group("range_targets")
 	hp = max_hp
-	model_name = MODEL_NAMES[model_variant]
-	visual = $VehicleVisual
-	var model: Node3D = $VehicleVisual/Model
-	_turret = model.find_child("TurretPivot", true, false) as Node3D
-	if _turret != null:
-		_turret_rest = _turret.transform
-	_build_mesh_collisions(model)
-	_configure_engine_bounds()
-	# Station identity and HP are drawn once by the HUD at get_marker_point().
+	_turret_rest = _turret.transform
+	_duplicate_materials(visual)
 
-func _build_mesh_collisions(node: Node) -> void:
+func _duplicate_materials(node: Node) -> void:
 	if node is MeshInstance3D:
-		var mesh_node := node as MeshInstance3D
-		var name_lower := String(mesh_node.name).to_lower()
-		var part := "track" if "track" in name_lower or "wheel" in name_lower else ("barrel" if "barrel" in name_lower else ("turret" if "turret" in name_lower else "hull"))
-		for surface in range(mesh_node.mesh.get_surface_count()):
-			var source := mesh_node.get_active_material(surface)
+		var mesh_node: MeshInstance3D = node
+		for surface: int in mesh_node.mesh.get_surface_count():
+			var source: Material = mesh_node.get_active_material(surface)
 			if source is StandardMaterial3D:
-				var material := source.duplicate() as StandardMaterial3D
+				var material: StandardMaterial3D = source.duplicate()
 				mesh_node.set_surface_override_material(surface, material)
 				_materials.append(material)
 				_colors.append(material.albedo_color)
 				_roughness.append(material.roughness)
-		var mesh_to_body := global_transform.affine_inverse() * mesh_node.global_transform
-		var cache_key := "%d|%s|%s" % [model_variant, mesh_node.name, mesh_node.mesh.resource_path]
-		for cached in _cached_island_shapes(mesh_node.mesh, cache_key):
-			var bounds: AABB = cached.bounds
-			var body_bounds := mesh_to_body * bounds
-			var center: Vector3 = mesh_to_body * bounds.get_center()
-			var island_part := part
-			# The original source Hull includes disconnected road wheels. Its wheel
-			# islands sit below 1m and outboard; keep them track armor, not hull.
-			if part == "hull" and absf(center.x) > 1.05 and center.y < 0.95 and body_bounds.size.y < 1.1:
-				island_part = "track"
-			var collider := CollisionShape3D.new()
-			collider.name = "Armor_%s_%d" % [island_part, _shape_count]
-			collider.shape = cached.shape
-			collider.set_meta("armor_part", island_part)
-			if island_part == "track":
-				# Includes disconnected road wheels originally merged into Hull.
-				collider.set_meta("component", &"left_track" if center.x < 0.0 else &"right_track")
-			elif island_part == "barrel":
-				collider.set_meta("component", &"barrel")
-			add_child(collider)
-			collider.transform = mesh_to_body
-			_collision_bindings.append({"shape": collider, "mesh": mesh_node})
-			_shape_count += 1
-			marker_height = maxf(marker_height, body_bounds.end.y + 0.45)
-			if island_part == "hull":
-				var volume := bounds.size.x * bounds.size.y * bounds.size.z
-				if volume > _largest_hull_volume:
-					_largest_hull_volume = volume
-					_aim_local = center
-					hull_bounds = body_bounds
-	for child in node.get_children():
-		_build_mesh_collisions(child)
-
-## The engine occupies the rear 35% of the MAIN hull island, central 80%
-## width, and 20–95% of its body height. Only a rear-facing HULL surface hit
-## inside this volume can damage it: turret rear, wheels, roof, and side hits
-## do not become engine hits merely because they are near the vehicle's rear.
-func _configure_engine_bounds() -> void:
-	engine_bounds = AABB(
-		hull_bounds.position + hull_bounds.size * Vector3(0.10, 0.20, 0.65),
-		hull_bounds.size * Vector3(0.80, 0.75, 0.35)
-	)
+	for child: Node in node.get_children():
+		_duplicate_materials(child)
 
 func _physics_process(delta: float) -> void:
 	if not dead:
@@ -135,102 +69,33 @@ func begin_fire() -> bool:
 func get_track_multipliers() -> Vector2:
 	return Vector2.ZERO if dead else components.get_track_multipliers()
 
-## A resource is cooked once per asset/mesh; reused Shape3D resources are never
-## edited after insertion. Wreck transforms only move each instance's nodes.
-func _cached_island_shapes(mesh: Mesh, key: String) -> Array[Dictionary]:
-	if _collision_mesh_cache.has(key):
-		return _collision_mesh_cache[key]
-	var result: Array[Dictionary] = []
-	for points in _connected_islands(mesh):
-		if points.size() < 4:
-			continue
-		var bounds := AABB(points[0], Vector3.ZERO)
-		for point in points:
-			bounds = bounds.expand(point)
-		if bounds.size.x * bounds.size.y * bounds.size.z < 0.000001:
-			continue
-		var shape := ConvexPolygonShape3D.new()
-		shape.points = points
-		result.append({"shape": shape, "bounds": bounds})
-	_collision_mesh_cache[key] = result
-	return result
-
-## Weld position-identical vertices across material/normal seams, then union
-## triangle edges. Convexifying each island avoids a single huge convex hull
-## spanning the antenna, wheels, muzzle and the empty space between them.
-func _connected_islands(mesh: Mesh) -> Array[PackedVector3Array]:
-	var faces := mesh.get_faces()
-	var positions: Array[Vector3] = []
-	var parents: Array[int] = []
-	var by_position: Dictionary = {}
-	var ids: Array[int] = []
-	for vertex in faces:
-		var key := Vector3i(roundi(vertex.x * 10000), roundi(vertex.y * 10000), roundi(vertex.z * 10000))
-		if not by_position.has(key):
-			by_position[key] = positions.size()
-			positions.append(vertex)
-			parents.append(parents.size())
-		ids.append(by_position[key])
-	for i in range(0, ids.size(), 3):
-		var root_a := _find_root(parents, ids[i])
-		var root_b := _find_root(parents, ids[i + 1])
-		var root_c := _find_root(parents, ids[i + 2])
-		parents[root_b] = root_a
-		parents[root_c] = root_a
-	var groups: Dictionary = {}
-	for i in positions.size():
-		var root_index := _find_root(parents, i)
-		if not groups.has(root_index):
-			groups[root_index] = PackedVector3Array()
-		var group: PackedVector3Array = groups[root_index]
-		group.append(positions[i])
-		groups[root_index] = group
-	var result: Array[PackedVector3Array] = []
-	for group in groups.values():
-		result.append(group)
-	return result
-
-func _find_root(parents: Array[int], value: int) -> int:
-	var root_index := value
-	while parents[root_index] != root_index:
-		root_index = parents[root_index]
-	var current := value
-	while parents[current] != current:
-		var next := parents[current]
-		parents[current] = root_index
-		current = next
-	return root_index
-
 func get_aim_point() -> Vector3:
 	return global_transform * _aim_local
 
 func get_marker_point() -> Vector3:
 	return global_transform * Vector3(0, marker_height, 0)
 
-func _collider_for_shape(shape_index: int) -> CollisionShape3D:
-	if shape_index >= 0 and shape_index < _shape_count:
-		var owner_id := shape_find_owner(shape_index)
-		var owner_node := shape_owner_get_owner(owner_id)
-		if owner_node is CollisionShape3D:
-			return owner_node
+func _collider_for_shape(shape_index: int) -> Collider:
+	if shape_index >= 0 and shape_index < colliders.size():
+		return shape_owner_get_owner(shape_find_owner(shape_index))
 	return null
 
 func _part_for_shape(shape_index: int) -> StringName:
-	var collider := _collider_for_shape(shape_index)
-	return StringName(collider.get_meta("armor_part", "hull")) if collider != null else &"hull"
+	var collider: Collider = _collider_for_shape(shape_index)
+	return collider.armor_part if collider != null else &"hull"
 
 ## Called with the actual swept-ray contact and shape index. Missing/invalid
 ## shape metadata never fabricates a component hit from a world position alone.
 func component_from_hit(world_point: Vector3, world_normal: Vector3, shape_index: int = -1) -> StringName:
-	var collider := _collider_for_shape(shape_index)
+	var collider: Collider = _collider_for_shape(shape_index)
 	if collider == null:
 		return &""
-	var part := StringName(collider.get_meta("armor_part", "hull"))
+	var part: StringName = collider.armor_part
 	if part == &"barrel" or part == &"track":
-		return StringName(collider.get_meta("component", ""))
+		return collider.component
 	if part != &"hull" or world_normal.length_squared() < 0.000001:
 		return &""
-	var local_normal := global_basis.orthonormalized().inverse() * world_normal.normalized()
+	var local_normal: Vector3 = global_basis.orthonormalized().inverse() * world_normal.normalized()
 	if DamageModel.classify_facing(local_normal) != "rear":
 		return &""
 	# Include the outer armor boundary despite small ray/float precision errors.
@@ -253,14 +118,14 @@ func apply_shell_hit(world_point: Vector3, world_normal: Vector3, incoming_direc
 	if bool(result.get("invalid", false)):
 		return result
 	last_hit = Time.get_ticks_msec() * 0.001
-	var applied := minf(hp, float(result.damage))
+	var applied: float = minf(hp, float(result.damage))
 	result["damage"] = applied
 	damage(applied)
 	result["hp"] = hp
 	result["destroyed"] = dead
 	# Ricochets/invalid/dead contacts neither apply nor refresh component timers.
 	if applied > 0.0 and not dead and not bool(result.ricochet):
-		var component := component_from_hit(world_point, world_normal, shape_index)
+		var component: StringName = component_from_hit(world_point, world_normal, shape_index)
 		if not component.is_empty():
 			result.disabled = not components.is_disabled(component)
 			components.apply_component(component)
@@ -282,7 +147,7 @@ func damage(amount: float = 0.0) -> void:
 	if hp <= 0.0:
 		dead = true
 		components.clear()
-		for material in _materials:
+		for material: StandardMaterial3D in _materials:
 			material.albedo_color = material.albedo_color.lerp(Color("252b28"), 0.85)
 			material.roughness = 1.0
 		# Small broken turret cant, not a folding paper target. The wreck remains
@@ -290,8 +155,8 @@ func damage(amount: float = 0.0) -> void:
 		if is_instance_valid(_turret):
 			_turret.rotation.z += 0.085
 			_turret.rotation.x -= 0.045
-		for binding in _collision_bindings:
-			binding.shape.transform = global_transform.affine_inverse() * binding.mesh.global_transform
+		for collider: Collider in colliders:
+			collider.transform = global_transform.affine_inverse() * collider.source_mesh.global_transform
 		destroyed.emit(self)
 
 func reset_target() -> void:
@@ -305,8 +170,8 @@ func reset_target() -> void:
 	for i: int in _materials.size():
 		_materials[i].albedo_color = _colors[i]
 		_materials[i].roughness = _roughness[i]
-	for binding: Dictionary in _collision_bindings:
-		binding.shape.transform = global_transform.affine_inverse() * binding.mesh.global_transform
+	for collider: Collider in colliders:
+		collider.transform = global_transform.affine_inverse() * collider.source_mesh.global_transform
 
 func apply_blast_hit(origin: Vector3, amount: float) -> Dictionary:
 	var result: Dictionary = {"damage": 0.0, "destroyed": false, "component": "", "disabled": false}

@@ -1,24 +1,17 @@
 [gd_resource type="Resource" script_class="" format=3]
 
 [ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/vehicle_spec.gd" id="spec"]
-[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/assets/bmpt/bmpt.glb" id="model"]
+[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/vehicles/bmpt.tscn" id="model"]
 [ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/bmpt_silhouette.svg" id="icon"]
 
 [resource]
 script = ExtResource("spec")
-display_name = "BMPT 终结者"
-description = "火力支援 · 双联机炮 / Ataka 导弹"
-model = ExtResource("model")
-track_path = "res://games/minigame/godot_party_default_tank_range/assets/bmpt/track_paths.json"
+name_key = &"vehicle.bmpt.name"
+description_key = &"vehicle.bmpt.description"
+scene = ExtResource("model")
 silhouette = ExtResource("icon")
 weapons = Array[int]([2, 4])
 max_speed = 13.2
 acceleration = 4.5
 traverse_rate = 1.05
 damage_multiplier = 1.05
-hull_size = Vector3(2.35, 0.8, 4.9)
-track_length = 4.5
-turret_size = Vector3(1.8, 1.1, 1.9)
-turret_center = Vector3(0, 0.5, 0)
-barrel_length = 2.5
-barrel_width = 0.5

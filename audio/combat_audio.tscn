@@ -1,0 +1,50 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/combat_audio.gd" id="script"]
+[ext_resource type="PackedScene" path="res://games/protocols/godot_party_default_protocol/audio/game_audio.tscn" id="scope"]
+[ext_resource type="Script" path="res://games/protocols/godot_party_default_protocol/audio/audio_cue.gd" id="cue"]
+[ext_resource type="AudioStream" path="res://games/minigame/godot_party_default_tank_range/assets/audio/engine.wav" id="engine"]
+[ext_resource type="AudioStream" path="res://games/minigame/godot_party_default_tank_range/assets/audio/cannon.wav" id="cannon"]
+[ext_resource type="AudioStream" path="res://games/minigame/godot_party_default_tank_range/assets/audio/impact.wav" id="impact"]
+
+[sub_resource type="Resource" id="EngineLoop"]
+script = ExtResource("cue")
+stream = ExtResource("engine")
+loop_mode = 1
+volume_db = -24.0
+
+[sub_resource type="Resource" id="Cannon"]
+script = ExtResource("cue")
+stream = ExtResource("cannon")
+volume_db = -8.0
+max_instances = 1
+
+[sub_resource type="Resource" id="AutomaticCannon"]
+script = ExtResource("cue")
+stream = ExtResource("cannon")
+volume_db = -16.0
+pitch_scale = 1.8
+max_instances = 1
+
+[sub_resource type="Resource" id="Impact"]
+script = ExtResource("cue")
+stream = ExtResource("impact")
+volume_db = -14.0
+max_instances = 1
+
+[node name="CombatAudio" type="Node" node_paths=PackedStringArray("scope", "engine")]
+script = ExtResource("script")
+scope = NodePath("GameAudio")
+engine = NodePath("Engine")
+engine_loop = SubResource("EngineLoop")
+cannon = SubResource("Cannon")
+automatic_cannon = SubResource("AutomaticCannon")
+impact = SubResource("Impact")
+
+[node name="GameAudio" parent="." instance=ExtResource("scope")]
+
+[node name="Engine" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("engine")
+volume_db = -24.0
+attenuation_model = 3
+panning_strength = 0.0

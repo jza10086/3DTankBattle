@@ -1,13 +1,12 @@
 extends Node3D
 ## Tracked vehicle presentation. Gameplay owns traverse, elevation and tread speeds.
-const Spec = preload("res://games/minigame/godot_party_default_tank_range/scripts/vehicle_spec.gd")
-var missile_muzzle: Node3D
-var second_muzzle: Node3D
-var launcher: Node3D
-var turret: Node3D
-var barrel: Node3D
-var muzzle: Node3D
-var _recoil: Node3D
+@export var missile_muzzle: Node3D
+@export var second_muzzle: Node3D
+@export var launcher: Node3D
+@export var turret: Node3D
+@export var barrel: Node3D
+@export var muzzle: Node3D
+@export var _recoil: Node3D
 var _paths: Array[PackedVector3Array] = []
 var _lengths: Array[float] = []
 var _phases: Array[float] = [0.0, 0.0]
@@ -18,58 +17,25 @@ var _colors: Array[Color] = []
 var _material_copies: Dictionary[Material, StandardMaterial3D] = {}
 var _destroyed: bool = false
 
+@export var left_path: PackedVector3Array
+@export var right_path: PackedVector3Array
+@export var left_shoes: Array[MeshInstance3D]
+@export var right_shoes: Array[MeshInstance3D]
+@export var left_wheels: Array[MeshInstance3D]
+@export var right_wheels: Array[MeshInstance3D]
+
 func _ready() -> void:
-	_bind_model("res://games/minigame/godot_party_default_tank_range/assets/m1_abrams/track_paths.json", false, false)
-
-func configure(spec: Spec) -> void:
-	var previous: Node = $Model
-	remove_child(previous)
-	previous.queue_free()
-	_paths.clear()
-	_lengths.clear()
-	_phases = [0.0, 0.0]
-	_shoes.clear()
-	_wheels = [[], []]
-	_materials.clear()
-	_colors.clear()
-	_material_copies.clear()
-	_destroyed = false
-	var instance: Node3D = spec.model.instantiate()
-	instance.name = "Model"
-	instance.position.y = -0.60
-	add_child(instance)
-	_bind_model(spec.track_path, spec.weapons[0] == 2, spec.weapons[0] == 3)
-
-func _bind_model(track_path: String, twin: bool, bradley: bool) -> void:
-	var model: Node3D = $Model.get_child(0)
-	turret = model.get_node("TurretPivot")
-	barrel = turret.get_node("BarrelPivot")
-	_recoil = barrel.get_node("Recoil")
-	muzzle = _recoil.get_node("Muzzle")
-	second_muzzle = _recoil.get_node("Muzzle2") if twin else muzzle
-	launcher = turret.get_node("LauncherPivot") if bradley else barrel
-	missile_muzzle = launcher.get_node("MissileMuzzle") if twin or bradley else muzzle
-	var data: Array = JSON.parse_string(FileAccess.get_file_as_string(track_path))
-	for side: int in 2:
-		var path: PackedVector3Array = []
-		for point: Array in data[side]:
-			path.append(Vector3(point[0], point[1], point[2]))
-		_paths.append(path)
+	assert(turret != null and barrel != null and muzzle != null and _recoil != null and launcher != null and missile_muzzle != null and second_muzzle != null, "Vehicle visual requires authored pivots and muzzles.")
+	assert(not left_shoes.is_empty() and not right_shoes.is_empty() and left_path.size() > 1 and right_path.size() > 1, "Vehicle visual requires authored tread belts.")
+	_paths = [left_path, right_path]
+	_shoes = [left_shoes, right_shoes]
+	_wheels = [left_wheels, right_wheels]
+	for path: PackedVector3Array in _paths:
 		var length: float = 0.0
 		for i: int in path.size():
 			length += path[i].distance_to(path[(i + 1) % path.size()])
 		_lengths.append(length)
-		var source: MeshInstance3D = model.get_node("TrackShoeL" if side == 0 else "TrackShoeR")
-		var shoes: Array[MeshInstance3D] = [source]
-		for i: int in range(1, roundi(length / 0.128)):
-			var shoe: MeshInstance3D = source.duplicate()
-			model.add_child(shoe)
-			shoes.append(shoe)
-		_shoes.append(shoes)
-		for wheel: Node in model.find_children("WheelL*" if side == 0 else "WheelR*", "MeshInstance3D", false, false):
-			_wheels[side].append(wheel)
-	_duplicate_materials(model)
-	animate_tracks(0.0, 0.0, 0.0)
+	_duplicate_materials($Model)
 
 func _duplicate_materials(node: Node) -> void:
 	if node is MeshInstance3D:

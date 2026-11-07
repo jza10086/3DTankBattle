@@ -93,3 +93,138 @@ msgstr "切换武器 / 弹药"
 
 msgid "开战前选择 M1 Abrams、BMPT 或 M2A2 布拉德利。1 人打靶；2–8 人坦克淘汰赛。机炮可按住左键连射，导弹随瞄准方向制导；Q 切换武器。每人一条生命，最后存活者获胜。Esc 打开菜单，比赛继续。"
 msgstr "开战前选择 M1 Abrams、BMPT 或 M2A2 布拉德利。1 人打靶；2–8 人坦克淘汰赛。机炮可按住左键连射，导弹随瞄准方向制导；Q 切换武器。每人一条生命，最后存活者获胜。Esc 打开菜单，比赛继续。"
+
+msgid "selection.controls"
+msgstr "{weapon} 切换武器 · {sight} 切换瞄准镜 · 滚轮缩放"
+
+msgid "selection.spectating"
+msgstr "等待参战玩家选择载具"
+
+msgid "selection.waiting"
+msgstr "已选择 {vehicle} · 等待其他玩家"
+
+msgid "selection.title"
+msgstr "选择载具"
+
+msgid "selection.subtitle"
+msgstr "每人一条生命 · 点击载具确认出战"
+
+msgid "跳弹"
+msgstr "跳弹"
+
+msgid "击杀"
+msgstr "击杀"
+
+msgid "目标摧毁"
+msgstr "目标摧毁"
+
+msgid "敌人瘫痪"
+msgstr "敌人瘫痪"
+
+msgid "敌方主炮瘫痪"
+msgstr "敌方主炮瘫痪"
+
+msgid "敌方履带损毁"
+msgstr "敌方履带损毁"
+
+msgid "命中"
+msgstr "命中"
+
+msgid "击毁"
+msgstr "击毁"
+
+msgid "伤害"
+msgstr "伤害"
+
+msgid "剩余生命"
+msgstr "剩余生命"
+
+msgid "用时"
+msgstr "用时"
+
+msgid "坦克已被击毁"
+msgstr "坦克已被击毁"
+
+msgid "观战"
+msgstr "观战"
+
+msgid "发动机瘫痪"
+msgstr "发动机瘫痪"
+
+msgid "履带损毁"
+msgstr "履带损毁"
+
+msgid "炮口受阻"
+msgstr "炮口受阻"
+
+msgid "武器失效"
+msgstr "武器失效"
+
+msgid "主炮维修中"
+msgstr "主炮维修中"
+
+msgid "准备就绪"
+msgstr "准备就绪"
+
+msgid "hud.reloading"
+msgstr "装填中  {seconds} s"
+
+msgid "hud.automatic_selected"
+msgstr "[ 机炮 ]   导弹"
+
+msgid "hud.missile_selected"
+msgstr "机炮   [ 导弹 ]"
+
+msgid "hud.weapon_selector"
+msgstr "{key}   {choices}"
+
+msgid "穿甲弹"
+msgstr "穿甲弹"
+
+msgid "高爆弹"
+msgstr "高爆弹"
+
+msgid "30 mm 机炮弹"
+msgstr "30 mm 机炮弹"
+
+msgid "25 mm 机炮弹"
+msgstr "25 mm 机炮弹"
+
+msgid "Ataka 导弹"
+msgstr "Ataka 导弹"
+
+msgid "TOW 导弹"
+msgstr "TOW 导弹"
+
+msgid "M68A1  /  105 mm"
+msgstr "M68A1  /  105 mm"
+
+msgid "双联 2A42  /  30 mm"
+msgstr "双联 2A42  /  30 mm"
+
+msgid "M242  /  25 mm"
+msgstr "M242  /  25 mm"
+
+msgid "Ataka  /  反坦克导弹"
+msgstr "Ataka  /  反坦克导弹"
+
+msgid "TOW  /  反坦克导弹"
+msgstr "TOW  /  反坦克导弹"
+
+msgid "vehicle.m1_abrams.name"
+msgstr "M1 Abrams"
+
+msgid "vehicle.m1_abrams.description"
+msgstr "主战坦克 · 穿甲弹 / 高爆弹"
+
+msgid "vehicle.bmpt.name"
+msgstr "BMPT 终结者"
+
+msgid "vehicle.bmpt.description"
+msgstr "火力支援 · 双联机炮 / Ataka 导弹"
+
+msgid "vehicle.bradley.name"
+msgstr "M2A2 布拉德利"
+
+msgid "vehicle.bradley.description"
+msgstr "步兵战车 · 25 mm 机炮 / TOW 导弹"

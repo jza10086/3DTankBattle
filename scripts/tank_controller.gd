@@ -5,9 +5,8 @@ const TankVisualScript = preload("res://games/minigame/godot_party_default_tank_
 ## Deliberately accessible tracked-vehicle model, not a full rigid-body simulator.
 ## Four suspension contacts tilt the rendered hull while a stable chassis handles collision.
 const Spec = preload("res://games/minigame/godot_party_default_tank_range/scripts/vehicle_spec.gd")
-const SPECS: Array[Spec] = [preload("res://games/minigame/godot_party_default_tank_range/vehicles/m1_abrams.tres"), preload("res://games/minigame/godot_party_default_tank_range/vehicles/bmpt.tres"), preload("res://games/minigame/godot_party_default_tank_range/vehicles/bradley.tres")]
 var vehicle_index: int = 0
-var spec: Spec = SPECS[0]
+var spec: Spec
 const BRAKING: float = 12.0
 const ELEVATION_RATE: float = 0.38
 const GRAVITY: float = 20.0
@@ -34,7 +33,7 @@ var ground_normal: Vector3 = Vector3.UP
 var contact_count: int = 0
 var left_track_speed: float = 0.0
 var right_track_speed: float = 0.0
-var visual: TankVisualScript
+@export var visual: TankVisualScript
 var start_transform: Transform3D = Transform3D.IDENTITY
 var ground_offsets: Array[float] = []
 var hull_pitch: float = 0.0
@@ -48,9 +47,11 @@ func _ready() -> void:
 	floor_max_angle = deg_to_rad(43)
 	floor_stop_on_slope = true
 	floor_constant_speed = true
-	visual = $Visual
+	assert(spec != null and visual != null and armor != null and _turret_shape != null and _barrel_shape != null and nameplate != null, "Vehicle requires its spec and authored rig.")
+	ammunition = spec.weapons[0]
+	components.reload_duration = DamageModel.reload_duration(ammunition)
 	start_transform = global_transform
-	_build_armor()
+	_update_armor()
 
 func _physics_process(delta: float) -> void:
 	if not simulation_enabled or dead:
@@ -223,45 +224,18 @@ var dead: bool = false
 var damage_dealt: float = 0.0
 var kills: int = 0
 var death_time: float = 0.0
-var armor: Area3D
-var _turret_shape: CollisionShape3D
-var _barrel_shape: CollisionShape3D
-var nameplate: Label3D
+@export var armor: Area3D
+@export var _turret_shape: CollisionShape3D
+@export var _barrel_shape: CollisionShape3D
+@export var nameplate: Label3D
 const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
 
-func _build_armor() -> void:
-	armor = Area3D.new()
-	armor.name = "Armor"
-	armor.collision_layer = 4
-	armor.collision_mask = 0
-	armor.monitoring = false
-	add_child(armor)
-	_add_armor_box("hull", spec.hull_size, spec.hull_center)
-	_add_armor_box("left_track", Vector3(0.45, 0.85, spec.track_length), Vector3(-spec.track_width, -0.13, 0))
-	_add_armor_box("right_track", Vector3(0.45, 0.85, spec.track_length), Vector3(spec.track_width, -0.13, 0))
-	_turret_shape = _add_armor_box("turret", spec.turret_size, Vector3.ZERO)
-	_barrel_shape = _add_armor_box("barrel", Vector3(spec.barrel_width, 0.18, spec.barrel_length), Vector3.ZERO)
-	nameplate = Label3D.new()
-	nameplate.position = Vector3(0, 2.8, 0)
-	nameplate.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	nameplate.font_size = 40
-	nameplate.pixel_size = 0.008
-	add_child(nameplate)
-	_update_armor()
-
-func _add_armor_box(part: String, dimensions: Vector3, center: Vector3) -> CollisionShape3D:
-	var collider: CollisionShape3D = CollisionShape3D.new()
-	var box: BoxShape3D = BoxShape3D.new()
-	box.size = dimensions
-	collider.shape = box
-	collider.position = center
-	collider.set_meta("part", part)
-	armor.add_child(collider)
-	return collider
+@export var turret_center: Vector3
+@export var barrel_length: float
 
 func _update_armor() -> void:
-	_turret_shape.global_transform = visual.turret.global_transform.translated_local(spec.turret_center)
-	_barrel_shape.global_transform = visual.barrel.global_transform.translated_local(Vector3(0, 0, -spec.barrel_length * 0.5))
+	_turret_shape.global_transform = visual.turret.global_transform.translated_local(turret_center)
+	_barrel_shape.global_transform = visual.barrel.global_transform.translated_local(Vector3(0, 0, -barrel_length * 0.5))
 
 func get_marker_point() -> Vector3:
 	return global_position + Vector3(0, 2.8, 0)
@@ -361,27 +335,6 @@ func apply_blast_hit(origin: Vector3, amount: float) -> Dictionary:
 		apply_component_hit(component)
 		result.component = component
 	return result
-
-## Called exactly once after the host locks the pre-round vehicle selection.
-func configure_vehicle(index: int) -> void:
-	vehicle_index = index
-	spec = SPECS[index]
-	visual.configure(spec)
-	visual.set_destroyed(dead)
-	ammunition = spec.weapons[0]
-	components.reload_duration = DamageModel.reload_duration(ammunition)
-	var body: BoxShape3D = BoxShape3D.new()
-	body.size = Vector3(spec.hull_size.x + 0.2, 1.15, spec.hull_size.z)
-	$Collision.shape = body
-	var shapes: Array = armor.get_children()
-	shapes[0].shape.size = spec.hull_size
-	shapes[0].position = spec.hull_center
-	for side: int in 2:
-		shapes[side + 1].shape.size.z = spec.track_length
-		shapes[side + 1].position.x = (-1.0 if side == 0 else 1.0) * spec.track_width
-	_turret_shape.shape.size = spec.turret_size
-	_barrel_shape.shape.size = Vector3(spec.barrel_width, 0.18, spec.barrel_length)
-	_update_armor()
 
 func shot_muzzle() -> Node3D:
 	return visual.firing_muzzle(DamageModel.is_missile(ammunition), rounds_fired)

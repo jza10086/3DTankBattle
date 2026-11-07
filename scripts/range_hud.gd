@@ -28,40 +28,41 @@ func _draw() -> void:
 	%HullHealth.modulate = RED if tank.hp <= 25.0 else WHITE
 	var condition: PackedStringArray = []
 	if tank.dead:
-		condition.append("坦克已被击毁")
+		condition.append(game.api.i18n.text("坦克已被击毁"))
 	elif game.local_id.is_empty():
-		condition.append("观战")
+		condition.append(game.api.i18n.text("观战"))
 	else:
-		if tank.components.engine_remaining > 0.0: condition.append("发动机瘫痪")
+		if tank.components.engine_remaining > 0.0: condition.append(game.api.i18n.text("发动机瘫痪"))
 		if tank.components.left_track_remaining > 0.0 or tank.components.right_track_remaining > 0.0:
-			condition.append("履带损毁")
-		if tank.muzzle_obstructed: condition.append("炮口受阻")
+			condition.append(game.api.i18n.text("履带损毁"))
+		if tank.muzzle_obstructed: condition.append(game.api.i18n.text("炮口受阻"))
 	%VehicleCondition.text = " · ".join(condition)
 	var repairing: bool = tank.components.barrel_remaining > 0.0
 	var remaining: float = tank.reload_remaining
 	var loaded: bool = remaining <= 0.0 and not repairing and not tank.dead
-	%AmmoName.text = DamageModel.ammo_name(tank.ammunition)
-	%WeaponName.text = DamageModel.weapon_name(tank.ammunition)
+	%AmmoName.text = game.api.i18n.text(DamageModel.ammo_name(tank.ammunition))
+	%WeaponName.text = game.api.i18n.text(DamageModel.weapon_name(tank.ammunition))
 	%WeaponIcon.texture = LAUNCHER_ICON if DamageModel.is_missile(tank.ammunition) else GUN_ICONS[tank.vehicle_index]
 	%VehicleIcon.texture = tank.spec.silhouette
-	%AmmoState.text = "武器失效" if tank.dead else ("主炮维修中" if repairing else ("准备就绪" if loaded else "装填中  %.1f s" % remaining))
+	%AmmoState.text = game.api.i18n.text("武器失效") if tank.dead else (game.api.i18n.text("主炮维修中") if repairing else (game.api.i18n.text("准备就绪") if loaded else game.api.i18n.text("hud.reloading", {"seconds": "%.1f" % remaining})))
 	%AmmoState.modulate = WHITE if loaded else AMBER
 	var icon: Texture2D = MISSILE_ICON if DamageModel.is_missile(tank.ammunition) else (AUTO_ICON if DamageModel.is_automatic(tank.ammunition) else (AP_ICON if tank.ammunition == DamageModel.Ammo.AP else HE_ICON))
 	%ShellFill.texture_under = icon
 	%ShellFill.texture_progress = icon
 	%ShellFill.value = 0.0 if repairing or tank.dead else 100.0 * (1.0 - remaining / tank.components.reload_duration)
 	%ShellFill.tint_progress = WHITE if loaded else AMBER
-	%AmmoSelector.text = "%s   %s" % [game.api.input.binding_text(&"tank_ammunition"), ("[ AP ]   HE" if tank.ammunition == DamageModel.Ammo.AP else "AP   [ HE ]") if tank.vehicle_index == 0 else ("[ 机炮 ]   导弹" if DamageModel.is_automatic(tank.ammunition) else "机炮   [ 导弹 ]")]
+	var choices: String = ("[ AP ]   HE" if tank.ammunition == DamageModel.Ammo.AP else "AP   [ HE ]") if tank.vehicle_index == 0 else game.api.i18n.text("hud.automatic_selected" if DamageModel.is_automatic(tank.ammunition) else "hud.missile_selected")
+	%AmmoSelector.text = game.api.i18n.text("hud.weapon_selector", {"key": game.api.input.binding_text(&"tank_ammunition"), "choices": choices})
 	var center: Vector2 = size * 0.5
-	if game.first_person:
+	if game.camera.first_person:
 		_draw_optic(center)
 	# Thin ring = player intent. Smaller circle = the shell's predicted landing point.
 	draw_arc(center, 21.0, 0, TAU, 48, Color(0.95, 0.93, 0.86, 0.55), 1.0, true)
 	for axis: Vector2 in [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN]:
 		draw_line(center + axis * 8.0, center + axis * 15.0, WHITE, 1.4, true)
 	draw_circle(center, 1.6, WHITE)
-	if not game.camera.is_position_behind(game.actual_impact):
-		var impact: Vector2 = game.camera.unproject_position(game.actual_impact)
+	if not game.camera.is_position_behind(game.camera.actual_impact):
+		var impact: Vector2 = game.camera.unproject_position(game.camera.actual_impact)
 		if Rect2(Vector2.ZERO, size).has_point(impact):
 			var bore_color: Color = AMBER if tank.muzzle_obstructed else WHITE
 			draw_arc(impact, 9.0, 0, TAU, 32, Color(0.02, 0.03, 0.02, 0.8), 4.0, true)
