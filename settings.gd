@@ -115,6 +115,25 @@ static func schema() -> Dictionary:
 	            },
 	            "max_items": 2
 	        },
+	        "tank_machine_gun": {
+	            "type": "array",
+	            "action": "tank_machine_gun",
+	            "default": [
+	                {
+	                    "kind": "mouse",
+	                    "code": 2
+	                }
+	            ],
+	            "title": "同轴机枪",
+	            "audience": "local",
+	            "apply": "immediate",
+	            "control": "binding",
+	            "items": {
+	                "type": "object",
+	                "format": "binding"
+	            },
+	            "max_items": 2
+	        },
 	        "tank_sight": {
 	            "type": "array",
 	            "action": "tank_sight",
@@ -282,6 +301,9 @@ static func schema() -> Dictionary:
 	                },
 	                {
 	                    "field": "tank_fire"
+	                },
+	                {
+	                    "field": "tank_machine_gun"
 	                },
 	                {
 	                    "field": "tank_sight"

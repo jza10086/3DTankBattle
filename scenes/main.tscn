@@ -15,6 +15,8 @@
 [ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/tank_camera.gd" id="camera_script"]
 [ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/audio/combat_audio.tscn" id="audio_scene"]
 
+[ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/machine_gun.svg" id="mg_icon"]
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kmpm6"]
 sky_top_color = Color(0.41960785, 0.6117647, 0.6509804, 1)
 sky_horizon_color = Color(0.8666667, 0.8745098, 0.78431374, 1)
@@ -80,6 +82,7 @@ corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
+
 
 [node name="ThunderWar" type="Node3D" unique_id=1924703324 node_paths=PackedStringArray("camera", "audio")]
 script = ExtResource("1_048g3")
@@ -217,7 +220,7 @@ anchor_right = 1.0
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = -404.0
-offset_top = -230.0
+offset_top = -276.0
 offset_right = -56.0
 offset_bottom = -52.0
 grow_horizontal = 0
@@ -284,6 +287,30 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Q    AP  /  HE"
 horizontal_alignment = 2
+
+[node name="MachineGunRow" type="HBoxContainer" parent="GameHUD/RangeHUD/WeaponStatus"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 2
+theme_override_constants/separation = 12
+mouse_filter = 2
+
+[node name="MachineGunStatus" type="Label" parent="GameHUD/RangeHUD/WeaponStatus/MachineGunRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "同轴机枪  100"
+horizontal_alignment = 2
+
+[node name="MachineGunReload" type="TextureProgressBar" parent="GameHUD/RangeHUD/WeaponStatus/MachineGunRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(128, 32)
+mouse_filter = 2
+texture_under = ExtResource("mg_icon")
+texture_progress = ExtResource("mg_icon")
+tint_under = Color(0.4, 0.45, 0.43, 0.5)
+value = 100.0
 
 [node name="SelectionLayer" type="CanvasLayer" parent="."]
 layer = -1

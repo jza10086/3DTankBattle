@@ -1,0 +1,28 @@
+Combat audio attribution and license notice
+
+KuraiWolf — Light Machine Gun (lmg_fire01.mp3)
+https://opengameart.org/content/light-machine-gun
+CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+Used with edits (trim, mono conversion, layering, pitch and normalization) in
+machine_gun.wav, auto25.wav, auto30.wav, cannon.wav, ataka.wav.
+
+Nayckron, original loop/collaborator qubodup — Engine-loop heavy vehicle/tank
+https://opengameart.org/content/engine-loop-heavy-vehicletank
+CC BY 3.0: https://creativecommons.org/licenses/by/3.0/
+engine.wav: mono conversion, DC removal, loop crossfade and normalization.
+
+EZduzziteh — Explosions
+https://opengameart.org/content/explosions-4
+CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+explosion1_0.ogg and explosion3.ogg: edited and layered in cannon, cannon_he,
+auto25, auto30, tow, explosion, wreck, armor and ground.
+
+Kenney — Sci-Fi Sounds 1.0
+https://kenney.nl/assets/sci-fi-sounds
+https://opengameart.org/content/sci-fi-sounds
+CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+Pack notice: licenses/Kenney.txt. Selected sounds trimmed, pitched and layered;
+see SOURCES.md for the complete mapping. No endorsement by any author implied.
+
+alarm, hit_confirm, disable_confirm, kill_confirm and repair are original
+synthesized tones dedicated to CC0 1.0 by the project owner.

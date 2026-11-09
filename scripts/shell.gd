@@ -13,7 +13,7 @@ var authoritative: bool = true
 
 func _ready() -> void:
 	var mesh: SphereMesh = SphereMesh.new()
-	mesh.radius = 0.09 if DamageModel.is_missile(ammunition) else 0.045
+	mesh.radius = 0.09 if DamageModel.is_missile(ammunition) else (0.018 if ammunition == DamageModel.Ammo.MG else 0.045)
 	mesh.height = 0.55 if DamageModel.is_missile(ammunition) else 0.09
 	mesh.radial_segments = 6
 	mesh.rings = 3

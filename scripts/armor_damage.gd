@@ -43,7 +43,10 @@ static func evaluate(part: StringName, target_basis: Basis, world_normal: Vector
 		Ammo.AUTO30: base_damage = 11.0 * 50.0 / (50.0 + resistance)
 		Ammo.AUTO25: base_damage = 13.0 * 50.0 / (50.0 + resistance)
 		Ammo.ATAKA, Ammo.TOW: base_damage = 140.0 * 85.0 / (85.0 + resistance)
+		Ammo.MG: base_damage = 1.0 if part_name == "track" or (part_name == "hull" and facing == "rear") else 0.0
 	var damage: float = 0.0 if ricochet else maxf(1.0, roundf(base_damage * (pow(incidence_cos, ANGLE_POWER) if not is_explosive(ammunition) else 1.0)))
+	if ammunition == Ammo.MG and base_damage == 0.0:
+		damage = 0.0
 	var region: String = "TRACKS" if part_name == "track" else ("BARREL" if part_name == "barrel" else "%s %s" % [part_name.to_upper(), facing.to_upper()])
 	return {"part": part_name, "facing": facing, "region": region, "damage": damage, "angle_degrees": angle, "ricochet": ricochet, "invalid": false, "ignored": false, "resistance": resistance, "incidence_cos": incidence_cos}
 
@@ -55,20 +58,20 @@ static func classify_facing(local_normal: Vector3) -> String:
 		return "front" if n.z < 0 else "rear"
 	return "side"
 
-enum Ammo { AP, HE, AUTO30, AUTO25, ATAKA, TOW }
+enum Ammo { AP, HE, AUTO30, AUTO25, ATAKA, TOW, MG }
 const BLAST_RADIUS: float = 4.0
 
 static func shell_speed(ammunition: int) -> float:
-	return [145.0, 85.0, 180.0, 160.0, 55.0, 48.0][ammunition]
+	return [145.0, 85.0, 180.0, 160.0, 55.0, 48.0, 240.0][ammunition]
 
 static func reload_duration(ammunition: int) -> float:
-	return [3.2, 4.0, 0.16, 0.24, 7.5, 8.5][ammunition]
+	return [3.2, 4.0, 0.16, 0.24, 7.5, 8.5, 0.1][ammunition]
 
 static func is_missile(ammunition: int) -> bool:
 	return ammunition in [Ammo.ATAKA, Ammo.TOW]
 
 static func is_automatic(ammunition: int) -> bool:
-	return ammunition in [Ammo.AUTO30, Ammo.AUTO25]
+	return ammunition in [Ammo.AUTO30, Ammo.AUTO25, Ammo.MG]
 
 static func is_explosive(ammunition: int) -> bool:
 	return ammunition == Ammo.HE or is_missile(ammunition)
@@ -80,7 +83,7 @@ static func blast_damage(distance: float) -> float:
 	return roundf(32.0 * maxf(0.0, 1.0 - distance / BLAST_RADIUS))
 
 static func weapon_name(ammunition: int) -> String:
-	return ["M68A1  /  105 mm", "M68A1  /  105 mm", "双联 2A42  /  30 mm", "M242  /  25 mm", "Ataka  /  反坦克导弹", "TOW  /  反坦克导弹"][ammunition]
+	return ["M68A1  /  105 mm", "M68A1  /  105 mm", "双联 2A42  /  30 mm", "M242  /  25 mm", "Ataka  /  反坦克导弹", "TOW  /  反坦克导弹", "同轴机枪  /  7.62 mm"][ammunition]
 
 static func ammo_name(ammunition: int) -> String:
-	return ["穿甲弹", "高爆弹", "30 mm 机炮弹", "25 mm 机炮弹", "Ataka 导弹", "TOW 导弹"][ammunition]
+	return ["穿甲弹", "高爆弹", "30 mm 机炮弹", "25 mm 机炮弹", "Ataka 导弹", "TOW 导弹", "7.62 mm 机枪弹"][ammunition]

@@ -3375,7 +3375,7 @@ size = Vector3(1.8, 1.1, 1.9)
 [sub_resource type="BoxShape3D" id="BoxShape3D_p8143"]
 size = Vector3(0.5, 0.18, 2.5)
 
-[node name="Tank" type="CharacterBody3D" unique_id=494800247 node_paths=PackedStringArray("_barrel_shape", "_turret_shape", "armor", "nameplate", "visual")]
+[node name="Tank" type="CharacterBody3D" unique_id=494800247 node_paths=PackedStringArray("coax_muzzle", "_barrel_shape", "_turret_shape", "armor", "nameplate", "visual")]
 collision_layer = 2
 collision_mask = 3
 floor_constant_speed = true
@@ -3389,6 +3389,7 @@ barrel_length = 2.5
 nameplate = NodePath("Nameplate")
 turret_center = Vector3(0, 0.5, 0)
 visual = NodePath("Visual")
+coax_muzzle = NodePath("Visual/Model/VehicleRig/TurretPivot/BarrelPivot/CoaxMuzzle")
 
 
 [node name="Collision" type="CollisionShape3D" parent="." unique_id=405967723]
@@ -4984,3 +4985,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 pixel_size = 0.008
 billboard = 1
 font_size = 40
+
+[node name="CoaxMuzzle" type="Marker3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot"]
+position = Vector3(0.44, 0.04, -0.85)

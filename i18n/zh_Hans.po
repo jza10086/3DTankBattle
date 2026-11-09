@@ -228,3 +228,27 @@ msgstr "M2A2 布拉德利"
 
 msgid "vehicle.bradley.description"
 msgstr "步兵战车 · 25 mm 机炮 / TOW 导弹"
+
+msgid "hud.machine_gun"
+msgstr "{key}  同轴机枪  {rounds}"
+
+msgid "hud.machine_gun_reload"
+msgstr "机枪装填 · {seconds} 秒"
+
+msgid "未击穿"
+msgstr "未击穿"
+
+msgid "同轴机枪"
+msgstr "同轴机枪"
+
+msgid "同轴机枪连射"
+msgstr "同轴机枪连射"
+
+msgid "同轴机枪  /  7.62 mm"
+msgstr "同轴机枪  /  7.62 mm"
+
+msgid "7.62 mm 机枪弹"
+msgstr "7.62 mm 机枪弹"
+
+msgid "开战前选择 M1 Abrams、BMPT 或 M2A2 布拉德利。1 人打靶；2–8 人坦克淘汰赛。机炮可按住左键连射，导弹随瞄准方向制导；Q 切换武器。每人一条生命，最后存活者获胜。Esc 打开菜单，比赛继续。 按住右键使用同轴机枪，100 发弹链打空后自动装填。"
+msgstr "开战前选择 M1 Abrams、BMPT 或 M2A2 布拉德利。1 人打靶；2–8 人坦克淘汰赛。机炮可按住左键连射，导弹随瞄准方向制导；Q 切换武器。每人一条生命，最后存活者获胜。Esc 打开菜单，比赛继续。 按住右键使用同轴机枪，100 发弹链打空后自动装填。"

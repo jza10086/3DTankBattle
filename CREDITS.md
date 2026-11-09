@@ -32,7 +32,7 @@ These target variants bake the original rest-pose meshes, retain separate hull/t
 - [tokyogeometry/nani-raycast-wheel](https://github.com/tokyogeometry/nani-raycast-wheel), MIT, Godot 4 raycast-wheel example: studied ground-contact and spring/damper concepts. This project implements its own four-contact visual ground-following model, not that example's rigid-body suspension.
 - [AnderHominem/Code-for-animating-tank-tracks](https://github.com/AnderHominem/Code-for-animating-tank-tracks), MIT: studied articulated tread animation approaches. The shipped default instead uses the CC0 model's original skeletal tread animation split by side.
 
-All procedural environment geometry, fallback tank geometry, HUD, gameplay code and synthesized WAV sound effects were authored for this project. No third-party example code was copied into the repository.
+All procedural environment geometry, fallback tank geometry, HUD, gameplay code and the original prototype synthesized WAV sound effects were authored for this project. No third-party example code was copied into the repository.
 
 ## 雷霆战争 M1 Abrams
 
@@ -41,3 +41,7 @@ All procedural environment geometry, fallback tank geometry, HUD, gameplay code 
 ## 雷霆战争支援载具
 
 BMPT 与布拉德利来自用户提供的原创 `F:/AstraBlender/Projects/1_Blender工程/MainBattleTanks/BMPT_Terminator.blend` 和 `M2A2_Bradley.blend`。导出见 `assets/bmpt/` 和 `assets/bradley/`；保留炮塔、炮管、导弹发射口、车轮和独立履带。原 Blender 文件未修改，演示用烟雾、曳光弹与摄影棚不导入游戏。新增 HUD 剪影为本项目绘制的 SVG。
+
+## 雷霆战争战斗音效
+
+新增战斗声音使用 Kenney、EZduzziteh、Nayckron／qubodup、KuraiWolf 的可商用素材，经过剪辑、混音和循环处理。逐文件来源、作者、许可及修改记录见 [音效来源](assets/audio/SOURCES.md)；发布包保留 `assets/audio/combat/NOTICE.txt` 与 Kenney 原始许可。CC BY 署名不可移除。

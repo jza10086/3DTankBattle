@@ -124,7 +124,7 @@ func apply_shell_hit(world_point: Vector3, world_normal: Vector3, incoming_direc
 	result["hp"] = hp
 	result["destroyed"] = dead
 	# Ricochets/invalid/dead contacts neither apply nor refresh component timers.
-	if applied > 0.0 and not dead and not bool(result.ricochet):
+	if applied > 0.0 and not dead and not bool(result.ricochet) and ammunition != DamageModel.Ammo.MG:
 		var component: StringName = component_from_hit(world_point, world_normal, shape_index)
 		if not component.is_empty():
 			result.disabled = not components.is_disabled(component)

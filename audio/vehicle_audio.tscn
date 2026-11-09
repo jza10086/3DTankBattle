@@ -1,0 +1,29 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/vehicle_audio.gd" id="script"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/engine.tres" id="engine"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/tracks.tres" id="tracks"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/traverse.tres" id="traverse"]
+
+[node name="VehicleAudio" type="Node3D" node_paths=PackedStringArray("engine", "tracks", "traverse")]
+script = ExtResource("script")
+engine = NodePath("Engine")
+tracks = NodePath("Tracks")
+traverse = NodePath("Traverse")
+engine_cue = ExtResource("engine")
+tracks_cue = ExtResource("tracks")
+traverse_cue = ExtResource("traverse")
+
+[node name="Engine" type="AudioStreamPlayer3D" parent="."]
+unit_size = 8.0
+max_distance = 120.0
+max_db = 0.0
+
+[node name="Tracks" type="AudioStreamPlayer3D" parent="."]
+unit_size = 8.0
+max_distance = 120.0
+max_db = 0.0
+
+[node name="Traverse" type="AudioStreamPlayer3D" parent="."]
+unit_size = 8.0
+max_distance = 120.0
+max_db = 0.0

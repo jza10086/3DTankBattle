@@ -27,6 +27,13 @@ var reload_remaining: float:
 	set(value):
 		components.reload_remaining = maxf(value, 0.0)
 var ammunition: int = DamageModel.Ammo.AP
+const MG_BELT_SIZE: int = 100
+const MG_RELOAD_SECONDS: float = 4.0
+var mg_rounds: int = MG_BELT_SIZE
+var mg_reload_remaining: float = 0.0
+var mg_cooldown: float = 0.0
+var mg_shots_fired: int = 0
+@export var coax_muzzle: Marker3D
 var rounds_fired: int = 0
 var recoil: float = 0.0
 var ground_normal: Vector3 = Vector3.UP
@@ -47,7 +54,7 @@ func _ready() -> void:
 	floor_max_angle = deg_to_rad(43)
 	floor_stop_on_slope = true
 	floor_constant_speed = true
-	assert(spec != null and visual != null and armor != null and _turret_shape != null and _barrel_shape != null and nameplate != null, "Vehicle requires its spec and authored rig.")
+	assert(coax_muzzle != null and spec != null and visual != null and armor != null and _turret_shape != null and _barrel_shape != null and nameplate != null, "Vehicle requires its spec and authored rig.")
 	ammunition = spec.weapons[0]
 	components.reload_duration = DamageModel.reload_duration(ammunition)
 	start_transform = global_transform
@@ -57,6 +64,11 @@ func _physics_process(delta: float) -> void:
 	if not simulation_enabled or dead:
 		return
 	components.tick(delta)
+	mg_cooldown = maxf(0.0, mg_cooldown - delta)
+	if mg_reload_remaining > 0.0:
+		mg_reload_remaining = maxf(0.0, mg_reload_remaining - delta)
+		if mg_reload_remaining <= 0.0:
+			mg_rounds = MG_BELT_SIZE
 	integrate_drive(delta)
 	recoil = move_toward(recoil, 0.0, delta * 1.7)
 	visual.set_recoil(recoil)
@@ -187,6 +199,21 @@ func begin_fire() -> bool:
 	recoil = 0.24 if DamageModel.is_automatic(ammunition) else 1.0
 	return true
 
+## Coax has its own belt and cadence; main-gun reload/damage does not block it.
+func begin_machine_gun_fire() -> bool:
+	if dead or mg_rounds == 0 or mg_cooldown > 0.0001 or mg_reload_remaining > 0.0:
+		return false
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(visual.barrel.global_position, coax_muzzle.global_position, 1)
+	query.hit_from_inside = true
+	if not get_world_3d().direct_space_state.intersect_ray(query).is_empty():
+		return false
+	mg_rounds -= 1
+	mg_shots_fired += 1
+	mg_cooldown = DamageModel.reload_duration(DamageModel.Ammo.MG)
+	if mg_rounds == 0:
+		mg_reload_remaining = MG_RELOAD_SECONDS
+	return true
+
 func apply_component_hit(component: StringName) -> bool:
 	if not components.apply_component(component):
 		return false
@@ -201,6 +228,9 @@ func apply_component_hit(component: StringName) -> bool:
 
 func reset_vehicle() -> void:
 	components.clear()
+	mg_rounds = MG_BELT_SIZE
+	mg_reload_remaining = 0.0
+	mg_cooldown = 0.0
 	global_transform = start_transform
 	velocity = Vector3.ZERO
 	speed = 0.0
@@ -252,7 +282,7 @@ func apply_shell_hit(point: Vector3, normal: Vector3, incoming: Vector3, shape_i
 	result["component_duration"] = 0.0
 	hp -= result.damage
 	dead = hp <= 0.0
-	if result.damage > 0.0 and not dead:
+	if result.damage > 0.0 and not dead and shell_ammunition != DamageModel.Ammo.MG:
 		var component: StringName = &""
 		if part.ends_with("track") or part == "barrel":
 			component = StringName(part)
@@ -271,14 +301,14 @@ func apply_shell_hit(point: Vector3, normal: Vector3, incoming: Vector3, shape_i
 	result["hp"] = hp
 	return result
 
-const SNAPSHOT_FLOATS: int = 22
+const SNAPSHOT_FLOATS: int = 25
 
 func make_snapshot() -> PackedFloat32Array:
-	# Fixed roster order and 22 floats keep all eight vehicles below ENet MTU.
+	# Fixed roster order and 25 floats keep all eight vehicles below ENet MTU.
 	return PackedFloat32Array([position.x, position.y, position.z, rotation.y, speed, yaw_rate,
 		visual.rotation.x, visual.rotation.z, visual.turret.rotation.y, visual.barrel.rotation.x, recoil,
 		hp, float(dead), damage_dealt, float(kills), float(rounds_fired), components.engine_remaining,
-		components.left_track_remaining, components.right_track_remaining, components.barrel_remaining, components.reload_remaining, float(ammunition)])
+		components.left_track_remaining, components.right_track_remaining, components.barrel_remaining, components.reload_remaining, float(ammunition), float(mg_rounds), mg_reload_remaining, float(mg_shots_fired)])
 
 func apply_snapshot(state: PackedFloat32Array, delta: float) -> void:
 	var target: Transform3D = Transform3D(Basis(Vector3.UP, state[3]), Vector3(state[0], state[1], state[2]))
@@ -300,6 +330,9 @@ func apply_snapshot(state: PackedFloat32Array, delta: float) -> void:
 	components.barrel_remaining = state[19]
 	components.reload_remaining = state[20]
 	ammunition = int(state[21])
+	mg_rounds = int(state[22])
+	mg_reload_remaining = state[23]
+	mg_shots_fired = int(state[24])
 	components.reload_duration = DamageModel.reload_duration(ammunition)
 	visual.set_destroyed(dead)
 	visual.animate_tracks(speed - yaw_rate * 1.3, speed + yaw_rate * 1.3, delta)

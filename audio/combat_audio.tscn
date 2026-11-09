@@ -1,50 +1,230 @@
 [gd_scene format=3]
-
 [ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/combat_audio.gd" id="script"]
 [ext_resource type="PackedScene" path="res://games/protocols/godot_party_default_protocol/audio/game_audio.tscn" id="scope"]
-[ext_resource type="Script" path="res://games/protocols/godot_party_default_protocol/audio/audio_cue.gd" id="cue"]
-[ext_resource type="AudioStream" path="res://games/minigame/godot_party_default_tank_range/assets/audio/engine.wav" id="engine"]
-[ext_resource type="AudioStream" path="res://games/minigame/godot_party_default_tank_range/assets/audio/cannon.wav" id="cannon"]
-[ext_resource type="AudioStream" path="res://games/minigame/godot_party_default_tank_range/assets/audio/impact.wav" id="impact"]
+[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/audio/vehicle_audio.tscn" id="vehicle"]
+[ext_resource type="Script" path="res://games/protocols/godot_party_default_protocol/audio/audio_cue.gd" id="cue_script"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/cannon.tres" id="cannon"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/cannon_he.tres" id="cannon_he"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/auto30.tres" id="auto30"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/auto25.tres" id="auto25"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/machine_gun.tres" id="machine_gun"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/ataka.tres" id="ataka"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/tow.tres" id="tow"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/missile_motor.tres" id="missile_motor"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/explosion.tres" id="explosion"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/wreck.tres" id="wreck"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/armor.tres" id="armor"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/ricochet.tres" id="ricochet"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/ground.tres" id="ground"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/interior_hit.tres" id="interior_hit"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/engine.tres" id="engine"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/tracks.tres" id="tracks"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/traverse.tres" id="traverse"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/alarm.tres" id="alarm"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/reload.tres" id="reload"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/ready.tres" id="ready"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/hit_confirm.tres" id="hit_confirm"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/disable_confirm.tres" id="disable_confirm"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/kill_confirm.tres" id="kill_confirm"]
+[ext_resource type="Resource" path="res://games/minigame/godot_party_default_tank_range/audio/cues/repair.tres" id="repair"]
 
-[sub_resource type="Resource" id="EngineLoop"]
-script = ExtResource("cue")
-stream = ExtResource("engine")
-loop_mode = 1
-volume_db = -24.0
+[sub_resource type="AudioEffectHardLimiter" id="Limiter"]
+ceiling_db = -1.0
+release = 0.12
 
-[sub_resource type="Resource" id="Cannon"]
-script = ExtResource("cue")
-stream = ExtResource("cannon")
-volume_db = -8.0
-max_instances = 1
-
-[sub_resource type="Resource" id="AutomaticCannon"]
-script = ExtResource("cue")
-stream = ExtResource("cannon")
-volume_db = -16.0
-pitch_scale = 1.8
-max_instances = 1
-
-[sub_resource type="Resource" id="Impact"]
-script = ExtResource("cue")
-stream = ExtResource("impact")
-volume_db = -14.0
-max_instances = 1
-
-[node name="CombatAudio" type="Node" node_paths=PackedStringArray("scope", "engine")]
+[node name="CombatAudio" type="Node" node_paths=PackedStringArray("scope", "voices_root", "alarm")]
 script = ExtResource("script")
 scope = NodePath("GameAudio")
-engine = NodePath("Engine")
-engine_loop = SubResource("EngineLoop")
-cannon = SubResource("Cannon")
-automatic_cannon = SubResource("AutomaticCannon")
-impact = SubResource("Impact")
+vehicle_audio_scene = ExtResource("vehicle")
+voices_root = NodePath("Voices")
+alarm = NodePath("Alarm")
+peak_limiter = SubResource("Limiter")
+cues = Dictionary[StringName, ExtResource("cue_script")]({
+&"cannon": ExtResource("cannon"),
+&"cannon_he": ExtResource("cannon_he"),
+&"auto30": ExtResource("auto30"),
+&"auto25": ExtResource("auto25"),
+&"machine_gun": ExtResource("machine_gun"),
+&"ataka": ExtResource("ataka"),
+&"tow": ExtResource("tow"),
+&"missile_motor": ExtResource("missile_motor"),
+&"explosion": ExtResource("explosion"),
+&"wreck": ExtResource("wreck"),
+&"armor": ExtResource("armor"),
+&"ricochet": ExtResource("ricochet"),
+&"ground": ExtResource("ground"),
+&"interior_hit": ExtResource("interior_hit"),
+&"engine": ExtResource("engine"),
+&"tracks": ExtResource("tracks"),
+&"traverse": ExtResource("traverse"),
+&"alarm": ExtResource("alarm"),
+&"reload": ExtResource("reload"),
+&"ready": ExtResource("ready"),
+&"hit_confirm": ExtResource("hit_confirm"),
+&"disable_confirm": ExtResource("disable_confirm"),
+&"kill_confirm": ExtResource("kill_confirm"),
+&"repair": ExtResource("repair")})
 
 [node name="GameAudio" parent="." instance=ExtResource("scope")]
+[node name="Alarm" type="AudioStreamPlayer" parent="."]
+[node name="Voices" type="Node3D" parent="."]
 
-[node name="Engine" type="AudioStreamPlayer3D" parent="."]
-stream = ExtResource("engine")
-volume_db = -24.0
-attenuation_model = 3
-panning_strength = 0.0
+[node name="Voice01" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice02" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice03" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice04" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice05" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice06" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice07" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice08" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice09" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice10" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice11" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice12" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice13" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice14" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice15" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice16" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice17" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice18" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice19" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice20" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice21" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice22" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice23" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice24" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice25" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice26" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice27" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice28" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice29" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice30" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice31" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0
+
+[node name="Voice32" type="AudioStreamPlayer3D" parent="Voices"]
+unit_size = 28.0
+max_distance = 280.0
+max_db = 0.0

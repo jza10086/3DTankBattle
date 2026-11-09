@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PartyAudioCue" format=3]
+[ext_resource type="Script" path="res://games/protocols/godot_party_default_protocol/audio/audio_cue.gd" id="script"]
+[ext_resource type="AudioStream" path="res://games/minigame/godot_party_default_tank_range/assets/audio/combat/cannon.wav" id="stream"]
+[resource]
+script = ExtResource("script")
+stream = ExtResource("stream")
+volume_db = -6.0
+loop_mode = 2
+priority = 75
+max_instances = 8
+cooldown = 0.0

@@ -53,6 +53,9 @@ func _draw() -> void:
 	%ShellFill.tint_progress = WHITE if loaded else AMBER
 	var choices: String = ("[ AP ]   HE" if tank.ammunition == DamageModel.Ammo.AP else "AP   [ HE ]") if tank.vehicle_index == 0 else game.api.i18n.text("hud.automatic_selected" if DamageModel.is_automatic(tank.ammunition) else "hud.missile_selected")
 	%AmmoSelector.text = game.api.i18n.text("hud.weapon_selector", {"key": game.api.input.binding_text(&"tank_ammunition"), "choices": choices})
+	%MachineGunStatus.text = game.api.i18n.text("hud.machine_gun", {"key": game.api.input.binding_text(&"tank_machine_gun"), "rounds": tank.mg_rounds}) if tank.mg_reload_remaining <= 0.0 else game.api.i18n.text("hud.machine_gun_reload", {"seconds": "%.1f" % tank.mg_reload_remaining})
+	%MachineGunReload.value = 100.0 * (1.0 - tank.mg_reload_remaining / Tank.MG_RELOAD_SECONDS)
+	%MachineGunRow.modulate = RED if tank.dead else (AMBER if tank.mg_reload_remaining > 0.0 else WHITE)
 	var center: Vector2 = size * 0.5
 	if game.camera.first_person:
 		_draw_optic(center)
