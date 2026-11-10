@@ -10,6 +10,32 @@ var velocity: Vector3 = Vector3.ZERO
 var age: float = 0.0
 var shooter: Tank
 var authoritative: bool = true
+var network_position: Vector3 = Vector3.ZERO
+var network_velocity: Vector3 = Vector3.ZERO
+var guidance_error: Vector3 = Vector3.ZERO
+var synchronizer: MultiplayerSynchronizer
+
+## The spawner owns lifetime; a missile synchronizer owns only guidance samples.
+func configure_guidance() -> void:
+	if not DamageModel.is_missile(ammunition):
+		return
+	synchronizer = MultiplayerSynchronizer.new()
+	synchronizer.name = "Guidance"
+	synchronizer.replication_interval = 0.05
+	var config: SceneReplicationConfig = SceneReplicationConfig.new()
+	for path: NodePath in [NodePath(":network_position"), NodePath(":network_velocity")]:
+		config.add_property(path)
+		config.property_set_spawn(path, true)
+		config.property_set_replication_mode(path, SceneReplicationConfig.REPLICATION_MODE_ALWAYS)
+	synchronizer.replication_config = config
+	synchronizer.synchronized.connect(_receive_guidance)
+	add_child(synchronizer)
+
+func _receive_guidance() -> void:
+	if not authoritative and network_position.is_finite() and network_velocity.is_finite():
+		guidance_error = network_position - global_position
+		velocity = network_velocity
+
 
 func _ready() -> void:
 	var mesh: SphereMesh = SphereMesh.new()
@@ -18,6 +44,7 @@ func _ready() -> void:
 	mesh.radial_segments = 6
 	mesh.rings = 3
 	var item: MeshInstance3D = MeshInstance3D.new()
+	item.name = "ProjectileVisual"
 	item.mesh = mesh
 	var material: StandardMaterial3D = StandardMaterial3D.new()
 	material.albedo_color = Color("fff2ac")
@@ -26,6 +53,10 @@ func _ready() -> void:
 	add_child(item)
 
 func _physics_process(delta: float) -> void:
+	if not authoritative:
+		var correction: Vector3 = guidance_error * (1.0 - exp(-20.0 * delta))
+		global_position += correction
+		guidance_error -= correction
 	var gravity: float = DamageModel.gravity(ammunition)
 	if authoritative and DamageModel.is_missile(ammunition) and not shooter.dead:
 		var direction: Vector3 = (shooter.aim_point - global_position).normalized()
@@ -53,11 +84,18 @@ func _physics_process(delta: float) -> void:
 	if DamageModel.is_missile(ammunition) and velocity.length_squared() > 0.0:
 		# The bright elongated projectile makes guidance readable at gameplay distance.
 		look_at(global_position + velocity.normalized(), Vector3.UP)
-		get_child(0).rotation.x = PI * 0.5
+		get_node("ProjectileVisual").rotation.x = PI * 0.5
 	velocity.y -= gravity * delta
 	age += delta
+	if authoritative:
+		network_position = global_position
+		network_velocity = velocity
 	if age > 8.0 or global_position.y < -10:
-		queue_free()
+		if authoritative:
+			queue_free()
+		else:
+			hide()
+			set_physics_process(false)
 
 
 ## A target takes direct OR blast damage, never both from the same explosion.

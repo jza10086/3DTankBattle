@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "core_api_major": 4,
-  "package_version": "1.4.0",
+  "core_api_major": 5,
+  "package_version": "1.4.2",
   "id": "godot_party_default_tank_range",
   "name": "雷霆战争",
   "kind": "minigame",
@@ -19,7 +19,7 @@
   ],
   "introduction": "开战前选择 M1 Abrams、BMPT 或 M2A2 布拉德利。1 人打靶；2–8 人坦克淘汰赛。机炮可按住左键连射，导弹随瞄准方向制导；Q 切换武器。每人一条生命，最后存活者获胜。Esc 打开菜单，比赛继续。 按住右键使用同轴机枪，100 发弹链打空后自动装填。",
   "dependencies": {
-    "godot_party_default_protocol": "1.0.4"
+    "godot_party_default_protocol": "1.0.6"
   },
   "adapters": [
     {
@@ -40,20 +40,6 @@
     "fallback_locale": "zh_Hans",
     "translations": {
       "zh_Hans": "i18n/zh_Hans.po"
-    }
-  },
-  "streams": {
-    "tank_state": {
-      "mode": "ordered",
-      "audience": "instance"
-    },
-    "tank_events": {
-      "mode": "reliable",
-      "audience": "instance"
-    },
-    "tank_missiles": {
-      "mode": "ordered",
-      "audience": "instance"
     }
   },
   "controls": {

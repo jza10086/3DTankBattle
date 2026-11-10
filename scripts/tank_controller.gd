@@ -301,43 +301,36 @@ func apply_shell_hit(point: Vector3, normal: Vector3, incoming: Vector3, shape_i
 	result["hp"] = hp
 	return result
 
-const SNAPSHOT_FLOATS: int = 25
+const MOTION_FLOATS: int = 11
 
-func make_snapshot() -> PackedFloat32Array:
-	# Fixed roster order and 25 floats keep all eight vehicles below ENet MTU.
+## Only chassis and rig motion need replaceable samples. Combat facts travel as reliable events.
+func motion_sample() -> PackedFloat32Array:
 	return PackedFloat32Array([position.x, position.y, position.z, rotation.y, speed, yaw_rate,
-		visual.rotation.x, visual.rotation.z, visual.turret.rotation.y, visual.barrel.rotation.x, recoil,
-		hp, float(dead), damage_dealt, float(kills), float(rounds_fired), components.engine_remaining,
-		components.left_track_remaining, components.right_track_remaining, components.barrel_remaining, components.reload_remaining, float(ammunition), float(mg_rounds), mg_reload_remaining, float(mg_shots_fired)])
+		visual.rotation.x, visual.rotation.z, visual.turret.rotation.y, visual.barrel.rotation.x, recoil])
 
-func apply_snapshot(state: PackedFloat32Array, delta: float) -> void:
+func apply_motion(state: PackedFloat32Array, delta: float) -> void:
 	var target: Transform3D = Transform3D(Basis(Vector3.UP, state[3]), Vector3(state[0], state[1], state[2]))
-	transform = transform.interpolate_with(target, minf(1.0, delta * 18.0))
+	transform = transform.interpolate_with(target, 1.0 - exp(-18.0 * delta))
 	speed = state[4]
 	yaw_rate = state[5]
 	visual.rotation = Vector3(state[6], 0, state[7])
-	visual.turret.rotation.y = lerp_angle(visual.turret.rotation.y, state[8], minf(1.0, delta * 18.0))
-	visual.barrel.rotation.x = lerpf(visual.barrel.rotation.x, state[9], minf(1.0, delta * 18.0))
+	visual.turret.rotation.y = lerp_angle(visual.turret.rotation.y, state[8], 1.0 - exp(-18.0 * delta))
+	visual.barrel.rotation.x = lerpf(visual.barrel.rotation.x, state[9], 1.0 - exp(-18.0 * delta))
 	visual.set_recoil(state[10])
-	hp = state[11]
-	dead = state[12] > 0.5
-	damage_dealt = state[13]
-	kills = int(state[14])
-	rounds_fired = int(state[15])
-	components.engine_remaining = state[16]
-	components.left_track_remaining = state[17]
-	components.right_track_remaining = state[18]
-	components.barrel_remaining = state[19]
-	components.reload_remaining = state[20]
-	ammunition = int(state[21])
-	mg_rounds = int(state[22])
-	mg_reload_remaining = state[23]
-	mg_shots_fired = int(state[24])
-	components.reload_duration = DamageModel.reload_duration(ammunition)
 	visual.set_destroyed(dead)
 	visual.animate_tracks(speed - yaw_rate * 1.3, speed + yaw_rate * 1.3, delta)
 	visual.aim_launcher()
 	_update_armor()
+
+func combat_facts(now: int) -> Dictionary:
+	var facts: Dictionary = {"hp": hp, "dead": dead, "damage_dealt": damage_dealt, "kills": kills,
+		"rounds_fired": rounds_fired, "ammunition": ammunition, "mg_rounds": mg_rounds, "mg_shots_fired": mg_shots_fired}
+	for part: String in ["engine", "left_track", "right_track", "barrel"]:
+		var remaining: float = components.get(part + "_remaining")
+		facts[part + "_end"] = now + roundi(remaining * 1000.0) if remaining > 0.0 else 0
+	facts["reload_end"] = now + roundi((components.barrel_remaining + components.reload_remaining) * 1000.0) if components.reload_remaining > 0.0 else 0
+	facts["mg_reload_end"] = now + roundi(mg_reload_remaining * 1000.0) if mg_reload_remaining > 0.0 else 0
+	return facts
 
 func switch_ammunition(value: int) -> void:
 	if dead or value == ammunition:

@@ -1,5 +1,5 @@
 extends Node3D
-## Thunder War: host simulation, scope-bound inputs/snapshots and local camera/HUD.
+## Host combat, replaceable driving/poses, reliable facts and native projectile replication.
 const TankScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
 const TargetScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_target.gd")
 const ShellScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/shell.gd")
@@ -22,6 +22,15 @@ var vehicles: Dictionary[String, TankScript] = {}
 var commands: Dictionary[String, Dictionary] = {}
 var withdrawn: Dictionary[String, bool] = {}
 var remote_states: Dictionary = {}
+var _published_facts: Dictionary = {}
+var _combat_facts: Dictionary = {}
+var _target_hp: Dictionary = {}
+var _published_summary: Dictionary = {}
+var _round_start_msec: int = 0
+var _action_sequence: int = 0
+var _action_sequences: Dictionary = {}
+var _shell_spawner: MultiplayerSpawner
+var _completed_shells: Dictionary = {}
 var shells: Dictionary[int, ShellScript] = {}
 var local_id: String = ""
 var tank: TankScript
@@ -73,6 +82,11 @@ func _ready() -> void:
 		set_physics_process(false)
 		set_process_unhandled_input(false)
 		return
+	_shell_spawner = MultiplayerSpawner.new()
+	_shell_spawner.name = "ProjectileSpawner"
+	_shell_spawner.spawn_path = NodePath("..")
+	_shell_spawner.spawn_function = _make_shell
+	add_child(_shell_spawner)
 	add_to_group("party_minimal_hud")
 	hud = $GameHUD/RangeHUD
 	hud.game = self
@@ -130,6 +144,7 @@ func _start_game() -> void:
 	audio_vehicles.assign(vehicles.values())
 	audio.start(audio_vehicles, tank if not local_id.is_empty() else null)
 	if api.is_host():
+		_round_start_msec = api.net.host_time_msec()
 		_publish()
 
 func party_stop(_reason: StringName) -> void:
@@ -142,6 +157,8 @@ func party_stop(_reason: StringName) -> void:
 	for shell: ShellScript in shells.values():
 		if is_instance_valid(shell):
 			shell.set_physics_process(false)
+			if shell.synchronizer != null:
+				shell.synchronizer.public_visibility = false
 	if api.net.message_received.is_connected(_message):
 		api.net.message_received.disconnect(_message)
 	if api.players_changed.is_connected(_players_changed):
@@ -198,13 +215,18 @@ func _physics_process(delta: float) -> void:
 				_finish_round()
 				return
 	else:
+		if not combat_ended and _round_start_msec > 0:
+			elapsed = maxf(0.0, float(api.net.host_time_msec() - _round_start_msec) / 1000.0)
 		for id: String in remote_states:
-			vehicles[id].apply_snapshot(remote_states[id], delta)
+			vehicles[id].apply_motion(remote_states[id], delta)
+		_advance_remote_timers()
 	camera.advance(delta, elapsed)
 	_input_clock += delta
 	if _input_clock >= INPUT_INTERVAL and not local_id.is_empty():
 		_input_clock = 0.0
 		_send_input(blocked)
+		if not started:
+			return
 	if api.is_host():
 		for id: String in vehicles:
 			var vehicle: TankScript = vehicles[id]
@@ -217,12 +239,18 @@ func _physics_process(delta: float) -> void:
 			if commands[id].fire:
 				commands[id].fire = false
 				_fire_vehicle(id)
+				if not started:
+					return
 			if commands[id].machine_gun:
 				_fire_machine_gun(id)
+				if not started:
+					return
 		_snapshot_clock += delta
 		if _snapshot_clock >= SNAPSHOT_INTERVAL:
 			_snapshot_clock = 0.0
 			_publish()
+			if not started:
+				return
 		_check_finish()
 	hit_flash = maxf(0.0, hit_flash - delta)
 	for feedback: Dictionary in feedbacks:
@@ -243,15 +271,27 @@ func _send_input(blocked: bool) -> void:
 	var data: Dictionary = {"seq": _input_sequence, "drive": drive, "steer": steer,
 		"brake": blocked or api.input.is_pressed(&"tank_brake"), "aim": tank.aim_point,
 		"direction_mode": camera.first_person, "direction": tank.requested_gun_direction,
-		"fire": (_pending_fire or (DamageModel.is_automatic(_requested_ammunition) and api.input.is_pressed(&"tank_fire"))) and not blocked, "machine_gun": api.input.is_pressed(&"tank_machine_gun") and not blocked, "recover": _pending_recover and not blocked, "ammunition": _requested_ammunition}
-	_pending_fire = false
-	_pending_recover = false
+		"automatic": DamageModel.is_automatic(_requested_ammunition) and api.input.is_pressed(&"tank_fire") and not blocked,
+		"machine_gun": api.input.is_pressed(&"tank_machine_gun") and not blocked, "ammunition": _requested_ammunition}
 	if api.is_host():
 		_accept_input(local_id, data)
 	else:
-		_network_failure(api.net.send_to_host(&"tank_input", data))
+		var error: Error = api.net.send_to_host(&"tank_input", data, MultiplayerPeer.TRANSFER_MODE_UNRELIABLE_ORDERED, 1)
+		if error != OK:
+			_network_failure(error)
+			return
+	if (_pending_fire or _pending_recover) and not blocked:
+		_action_sequence += 1
+		var action: Dictionary = {"seq": _action_sequence, "fire": _pending_fire, "recover": _pending_recover,
+			"ammunition": _requested_ammunition, "aim": tank.aim_point, "direction_mode": camera.first_person,
+			"direction": tank.requested_gun_direction}
+		var error: Error = api.net.send_to_host(&"tank_action", action)
+		if error != OK:
+			_network_failure(error)
+			return
+	_pending_fire = false
+	_pending_recover = false
 
-## Authenticate ownership before consuming logical actions. Never accept client poses or damage.
 func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
 	if topic == &"tank_selection" and not started and not finished:
 		_selection_message(sender, payload)
@@ -263,40 +303,34 @@ func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
 			if player.connected and player.player_id in sender.player_ids and not withdrawn.has(player.player_id):
 				_accept_input(player.player_id, payload)
 				return
+	elif topic == &"tank_action" and api.is_host():
+		for player: Dictionary in api.get_players():
+			if player.connected and player.player_id in sender.player_ids and not withdrawn.has(player.player_id):
+				_accept_action(player.player_id, payload)
+				return
 	elif sender.peer_id == 1 and not api.is_host():
-		if topic == &"tank_state":
-			if payload.sequence <= _received_state:
+		if topic == &"tank_motion":
+			if not payload.get("sequence") is int or payload.sequence <= _received_state or not payload.get("vehicles") is Dictionary:
 				return
+			for id: Variant in payload.vehicles:
+				var sample: Variant = payload.vehicles[id]
+				if not id is String or not vehicles.has(id) or not sample is PackedFloat32Array or sample.size() != TankScript.MOTION_FLOATS:
+					return
+				for number: float in sample:
+					if not is_finite(number):
+						return
+				remote_states[id] = sample
 			_received_state = payload.sequence
-			elapsed = payload.elapsed
-			combat_ended = payload.ending
-			if combat_ended:
-				audio.end_combat()
-			var packed: PackedFloat32Array = payload.vehicles
-			if packed.size() != players.size() * TankScript.SNAPSHOT_FLOATS:
-				_network_failure(ERR_INVALID_DATA)
+		elif topic == &"tank_facts":
+			_receive_facts(payload)
+		elif topic == &"tank_events" and payload.get("kind") == "impact":
+			if not payload.get("id") is int:
 				return
-			for i: int in players.size():
-				remote_states[players[i].player_id] = packed.slice(i * TankScript.SNAPSHOT_FLOATS, (i + 1) * TankScript.SNAPSHOT_FLOATS)
-			destroyed_count = payload.destroyed
-			hits = payload.hits
-			for i: int in targets.size():
-				var target: TargetScript = targets[i]
-				var state: Dictionary = payload.targets[i]
-				if state.hp < target.hp:
-					target.damage(target.hp - state.hp)
-		elif topic == &"tank_missiles":
+			_completed_shells[payload.id] = true
 			if shells.has(payload.id) and is_instance_valid(shells[payload.id]):
-				shells[payload.id].global_position = payload.position
-				shells[payload.id].velocity = payload.velocity
-		elif topic == &"tank_events":
-			if payload.kind == "shot":
-				_spawn_shell(payload.id, payload.player, payload.position, payload.velocity, false, payload.ammunition)
-			elif payload.kind == "impact":
-				if shells.has(payload.id) and is_instance_valid(shells[payload.id]):
-					shells[payload.id].queue_free()
-				shells.erase(payload.id)
-				_impact_effect(payload.position, payload.normal, payload.player, payload.feedback, payload.ammunition, payload.surface)
+				shells[payload.id].hide()
+				shells[payload.id].set_physics_process(false)
+			_impact_effect(payload.position, payload.normal, payload.player, payload.feedback, payload.ammunition, payload.surface)
 
 func _accept_input(id: String, data: Dictionary) -> void:
 	if combat_ended:
@@ -308,7 +342,7 @@ func _accept_input(id: String, data: Dictionary) -> void:
 	for key: String in ["drive", "steer"]:
 		if not (data.get(key) is float or data.get(key) is int) or not is_finite(float(data[key])) or absf(data[key]) > 1.0:
 			return
-	for key: String in ["brake", "direction_mode", "fire", "recover", "machine_gun"]:
+	for key: String in ["brake", "direction_mode", "automatic", "machine_gun"]:
 		if not data.get(key) is bool:
 			return
 	for key: String in ["aim", "direction"]:
@@ -328,10 +362,8 @@ func _accept_input(id: String, data: Dictionary) -> void:
 	vehicle.aim_point = data.aim
 	vehicle.aim_direction_mode = data.direction_mode
 	vehicle.requested_gun_direction = data.direction.normalized()
-	commands[id].fire = commands[id].fire or data.fire
+	commands[id].fire = commands[id].fire or (data.automatic and DamageModel.is_automatic(data.ammunition))
 	commands[id].machine_gun = data.machine_gun
-	if data.recover and players.size() == 1:
-		vehicle.reset_vehicle()
 
 func _fire_vehicle(id: String) -> void:
 	if combat_ended:
@@ -342,8 +374,7 @@ func _fire_vehicle(id: String) -> void:
 	_shot_id += 1
 	var origin: Vector3 = vehicle.shot_muzzle().global_position
 	var velocity: Vector3 = vehicle.muzzle_direction() * DamageModel.shell_speed(vehicle.ammunition)
-	_spawn_shell(_shot_id, id, origin, velocity, true, vehicle.ammunition)
-	_network_failure(api.net.broadcast_stream(&"tank_events", {"kind": "shot", "id": _shot_id, "player": id, "position": origin, "velocity": velocity, "ammunition": vehicle.ammunition}, "instance", true))
+	_spawn_shell(_shot_id, id, origin, velocity, vehicle.ammunition)
 
 func _fire_machine_gun(id: String) -> void:
 	var vehicle: TankScript = vehicles[id]
@@ -352,28 +383,56 @@ func _fire_machine_gun(id: String) -> void:
 	_shot_id += 1
 	var origin: Vector3 = vehicle.coax_muzzle.global_position
 	var velocity: Vector3 = -vehicle.coax_muzzle.global_basis.z.normalized() * DamageModel.shell_speed(DamageModel.Ammo.MG)
-	_spawn_shell(_shot_id, id, origin, velocity, true, DamageModel.Ammo.MG)
-	_network_failure(api.net.broadcast_stream(&"tank_events", {"kind": "shot", "id": _shot_id, "player": id, "position": origin, "velocity": velocity, "ammunition": DamageModel.Ammo.MG}, "instance", true))
+	_spawn_shell(_shot_id, id, origin, velocity, DamageModel.Ammo.MG)
 
-func _spawn_shell(id: int, player: String, origin: Vector3, velocity: Vector3, authoritative: bool, ammunition: int) -> void:
+func _spawn_shell(id: int, player: String, origin: Vector3, velocity: Vector3, ammunition: int) -> void:
+	var shell: Node = _shell_spawner.spawn({"id": id, "player": player, "position": origin, "velocity": velocity,
+		"ammunition": ammunition, "at_msec": api.net.host_time_msec()})
+	if shell == null:
+		_network_failure(ERR_CANT_CREATE)
+
+## MultiplayerSpawner inserts the returned node. Never add it manually in this callback.
+func _make_shell(data: Variant) -> Node:
+	if not data is Dictionary or not data.get("id") is int or not data.get("player") is String or not vehicles.has(data.player) or not data.get("position") is Vector3 or not data.position.is_finite() or not data.get("velocity") is Vector3 or not data.velocity.is_finite() or not data.get("ammunition") is int or not data.get("at_msec") is int:
+		_network_failure(ERR_INVALID_DATA)
+		return null
+	if data.ammunition not in DamageModel.Ammo.values():
+		_network_failure(ERR_INVALID_DATA)
+		return null
 	var shell: ShellScript = ShellScript.new()
-	shell.authoritative = authoritative
-	shell.ammunition = ammunition
-	if authoritative:
+	shell.name = "Shell%d" % data.id
+	shell.authoritative = api.is_host()
+	shell.ammunition = data.ammunition
+	if shell.authoritative:
 		shell.damage_targets.assign(vehicles.values() + targets)
-	shell.shooter = vehicles[player]
-	shell.velocity = velocity
-	add_child(shell)
-	shell.global_position = origin
-	shells[id] = shell
-	if authoritative:
-		shell.impacted.connect(_shell_impact.bind(id, player, ammunition))
-	shell.tree_exited.connect(func() -> void: shells.erase(id))
-	var automatic: bool = DamageModel.is_automatic(ammunition)
-	if player == local_id:
-		camera.shot_shake = maxf(camera.shot_shake, 0.035 if ammunition == DamageModel.Ammo.MG else (0.18 if automatic else 1.0))
-	audio.fire(ammunition, origin, shell)
-	_emit_effect(origin, Color("ffdb7c"), 0.12 if ammunition == DamageModel.Ammo.MG else (0.3 if camera.first_person and player == local_id else 0.9), 0.12, Vector3.ZERO)
+	shell.shooter = vehicles[data.player]
+	shell.velocity = data.velocity
+	var delay: float = 0.0 if api.is_host() else clampf(float(api.net.host_time_msec() - data.at_msec) / 1000.0, 0.0, 8.0)
+	var gravity: float = DamageModel.gravity(shell.ammunition)
+	var position_value: Vector3 = data.position + data.velocity * delay + Vector3.DOWN * gravity * delay * delay * 0.5
+	shell.position = to_local(position_value)
+	shell.velocity.y -= gravity * delay
+	shell.age = delay
+	shell.network_position = position_value
+	shell.network_velocity = shell.velocity
+	shell.configure_guidance()
+	shells[data.id] = shell
+	if shell.authoritative:
+		shell.impacted.connect(_shell_impact.bind(data.id, data.player, data.ammunition))
+	shell.tree_exited.connect(func() -> void: shells.erase(data.id))
+	shell.ready.connect(_present_shell.bind(shell, data), CONNECT_ONE_SHOT)
+	return shell
+
+func _present_shell(shell: ShellScript, data: Dictionary) -> void:
+	if _completed_shells.has(data.id):
+		shell.hide()
+		shell.set_physics_process(false)
+		return
+	var automatic: bool = DamageModel.is_automatic(data.ammunition)
+	if data.player == local_id:
+		camera.shot_shake = maxf(camera.shot_shake, 0.035 if data.ammunition == DamageModel.Ammo.MG else (0.18 if automatic else 1.0))
+	audio.fire(data.ammunition, data.position, shell)
+	_emit_effect(data.position, Color("ffdb7c"), 0.12 if data.ammunition == DamageModel.Ammo.MG else (0.3 if camera.first_person and data.player == local_id else 0.9), 0.12, Vector3.ZERO)
 
 func _shell_impact(point: Vector3, normal: Vector3, contacts: Array[Dictionary], id: int, player: String, ammunition: int) -> void:
 	var feedback: Array[Dictionary] = []
@@ -410,8 +469,8 @@ func _shell_impact(point: Vector3, normal: Vector3, contacts: Array[Dictionary],
 		else:
 			feedback.append({"kind": "hit", "text": "命中"})
 	_impact_effect(point, normal, player, feedback, ammunition, surface)
-	_network_failure(api.net.broadcast_stream(&"tank_events", {"kind": "impact", "id": id, "position": point,
-		"normal": normal, "player": player, "feedback": feedback, "ammunition": ammunition, "surface": surface}, "instance", true))
+	_network_failure(api.net.send_to_group(&"tank_events", {"kind": "impact", "id": id, "position": point,
+		"normal": normal, "player": player, "feedback": feedback, "ammunition": ammunition, "surface": surface}, MultiplayerPeer.TRANSFER_MODE_RELIABLE, "instance", true))
 
 func _impact_effect(point: Vector3, normal: Vector3, player: String, feedback: Array, ammunition: int, surface: StringName) -> void:
 	audio.impact(point, ammunition, surface, feedback, player == local_id)
@@ -427,19 +486,47 @@ func _impact_effect(point: Vector3, normal: Vector3, player: String, feedback: A
 		_emit_effect(point, Color("746e57"), randf_range(0.4, 1.1) if explosive else randf_range(0.15, 0.4), randf_range(0.7, 1.5), Vector3(randf_range(-3, 3), randf_range(0.4, 5), randf_range(-3, 3)))
 
 func _publish() -> void:
-	var states: PackedFloat32Array = []
-	for player: Dictionary in players:
-		states.append_array(vehicles[player.player_id].make_snapshot())
-	for id: int in shells:
-		var shell: ShellScript = shells[id]
-		if is_instance_valid(shell) and DamageModel.is_missile(shell.ammunition):
-			_network_failure(api.net.broadcast_stream(&"tank_missiles", {"id": id, "position": shell.global_position, "velocity": shell.velocity}, "instance", true))
-	var target_states: Array[Dictionary] = []
-	for target: TargetScript in targets:
-		target_states.append({"hp": target.hp})
+	var now: int = api.net.host_time_msec()
+	var changes: Dictionary = {}
+	var motion: Dictionary = {}
+	for id: String in vehicles:
+		motion[id] = vehicles[id].motion_sample()
+		var current: Dictionary = vehicles[id].combat_facts(now)
+		var previous: Dictionary = _published_facts.get(id, {})
+		var changed: Dictionary = {}
+		for key: String in current:
+			var same_deadline: bool = key.ends_with("_end") and previous.has(key) and current[key] > 0 and previous[key] > 0 and absi(current[key] - previous[key]) < 100
+			if not same_deadline and (not previous.has(key) or previous[key] != current[key]):
+				changed[key] = current[key]
+		if not changed.is_empty():
+			changes[id] = changed
+		if not _published_facts.has(id):
+			_published_facts[id] = {}
+		_published_facts[id].merge(changed, true)
+	var target_changes: Dictionary = {}
+	for index: int in targets.size():
+		if not _target_hp.has(index) or _target_hp[index] != targets[index].hp:
+			target_changes[index] = targets[index].hp
+			_target_hp[index] = targets[index].hp
+	var summary: Dictionary = {"ending": combat_ended, "destroyed": destroyed_count, "hits": hits}
+	var message: Dictionary = {"vehicles": changes, "targets": target_changes}
+	if summary != _published_summary:
+		message["summary"] = summary
+		if combat_ended:
+			message["final_elapsed"] = elapsed
+	if _published_summary.is_empty():
+		message["start_msec"] = _round_start_msec
+	if not changes.is_empty() or not target_changes.is_empty() or summary != _published_summary:
+		var error: Error = api.net.broadcast(&"tank_facts", message, MultiplayerPeer.TRANSFER_MODE_RELIABLE, false)
+		if error != OK:
+			_network_failure(error)
+			return
+		_published_summary = summary
 	_state_sequence += 1
-	_network_failure(api.net.broadcast_stream(&"tank_state", {"sequence": _state_sequence, "elapsed": elapsed, "ending": combat_ended,
-		"vehicles": states, "targets": target_states, "destroyed": destroyed_count, "hits": hits}, "instance", true))
+	var error: Error = api.net.broadcast(&"tank_motion", {"sequence": _state_sequence, "vehicles": motion},
+		MultiplayerPeer.TRANSFER_MODE_UNRELIABLE_ORDERED, false, "instance", 2)
+	if error != OK:
+		_network_failure(error)
 
 func _players_changed() -> void:
 	if not api.is_host() or (not started and not selecting) or finished:
@@ -637,3 +724,80 @@ func _deploy_vehicles() -> void:
 	%VehicleSelection.hide()
 	$GameHUD.show()
 	_start_game()
+
+func _accept_action(id: String, data: Dictionary) -> void:
+	if combat_ended or vehicles[id].dead or not data.get("seq") is int or data.seq <= int(_action_sequences.get(id, 0)):
+		return
+	if not data.get("fire") is bool or not data.get("recover") is bool or not data.get("ammunition") is int or data.ammunition not in vehicles[id].spec.weapons or not data.get("direction_mode") is bool:
+		return
+	if not data.get("aim") is Vector3 or not data.aim.is_finite() or data.aim.length() > 2000.0 or not data.get("direction") is Vector3 or not data.direction.is_finite() or data.direction.length_squared() < 0.5 or data.direction.length_squared() > 1.5:
+		return
+	_action_sequences[id] = data.seq
+	var vehicle: TankScript = vehicles[id]
+	vehicle.switch_ammunition(data.ammunition)
+	vehicle.aim_point = data.aim
+	vehicle.aim_direction_mode = data.direction_mode
+	vehicle.requested_gun_direction = data.direction.normalized()
+	commands[id].fire = commands[id].fire or data.fire
+	if data.recover and players.size() == 1:
+		vehicle.reset_vehicle()
+
+func _receive_facts(payload: Dictionary) -> void:
+	if not payload.get("vehicles") is Dictionary or not payload.get("targets") is Dictionary:
+		return
+	for id: Variant in payload.vehicles:
+		if not id is String or not vehicles.has(id) or not payload.vehicles[id] is Dictionary:
+			return
+		if not _combat_facts.has(id):
+			_combat_facts[id] = {}
+		for key: String in payload.vehicles[id]:
+			var value: Variant = payload.vehicles[id][key]
+			if key.ends_with("_end"):
+				if key not in ["engine_end", "left_track_end", "right_track_end", "barrel_end", "reload_end", "mg_reload_end"] or not value is int or value < 0:
+					return
+			elif key == "dead":
+				if not value is bool:
+					return
+			elif key in ["hp", "damage_dealt"]:
+				if not (value is float or value is int) or not is_finite(float(value)) or value < 0:
+					return
+			elif key in ["kills", "rounds_fired", "ammunition", "mg_rounds", "mg_shots_fired"]:
+				if not value is int or value < 0 or (key == "ammunition" and value not in vehicles[id].spec.weapons):
+					return
+			else:
+				return
+			_combat_facts[id][key] = value
+			if not key.ends_with("_end"):
+				vehicles[id].set(key, value)
+		vehicles[id].components.reload_duration = DamageModel.reload_duration(vehicles[id].ammunition)
+	for index: Variant in payload.targets:
+		if not index is int or index < 0 or index >= targets.size() or not (payload.targets[index] is float or payload.targets[index] is int) or not is_finite(float(payload.targets[index])):
+			return
+		if payload.targets[index] < targets[index].hp:
+			targets[index].damage(targets[index].hp - payload.targets[index])
+	if payload.has("start_msec"):
+		if not payload.start_msec is int:
+			return
+		_round_start_msec = payload.start_msec
+	if payload.has("summary"):
+		if not payload.summary is Dictionary or not payload.summary.get("ending") is bool or not payload.summary.get("destroyed") is int or not payload.summary.get("hits") is int:
+			return
+		combat_ended = payload.summary.ending
+		destroyed_count = payload.summary.destroyed
+		hits = payload.summary.hits
+		if combat_ended:
+			if not (payload.get("final_elapsed") is float or payload.get("final_elapsed") is int):
+				return
+			elapsed = payload.final_elapsed
+			audio.end_combat()
+	_advance_remote_timers()
+
+func _advance_remote_timers() -> void:
+	var now: int = api.net.host_time_msec()
+	for id: String in _combat_facts:
+		var vehicle: TankScript = vehicles[id]
+		var facts: Dictionary = _combat_facts[id]
+		for part: String in ["engine", "left_track", "right_track", "barrel"]:
+			vehicle.components.set(part + "_remaining", maxf(0.0, float(facts[part + "_end"] - now) / 1000.0))
+		vehicle.components.reload_remaining = maxf(0.0, float(facts.reload_end - now) / 1000.0 - vehicle.components.barrel_remaining)
+		vehicle.mg_reload_remaining = maxf(0.0, float(facts.mg_reload_end - now) / 1000.0)
