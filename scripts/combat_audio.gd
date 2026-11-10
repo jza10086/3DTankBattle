@@ -1,9 +1,9 @@
 extends Node
 ## Template PartyGameAudio owns mix, pause and cleanup. This component owns combat
 ## events and a bounded positional voice pool; it never reads physical input.
-const Tank = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
-const VehicleAudio = preload("res://games/minigame/godot_party_default_tank_range/scripts/vehicle_audio.gd")
-const Damage = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
+const Tank = preload("res://games/minigame/gp_tank_war/scripts/tank_controller.gd")
+const VehicleAudio = preload("res://games/minigame/gp_tank_war/scripts/vehicle_audio.gd")
+const Damage = preload("res://games/minigame/gp_tank_war/scripts/armor_damage.gd")
 @export var scope: PartyGameAudio
 @export var vehicle_audio_scene: PackedScene
 @export var voices_root: Node3D

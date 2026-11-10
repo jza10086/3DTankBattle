@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dxgcjddatjfog"
-path="res://.godot/imported/cannon.wav-10cbb88047761f08b728d7ee6683d2b8.sample"
+path="res://.godot/imported/cannon.wav-f205f8391bb69a712ed3a798dde21723.sample"
 
 [deps]
 
-source_file="res://games/minigame/godot_party_default_tank_range/assets/audio/combat/cannon.wav"
-dest_files=["res://.godot/imported/cannon.wav-10cbb88047761f08b728d7ee6683d2b8.sample"]
+source_file="res://games/minigame/gp_tank_war/assets/audio/combat/cannon.wav"
+dest_files=["res://.godot/imported/cannon.wav-f205f8391bb69a712ed3a798dde21723.sample"]
 
 [params]
 

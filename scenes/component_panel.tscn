@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/component_panel.gd" id="1_13mcq"]
+[ext_resource type="Script" path="res://games/minigame/gp_tank_war/scripts/component_panel.gd" id="1_13mcq"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ew2om"]
 content_margin_left = 18.0

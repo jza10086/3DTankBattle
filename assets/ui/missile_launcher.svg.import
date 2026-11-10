@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c7q00ywm2svk1"
-path="res://.godot/imported/missile_launcher.svg-11ee5f10f128781dfbc4e756090abf53.ctex"
+path="res://.godot/imported/missile_launcher.svg-12d0d11a5f9b6d001d963615b88000e8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://games/minigame/godot_party_default_tank_range/assets/ui/missile_launcher.svg"
-dest_files=["res://.godot/imported/missile_launcher.svg-11ee5f10f128781dfbc4e756090abf53.ctex"]
+source_file="res://games/minigame/gp_tank_war/assets/ui/missile_launcher.svg"
+dest_files=["res://.godot/imported/missile_launcher.svg-12d0d11a5f9b6d001d963615b88000e8.ctex"]
 
 [params]
 

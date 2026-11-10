@@ -2,9 +2,9 @@ class_name RangeTarget
 extends StaticBody3D
 ## Static training target. Authored island colliders identify armor and damageable components.
 signal destroyed(target: RangeTarget)
-const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
-const ComponentStatusScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_status.gd")
-const Collider = preload("res://games/minigame/godot_party_default_tank_range/scripts/target_collider.gd")
+const DamageModel = preload("res://games/minigame/gp_tank_war/scripts/armor_damage.gd")
+const ComponentStatusScript = preload("res://games/minigame/gp_tank_war/scripts/component_status.gd")
+const Collider = preload("res://games/minigame/gp_tank_war/scripts/target_collider.gd")
 @export var colliders: Array[Collider]
 @export var index: int = 0
 @export var model_name: String = ""

@@ -1,8 +1,8 @@
 [gd_scene format=4]
 
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/range_target.gd" id="1_dfd3b"]
+[ext_resource type="Script" path="res://games/minigame/gp_tank_war/scripts/range_target.gd" id="1_dfd3b"]
 
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/target_collider.gd" id="collider_script"]
+[ext_resource type="Script" path="res://games/minigame/gp_tank_war/scripts/target_collider.gd" id="collider_script"]
 
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_spwnc"]

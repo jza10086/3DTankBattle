@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "core_api_major": 5,
-  "package_version": "1.4.3",
-  "id": "godot_party_default_tank_range",
+  "package_version": "1.4.4",
+  "id": "gp_tank_war",
   "name": "雷霆战争",
   "kind": "minigame",
   "supported_systems": ["windows"],

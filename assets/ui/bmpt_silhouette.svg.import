@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://6t5ps6q48ypa"
-path="res://.godot/imported/bmpt_silhouette.svg-d2ad2b7da1174eea1f242fb7cbfdbff3.ctex"
+path="res://.godot/imported/bmpt_silhouette.svg-b78441e850e75530434d43a9c0a3f637.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://games/minigame/godot_party_default_tank_range/assets/ui/bmpt_silhouette.svg"
-dest_files=["res://.godot/imported/bmpt_silhouette.svg-d2ad2b7da1174eea1f242fb7cbfdbff3.ctex"]
+source_file="res://games/minigame/gp_tank_war/assets/ui/bmpt_silhouette.svg"
+dest_files=["res://.godot/imported/bmpt_silhouette.svg-b78441e850e75530434d43a9c0a3f637.ctex"]
 
 [params]
 

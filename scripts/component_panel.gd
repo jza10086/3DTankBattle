@@ -1,7 +1,7 @@
 class_name ComponentPanel
 extends PanelContainer
 ## Explicit training controls, not a permanent debug sidebar.
-const Status = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_status.gd")
+const Status = preload("res://games/minigame/gp_tank_war/scripts/component_status.gd")
 signal component_requested(component: StringName)
 signal clear_requested
 signal close_requested

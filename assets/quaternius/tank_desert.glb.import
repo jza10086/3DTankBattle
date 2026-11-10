@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://xyrftdhmjw66"
-path="res://.godot/imported/tank_desert.glb-d6d826c847cd92f7d7932eb1c031f7d1.scn"
+path="res://.godot/imported/tank_desert.glb-4cd34f28f21d31116efd00a315b0c63a.scn"
 
 [deps]
 
-source_file="res://games/minigame/godot_party_default_tank_range/assets/quaternius/tank_desert.glb"
-dest_files=["res://.godot/imported/tank_desert.glb-d6d826c847cd92f7d7932eb1c031f7d1.scn"]
+source_file="res://games/minigame/gp_tank_war/assets/quaternius/tank_desert.glb"
+dest_files=["res://.godot/imported/tank_desert.glb-4cd34f28f21d31116efd00a315b0c63a.scn"]
 
 [params]
 

@@ -1,8 +1,8 @@
 extends Camera3D
 ## Local optical intent and barrel trajectory; never simulates damage or network input.
-const TankScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
-const TargetScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_target.gd")
-const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
+const TankScript = preload("res://games/minigame/gp_tank_war/scripts/tank_controller.gd")
+const TargetScript = preload("res://games/minigame/gp_tank_war/scripts/range_target.gd")
+const DamageModel = preload("res://games/minigame/gp_tank_war/scripts/armor_damage.gd")
 var tank: TankScript
 var active: bool = false
 var controllable: bool = false

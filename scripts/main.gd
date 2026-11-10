@@ -1,16 +1,16 @@
 extends Node3D
 ## Host combat, replaceable driving/poses, reliable facts and native projectile replication.
-const TankScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
-const TargetScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_target.gd")
-const ShellScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/shell.gd")
-const CameraScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_camera.gd")
-const AudioScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/combat_audio.gd")
-const Spec = preload("res://games/minigame/godot_party_default_tank_range/scripts/vehicle_spec.gd")
-const SPECS: Array[Spec] = [preload("res://games/minigame/godot_party_default_tank_range/vehicles/m1_abrams.tres"), preload("res://games/minigame/godot_party_default_tank_range/vehicles/bmpt.tres"), preload("res://games/minigame/godot_party_default_tank_range/vehicles/bradley.tres")]
+const TankScript = preload("res://games/minigame/gp_tank_war/scripts/tank_controller.gd")
+const TargetScript = preload("res://games/minigame/gp_tank_war/scripts/range_target.gd")
+const ShellScript = preload("res://games/minigame/gp_tank_war/scripts/shell.gd")
+const CameraScript = preload("res://games/minigame/gp_tank_war/scripts/tank_camera.gd")
+const AudioScript = preload("res://games/minigame/gp_tank_war/scripts/combat_audio.gd")
+const Spec = preload("res://games/minigame/gp_tank_war/scripts/vehicle_spec.gd")
+const SPECS: Array[Spec] = [preload("res://games/minigame/gp_tank_war/vehicles/m1_abrams.tres"), preload("res://games/minigame/gp_tank_war/vehicles/bmpt.tres"), preload("res://games/minigame/gp_tank_war/vehicles/bradley.tres")]
 @export var camera: CameraScript
 @export var audio: AudioScript
 const Pages = preload("res://games/protocols/godot_party_default_protocol/round_pages.gd")
-const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
+const DamageModel = preload("res://games/minigame/gp_tank_war/scripts/armor_damage.gd")
 const INPUT_INTERVAL: float = 0.05
 const SNAPSHOT_INTERVAL: float = 0.05
 const INPUT_EXPIRY: float = 0.5

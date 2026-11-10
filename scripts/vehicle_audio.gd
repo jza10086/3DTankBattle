@@ -1,6 +1,6 @@
 extends Node3D
 ## Positional powertrain loops follow the authoritative vehicle state on every peer.
-const Tank = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
+const Tank = preload("res://games/minigame/gp_tank_war/scripts/tank_controller.gd")
 @export var engine: AudioStreamPlayer3D
 @export var tracks: AudioStreamPlayer3D
 @export var traverse: AudioStreamPlayer3D

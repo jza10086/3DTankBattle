@@ -1,13 +1,13 @@
 extends Control
 ## Minimal combat instrumentation; camera intent and ballistic impact stay distinct.
-const Tank = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
-const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
-const AP_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/shell_ap.svg")
-const HE_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/shell_he.svg")
-const AUTO_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/shell_auto.svg")
-const MISSILE_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/missile.svg")
-const GUN_ICONS: Array[Texture2D] = [preload("res://games/minigame/godot_party_default_tank_range/assets/ui/m68_cannon.svg"), preload("res://games/minigame/godot_party_default_tank_range/assets/ui/twin_cannon.svg"), preload("res://games/minigame/godot_party_default_tank_range/assets/ui/autocannon.svg")]
-const LAUNCHER_ICON: Texture2D = preload("res://games/minigame/godot_party_default_tank_range/assets/ui/missile_launcher.svg")
+const Tank = preload("res://games/minigame/gp_tank_war/scripts/tank_controller.gd")
+const DamageModel = preload("res://games/minigame/gp_tank_war/scripts/armor_damage.gd")
+const AP_ICON: Texture2D = preload("res://games/minigame/gp_tank_war/assets/ui/shell_ap.svg")
+const HE_ICON: Texture2D = preload("res://games/minigame/gp_tank_war/assets/ui/shell_he.svg")
+const AUTO_ICON: Texture2D = preload("res://games/minigame/gp_tank_war/assets/ui/shell_auto.svg")
+const MISSILE_ICON: Texture2D = preload("res://games/minigame/gp_tank_war/assets/ui/missile.svg")
+const GUN_ICONS: Array[Texture2D] = [preload("res://games/minigame/gp_tank_war/assets/ui/m68_cannon.svg"), preload("res://games/minigame/gp_tank_war/assets/ui/twin_cannon.svg"), preload("res://games/minigame/gp_tank_war/assets/ui/autocannon.svg")]
+const LAUNCHER_ICON: Texture2D = preload("res://games/minigame/gp_tank_war/assets/ui/missile_launcher.svg")
 const WHITE: Color = Color("f3eedc")
 const AMBER: Color = Color("ffc66d")
 const RED: Color = Color("ff7668")

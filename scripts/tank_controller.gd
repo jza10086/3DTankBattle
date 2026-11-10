@@ -1,16 +1,16 @@
 extends CharacterBody3D
 
-const TankVisualScript = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_visual.gd")
+const TankVisualScript = preload("res://games/minigame/gp_tank_war/scripts/tank_visual.gd")
 
 ## Deliberately accessible tracked-vehicle model, not a full rigid-body simulator.
 ## Four suspension contacts tilt the rendered hull while a stable chassis handles collision.
-const Spec = preload("res://games/minigame/godot_party_default_tank_range/scripts/vehicle_spec.gd")
+const Spec = preload("res://games/minigame/gp_tank_war/scripts/vehicle_spec.gd")
 var vehicle_index: int = 0
 var spec: Spec
 const BRAKING: float = 12.0
 const ELEVATION_RATE: float = 0.38
 const GRAVITY: float = 20.0
-const ComponentState = preload("res://games/minigame/godot_party_default_tank_range/scripts/component_status.gd")
+const ComponentState = preload("res://games/minigame/gp_tank_war/scripts/component_status.gd")
 var speed: float = 0.0
 var yaw_rate: float = 0.0
 var throttle: float = 0.0
@@ -258,7 +258,7 @@ var death_time: float = 0.0
 @export var _turret_shape: CollisionShape3D
 @export var _barrel_shape: CollisionShape3D
 @export var nameplate: Label3D
-const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
+const DamageModel = preload("res://games/minigame/gp_tank_war/scripts/armor_damage.gd")
 
 @export var turret_center: Vector3
 @export var barrel_length: float

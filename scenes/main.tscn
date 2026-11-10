@@ -1,21 +1,21 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/targets/target_0.tscn" id="target0"]
-[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/targets/target_1.tscn" id="target1"]
-[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/targets/target_2.tscn" id="target2"]
-[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/scenes/range.tscn" id="range"]
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/range_hud.gd" id="hud"]
+[ext_resource type="PackedScene" path="res://games/minigame/gp_tank_war/scenes/targets/target_0.tscn" id="target0"]
+[ext_resource type="PackedScene" path="res://games/minigame/gp_tank_war/scenes/targets/target_1.tscn" id="target1"]
+[ext_resource type="PackedScene" path="res://games/minigame/gp_tank_war/scenes/targets/target_2.tscn" id="target2"]
+[ext_resource type="PackedScene" path="res://games/minigame/gp_tank_war/scenes/range.tscn" id="range"]
+[ext_resource type="Script" path="res://games/minigame/gp_tank_war/scripts/range_hud.gd" id="hud"]
 
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/main.gd" id="1_048g3"]
+[ext_resource type="Script" path="res://games/minigame/gp_tank_war/scripts/main.gd" id="1_048g3"]
 
-[ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/m68_cannon.svg" id="gun_icon"]
-[ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/shell_ap.svg" id="ap_icon"]
-[ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/m1_silhouette.svg" id="tank_icon"]
+[ext_resource type="Texture2D" path="res://games/minigame/gp_tank_war/assets/ui/m68_cannon.svg" id="gun_icon"]
+[ext_resource type="Texture2D" path="res://games/minigame/gp_tank_war/assets/ui/shell_ap.svg" id="ap_icon"]
+[ext_resource type="Texture2D" path="res://games/minigame/gp_tank_war/assets/ui/m1_silhouette.svg" id="tank_icon"]
 
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/tank_camera.gd" id="camera_script"]
-[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/audio/combat_audio.tscn" id="audio_scene"]
+[ext_resource type="Script" path="res://games/minigame/gp_tank_war/scripts/tank_camera.gd" id="camera_script"]
+[ext_resource type="PackedScene" path="res://games/minigame/gp_tank_war/audio/combat_audio.tscn" id="audio_scene"]
 
-[ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/machine_gun.svg" id="mg_icon"]
+[ext_resource type="Texture2D" path="res://games/minigame/gp_tank_war/assets/ui/machine_gun.svg" id="mg_icon"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kmpm6"]
 sky_top_color = Color(0.41960785, 0.6117647, 0.6509804, 1)

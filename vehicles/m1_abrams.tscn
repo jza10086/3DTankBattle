@@ -1,7 +1,7 @@
 [gd_scene format=4]
 
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd" id="1_y64yt"]
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/tank_visual.gd" id="2_7lg8q"]
+[ext_resource type="Script" path="res://games/minigame/gp_tank_war/scripts/tank_controller.gd" id="1_y64yt"]
+[ext_resource type="Script" path="res://games/minigame/gp_tank_war/scripts/tank_visual.gd" id="2_7lg8q"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_j3o0f"]
 size = Vector3(2.6000001, 1.15, 5.5)

@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c2234rni1q4ao"
-path="res://.godot/imported/m68_cannon.svg-dc1740e83fd9c53612af1952f3026186.ctex"
+path="res://.godot/imported/m68_cannon.svg-b093f0c3b2941754ec2ce57781468f2c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://games/minigame/godot_party_default_tank_range/assets/ui/m68_cannon.svg"
-dest_files=["res://.godot/imported/m68_cannon.svg-dc1740e83fd9c53612af1952f3026186.ctex"]
+source_file="res://games/minigame/gp_tank_war/assets/ui/m68_cannon.svg"
+dest_files=["res://.godot/imported/m68_cannon.svg-b093f0c3b2941754ec2ce57781468f2c.ctex"]
 
 [params]
 

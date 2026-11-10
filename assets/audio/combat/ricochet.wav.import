@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://g8yebapp8x6g"
-path="res://.godot/imported/ricochet.wav-3cc674c290d3addf03ede25919147c4d.sample"
+path="res://.godot/imported/ricochet.wav-7f50326dee23e055bb3237b2d6917f03.sample"
 
 [deps]
 
-source_file="res://games/minigame/godot_party_default_tank_range/assets/audio/combat/ricochet.wav"
-dest_files=["res://.godot/imported/ricochet.wav-3cc674c290d3addf03ede25919147c4d.sample"]
+source_file="res://games/minigame/gp_tank_war/assets/audio/combat/ricochet.wav"
+dest_files=["res://.godot/imported/ricochet.wav-7f50326dee23e055bb3237b2d6917f03.sample"]
 
 [params]
 

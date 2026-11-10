@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="" format=3]
 
-[ext_resource type="Script" path="res://games/minigame/godot_party_default_tank_range/scripts/vehicle_spec.gd" id="spec"]
-[ext_resource type="PackedScene" path="res://games/minigame/godot_party_default_tank_range/vehicles/m1_abrams.tscn" id="model"]
-[ext_resource type="Texture2D" path="res://games/minigame/godot_party_default_tank_range/assets/ui/m1_silhouette.svg" id="icon"]
+[ext_resource type="Script" path="res://games/minigame/gp_tank_war/scripts/vehicle_spec.gd" id="spec"]
+[ext_resource type="PackedScene" path="res://games/minigame/gp_tank_war/vehicles/m1_abrams.tscn" id="model"]
+[ext_resource type="Texture2D" path="res://games/minigame/gp_tank_war/assets/ui/m1_silhouette.svg" id="icon"]
 
 [resource]
 script = ExtResource("spec")

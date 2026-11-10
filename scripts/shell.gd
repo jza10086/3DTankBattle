@@ -1,9 +1,9 @@
 extends Node3D
 ## Host-only swept ballistic projectile; peers receive shot/impact presentation events.
 signal impacted(point: Vector3, normal: Vector3, hits: Array[Dictionary])
-const Tank = preload("res://games/minigame/godot_party_default_tank_range/scripts/tank_controller.gd")
-const Target = preload("res://games/minigame/godot_party_default_tank_range/scripts/range_target.gd")
-const DamageModel = preload("res://games/minigame/godot_party_default_tank_range/scripts/armor_damage.gd")
+const Tank = preload("res://games/minigame/gp_tank_war/scripts/tank_controller.gd")
+const Target = preload("res://games/minigame/gp_tank_war/scripts/range_target.gd")
+const DamageModel = preload("res://games/minigame/gp_tank_war/scripts/armor_damage.gd")
 var ammunition: int = DamageModel.Ammo.AP
 var damage_targets: Array[Node3D] = []
 var velocity: Vector3 = Vector3.ZERO
