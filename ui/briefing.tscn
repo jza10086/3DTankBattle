@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://games/protocols/godot_party_default_protocol/briefing/briefing_page.tscn" id="1"]
+
+[node name="Briefing" instance=ExtResource("1")]
+
+[node name="Title" parent="View/Layout/Center/Content" index="0"]
+text = "雷霆战争"
+
+[node name="Introduction" parent="View/Layout/Center/Content/Columns/RightColumn/InformationPanel/InformationMargin/Information/Rules/InformationScroll" index="0"]
+text = "开战前选择 M1 Abrams、BMPT 或 M2A2 布拉德利。1 人打靶；2–8 人坦克淘汰赛。机炮可按住左键连射，导弹随瞄准方向制导；Q 切换武器。每人一条生命，最后存活者获胜。Esc 打开菜单，比赛继续。 按住右键使用同轴机枪，100 发弹链打空后自动装填。"
+
+[editable path="View"]

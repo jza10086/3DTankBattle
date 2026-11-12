@@ -16,7 +16,7 @@ const SNAPSHOT_INTERVAL: float = 0.05
 const INPUT_EXPIRY: float = 0.5
 var api: PartyAPI
 var request: Dictionary
-var pages: Pages
+@export var pages: Pages
 var players: Array[Dictionary] = []
 var vehicles: Dictionary[String, TankScript] = {}
 var commands: Dictionary[String, Dictionary] = {}
@@ -123,7 +123,7 @@ func _ready() -> void:
 		button.text = "\n\n" + api.i18n.text(SPECS[index].name_key) + "\n" + api.i18n.text(SPECS[index].description_key).replace(" · ", "\n")
 		button.get_node("Silhouette").texture = SPECS[index].silhouette
 		button.pressed.connect(select_vehicle.bind(index))
-	pages = Pages.new()
+	assert(pages != null, "Assign ProtocolPages in the game scene")
 	var error: Error = pages.prepare(self, api, request, _begin_selection)
 	if error != OK:
 		_network_failure(error)

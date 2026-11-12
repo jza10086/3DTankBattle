@@ -1,5 +1,11 @@
 [gd_scene format=3]
 
+[ext_resource type="PackedScene" path="res://games/minigame/gp_tank_war/ui/round_pages.tscn" id="protocol_pages"]
+
 [ext_resource type="PackedScene" path="scenes/main.tscn" id="main"]
 
-[node name="ThunderWar" instance=ExtResource("main")]
+[node name="ThunderWar" instance=ExtResource("main") node_paths=PackedStringArray("pages")]
+pages = NodePath("ProtocolPages")
+
+[node name="ProtocolPages" parent="." instance=ExtResource("protocol_pages")]
+unique_name_in_owner = true
