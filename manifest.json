@@ -1,63 +1,10 @@
 {
-  "manifest_version": 2,
-  "core_api_major": 6,
-  "package_version": "1.4.11",
-  "id": "gp_tank_war",
   "name": "雷霆战争",
   "kind": "minigame",
-  "supported_systems": [
-    "windows"
-  ],
-  "config_schema": "settings.gd",
-  "entry": "party_round.tscn",
-  "player_counts": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8
-  ],
-  "introduction": "开战前选择 M1 Abrams、BMPT 或 M2A2 布拉德利。1 人打靶；2–8 人坦克淘汰赛。机炮可按住左键连射，导弹随瞄准方向制导；Q 切换武器。每人一条生命，最后存活者获胜。Esc 打开菜单，比赛继续。 按住右键使用同轴机枪，100 发弹链打空后自动装填。",
+  "package_version": "0.0.1",
+  "framework_version": "0.0.1",
+  "remark": "",
   "dependencies": {
-    "godot_party_default_protocol": "1.0.14"
-  },
-  "adapters": [
-    {
-      "id": "standard",
-      "protocol": {
-        "id": "godot_party_default_protocol",
-        "api_major": 1,
-        "min_api_minor": 0
-      },
-      "config_schema": "settings.gd",
-      "entry": "adapter.gd"
-    }
-  ],
-  "localization": {
-    "supported_locales": [
-      "zh_Hans"
-    ],
-    "fallback_locale": "zh_Hans",
-    "translations": {
-      "zh_Hans": "i18n/zh_Hans.po"
-    }
-  },
-  "controls": {
-    "move_up": "前进",
-    "move_down": "倒车",
-    "move_left": "左转",
-    "move_right": "右转",
-    "tank_fire": "开炮",
-    "tank_sight": "切换第一 / 第三人称",
-    "tank_brake": "刹车",
-    "tank_center": "镜头回正",
-    "tank_recover": "单人回正车辆",
-    "tank_ammunition": "切换武器 / 弹药",
-    "tank_zoom_in": "放大镜头 / 瞄准镜",
-    "tank_zoom_out": "缩小镜头 / 瞄准镜",
-    "tank_machine_gun": "同轴机枪连射"
+    "godot_party_default_protocol": "~0.0.1"
   }
 }

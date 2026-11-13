@@ -1,4 +1,9 @@
 extends RefCounted
+
+## Content-owned gameplay rules, independent of package compatibility.
+static func party_definition() -> Dictionary:
+	return {"dependencies": {}}
+
 ## Thunder War publishes standard-round rankings; no economy or item effects.
 
 func check_request(request: Dictionary) -> Dictionary:
