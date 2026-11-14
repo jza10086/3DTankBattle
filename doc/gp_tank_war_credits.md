@@ -44,4 +44,4 @@ BMPT 与布拉德利来自用户提供的原创 `F:/AstraBlender/Projects/1_Blen
 
 ## 雷霆战争战斗音效
 
-新增战斗声音使用 Kenney、EZduzziteh、Nayckron／qubodup、KuraiWolf 的可商用素材，经过剪辑、混音和循环处理。逐文件来源、作者、许可及修改记录见 [音效来源](assets/audio/SOURCES.md)；发布包保留 `assets/audio/combat/NOTICE.txt` 与 Kenney 原始许可。CC BY 署名不可移除。
+新增战斗声音使用 Kenney、EZduzziteh、Nayckron／qubodup、KuraiWolf 的可商用素材，经过剪辑、混音和循环处理。逐文件来源、作者、许可及修改记录见 [音效来源](gp_tank_war_assets_audio_sources.md)；发布包保留 `assets/audio/combat/NOTICE.txt` 与 Kenney 原始许可。CC BY 署名不可移除。
