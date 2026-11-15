@@ -10,7 +10,7 @@ metadata={
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/ui/m68_cannon.svg"
+source_file="res://games/minigame/GP_tank_war/assets/ui/m68_cannon.svg"
 dest_files=["res://.godot/imported/m68_cannon.svg-b093f0c3b2941754ec2ce57781468f2c.ctex"]
 
 [params]

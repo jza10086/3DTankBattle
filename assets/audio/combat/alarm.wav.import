@@ -7,7 +7,7 @@ path="res://.godot/imported/alarm.wav-9366e25c8e69308231276bd52d8da8a1.sample"
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/audio/combat/alarm.wav"
+source_file="res://games/minigame/GP_tank_war/assets/audio/combat/alarm.wav"
 dest_files=["res://.godot/imported/alarm.wav-9366e25c8e69308231276bd52d8da8a1.sample"]
 
 [params]

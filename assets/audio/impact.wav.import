@@ -7,7 +7,7 @@ path="res://.godot/imported/impact.wav-5cb128e18ab67af7b2e237bc39a1affa.sample"
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/audio/impact.wav"
+source_file="res://games/minigame/GP_tank_war/assets/audio/impact.wav"
 dest_files=["res://.godot/imported/impact.wav-5cb128e18ab67af7b2e237bc39a1affa.sample"]
 
 [params]

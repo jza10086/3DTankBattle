@@ -7,7 +7,7 @@ path="res://.godot/imported/hit_confirm.wav-98335ee1ae4f08b8730d15473a6b00b4.sam
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/audio/combat/hit_confirm.wav"
+source_file="res://games/minigame/GP_tank_war/assets/audio/combat/hit_confirm.wav"
 dest_files=["res://.godot/imported/hit_confirm.wav-98335ee1ae4f08b8730d15473a6b00b4.sample"]
 
 [params]

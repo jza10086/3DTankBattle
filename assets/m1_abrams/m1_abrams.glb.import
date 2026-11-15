@@ -8,7 +8,7 @@ path="res://.godot/imported/m1_abrams.glb-203290622df1267f43acecde99ca5275.scn"
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/m1_abrams/m1_abrams.glb"
+source_file="res://games/minigame/GP_tank_war/assets/m1_abrams/m1_abrams.glb"
 dest_files=["res://.godot/imported/m1_abrams.glb-203290622df1267f43acecde99ca5275.scn"]
 
 [params]

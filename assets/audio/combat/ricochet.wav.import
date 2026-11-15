@@ -7,7 +7,7 @@ path="res://.godot/imported/ricochet.wav-7f50326dee23e055bb3237b2d6917f03.sample
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/audio/combat/ricochet.wav"
+source_file="res://games/minigame/GP_tank_war/assets/audio/combat/ricochet.wav"
 dest_files=["res://.godot/imported/ricochet.wav-7f50326dee23e055bb3237b2d6917f03.sample"]
 
 [params]

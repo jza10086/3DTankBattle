@@ -8,7 +8,7 @@ path="res://.godot/imported/bmpt.glb-522f307a957562f4760656afb66dbde5.scn"
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/bmpt/bmpt.glb"
+source_file="res://games/minigame/GP_tank_war/assets/bmpt/bmpt.glb"
 dest_files=["res://.godot/imported/bmpt.glb-522f307a957562f4760656afb66dbde5.scn"]
 
 [params]

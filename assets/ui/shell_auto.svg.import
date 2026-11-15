@@ -10,7 +10,7 @@ metadata={
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/ui/shell_auto.svg"
+source_file="res://games/minigame/GP_tank_war/assets/ui/shell_auto.svg"
 dest_files=["res://.godot/imported/shell_auto.svg-0c0a9ad4ae71c0ac0f04156b28385ae2.ctex"]
 
 [params]

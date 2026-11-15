@@ -7,7 +7,7 @@ path="res://.godot/imported/engine.wav-9c105ae079aaaf5fd10e456388dd07c4.sample"
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/audio/engine.wav"
+source_file="res://games/minigame/GP_tank_war/assets/audio/engine.wav"
 dest_files=["res://.godot/imported/engine.wav-9c105ae079aaaf5fd10e456388dd07c4.sample"]
 
 [params]

@@ -8,7 +8,7 @@ path="res://.godot/imported/tank_artillery_target.glb-bbf25db24324917895d0efe825
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/quaternius/tank_artillery_target.glb"
+source_file="res://games/minigame/GP_tank_war/assets/quaternius/tank_artillery_target.glb"
 dest_files=["res://.godot/imported/tank_artillery_target.glb-bbf25db24324917895d0efe825d1d3a7.scn"]
 
 [params]

@@ -7,7 +7,7 @@ path="res://.godot/imported/auto25.wav-c9770b13434111c336988e2a34547465.sample"
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/audio/combat/auto25.wav"
+source_file="res://games/minigame/GP_tank_war/assets/audio/combat/auto25.wav"
 dest_files=["res://.godot/imported/auto25.wav-c9770b13434111c336988e2a34547465.sample"]
 
 [params]

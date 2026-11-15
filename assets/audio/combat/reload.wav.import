@@ -7,7 +7,7 @@ path="res://.godot/imported/reload.wav-a2023c2e37e4277e6ff2fd96137a9587.sample"
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/audio/combat/reload.wav"
+source_file="res://games/minigame/GP_tank_war/assets/audio/combat/reload.wav"
 dest_files=["res://.godot/imported/reload.wav-a2023c2e37e4277e6ff2fd96137a9587.sample"]
 
 [params]

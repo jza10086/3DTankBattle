@@ -10,7 +10,7 @@ metadata={
 
 [deps]
 
-source_file="res://games/minigame/gp_tank_war/assets/ui/bmpt_silhouette.svg"
+source_file="res://games/minigame/GP_tank_war/assets/ui/bmpt_silhouette.svg"
 dest_files=["res://.godot/imported/bmpt_silhouette.svg-b78441e850e75530434d43a9c0a3f637.ctex"]
 
 [params]
