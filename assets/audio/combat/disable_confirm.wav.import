@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://dsn7yinbpo6my"
-path="res://.godot/imported/disable_confirm.wav-b930126e197cffd71040a19aed18cbe4.sample"
+path="res://.godot/imported/disable_confirm.wav-d0038a01139884e510c5ce26430b7a1e.sample"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/audio/combat/disable_confirm.wav"
-dest_files=["res://.godot/imported/disable_confirm.wav-b930126e197cffd71040a19aed18cbe4.sample"]
+dest_files=["res://.godot/imported/disable_confirm.wav-d0038a01139884e510c5ce26430b7a1e.sample"]
 
 [params]
 

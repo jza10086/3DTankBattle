@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bu205jpfow2rw"
-path="res://.godot/imported/m1_abrams.glb-203290622df1267f43acecde99ca5275.scn"
+path="res://.godot/imported/m1_abrams.glb-d9b432535f41e0bae50db8de833937a8.scn"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/m1_abrams/m1_abrams.glb"
-dest_files=["res://.godot/imported/m1_abrams.glb-203290622df1267f43acecde99ca5275.scn"]
+dest_files=["res://.godot/imported/m1_abrams.glb-d9b432535f41e0bae50db8de833937a8.scn"]
 
 [params]
 

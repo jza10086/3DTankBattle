@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://cyvi8txh202r3"
-path="res://.godot/imported/machine_gun.wav-5da03a496be973e158adbf05ddbb2767.sample"
+path="res://.godot/imported/machine_gun.wav-a89ac14dff5b915bcfd036c3a2730b49.sample"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/audio/combat/machine_gun.wav"
-dest_files=["res://.godot/imported/machine_gun.wav-5da03a496be973e158adbf05ddbb2767.sample"]
+dest_files=["res://.godot/imported/machine_gun.wav-a89ac14dff5b915bcfd036c3a2730b49.sample"]
 
 [params]
 

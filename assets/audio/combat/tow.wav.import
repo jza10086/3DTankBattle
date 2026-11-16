@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://c4euya1ughabl"
-path="res://.godot/imported/tow.wav-7726b513dab8e5e844e84caa5cdfa3d3.sample"
+path="res://.godot/imported/tow.wav-cda0425c223b426b7814c3be8f98406d.sample"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/audio/combat/tow.wav"
-dest_files=["res://.godot/imported/tow.wav-7726b513dab8e5e844e84caa5cdfa3d3.sample"]
+dest_files=["res://.godot/imported/tow.wav-cda0425c223b426b7814c3be8f98406d.sample"]
 
 [params]
 

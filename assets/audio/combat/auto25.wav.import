@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://d1n44iuccdpuh"
-path="res://.godot/imported/auto25.wav-c9770b13434111c336988e2a34547465.sample"
+path="res://.godot/imported/auto25.wav-254fe7fb9ffd0241cede3515a3b9a1ac.sample"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/audio/combat/auto25.wav"
-dest_files=["res://.godot/imported/auto25.wav-c9770b13434111c336988e2a34547465.sample"]
+dest_files=["res://.godot/imported/auto25.wav-254fe7fb9ffd0241cede3515a3b9a1ac.sample"]
 
 [params]
 

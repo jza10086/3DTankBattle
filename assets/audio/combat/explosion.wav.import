@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://wywir8o4dvvc"
-path="res://.godot/imported/explosion.wav-92e869141d7dd985d35f7ad7ad97c44a.sample"
+path="res://.godot/imported/explosion.wav-7d1e8eb331f770eaedd47e39c70fbc39.sample"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/audio/combat/explosion.wav"
-dest_files=["res://.godot/imported/explosion.wav-92e869141d7dd985d35f7ad7ad97c44a.sample"]
+dest_files=["res://.godot/imported/explosion.wav-7d1e8eb331f770eaedd47e39c70fbc39.sample"]
 
 [params]
 

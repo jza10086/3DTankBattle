@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://u7m32ad3dhu"
-path="res://.godot/imported/armor.wav-8bc37c7a7d8f9482a86dc0a90a5ea4f7.sample"
+path="res://.godot/imported/armor.wav-c99e832ed487154562cc6e8e079e500a.sample"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/audio/combat/armor.wav"
-dest_files=["res://.godot/imported/armor.wav-8bc37c7a7d8f9482a86dc0a90a5ea4f7.sample"]
+dest_files=["res://.godot/imported/armor.wav-c99e832ed487154562cc6e8e079e500a.sample"]
 
 [params]
 

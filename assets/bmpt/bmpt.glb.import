@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://dnh6tcvev1h4i"
-path="res://.godot/imported/bmpt.glb-522f307a957562f4760656afb66dbde5.scn"
+path="res://.godot/imported/bmpt.glb-aa721a5ca7839fae1897b425daaf7c37.scn"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/bmpt/bmpt.glb"
-dest_files=["res://.godot/imported/bmpt.glb-522f307a957562f4760656afb66dbde5.scn"]
+dest_files=["res://.godot/imported/bmpt.glb-aa721a5ca7839fae1897b425daaf7c37.scn"]
 
 [params]
 

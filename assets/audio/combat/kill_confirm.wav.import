@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://bstd6aa8ncybi"
-path="res://.godot/imported/kill_confirm.wav-62ff78d23652c326b21894a0ab54c3d7.sample"
+path="res://.godot/imported/kill_confirm.wav-01c919da28072ccee5e5e4073cff1b40.sample"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/audio/combat/kill_confirm.wav"
-dest_files=["res://.godot/imported/kill_confirm.wav-62ff78d23652c326b21894a0ab54c3d7.sample"]
+dest_files=["res://.godot/imported/kill_confirm.wav-01c919da28072ccee5e5e4073cff1b40.sample"]
 
 [params]
 

@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cuilvpivtub4m"
-path="res://.godot/imported/shell_he.svg-7c1363cdc3f5f47cf91aed2ace2f78f9.ctex"
+path="res://.godot/imported/shell_he.svg-dc9d43aa6287665f8f1840e1b4f14efe.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/ui/shell_he.svg"
-dest_files=["res://.godot/imported/shell_he.svg-7c1363cdc3f5f47cf91aed2ace2f78f9.ctex"]
+dest_files=["res://.godot/imported/shell_he.svg-dc9d43aa6287665f8f1840e1b4f14efe.ctex"]
 
 [params]
 

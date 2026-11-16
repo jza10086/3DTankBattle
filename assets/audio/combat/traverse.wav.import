@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://clysje0cco8jp"
-path="res://.godot/imported/traverse.wav-d5d8a39567b1a44cb7b98369b469230a.sample"
+path="res://.godot/imported/traverse.wav-12c852efae1e719fb025f10a8d34076a.sample"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/audio/combat/traverse.wav"
-dest_files=["res://.godot/imported/traverse.wav-d5d8a39567b1a44cb7b98369b469230a.sample"]
+dest_files=["res://.godot/imported/traverse.wav-12c852efae1e719fb025f10a8d34076a.sample"]
 
 [params]
 

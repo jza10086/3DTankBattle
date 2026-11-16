@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c2234rni1q4ao"
-path="res://.godot/imported/m68_cannon.svg-b093f0c3b2941754ec2ce57781468f2c.ctex"
+path="res://.godot/imported/m68_cannon.svg-c18dfbac2fb7440aa99cd8b60ffcce02.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/ui/m68_cannon.svg"
-dest_files=["res://.godot/imported/m68_cannon.svg-b093f0c3b2941754ec2ce57781468f2c.ctex"]
+dest_files=["res://.godot/imported/m68_cannon.svg-c18dfbac2fb7440aa99cd8b60ffcce02.ctex"]
 
 [params]
 

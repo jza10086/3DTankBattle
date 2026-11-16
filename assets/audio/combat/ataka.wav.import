@@ -3,12 +3,12 @@
 importer="wav"
 type="AudioStreamWAV"
 uid="uid://due13xcvgea3"
-path="res://.godot/imported/ataka.wav-0a06284abcd5ddb12ef36132b6d80c3c.sample"
+path="res://.godot/imported/ataka.wav-46a1cc582fb2b044e644e088e0e13e11.sample"
 
 [deps]
 
 source_file="res://games/minigame/GP_tank_war/assets/audio/combat/ataka.wav"
-dest_files=["res://.godot/imported/ataka.wav-0a06284abcd5ddb12ef36132b6d80c3c.sample"]
+dest_files=["res://.godot/imported/ataka.wav-46a1cc582fb2b044e644e088e0e13e11.sample"]
 
 [params]
 
