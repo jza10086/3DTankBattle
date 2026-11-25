@@ -1,17 +1,38 @@
-[gd_resource type="Resource" script_class="" format=3]
+[gd_resource type="Resource" script_class="TankVehicleSpec" format=3 uid="uid://be1wht4w37b3r"]
 
-[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/vehicle_spec.gd" id="spec"]
-[ext_resource type="PackedScene" path="res://games/minigame/GP_tank_war/vehicles/bmpt.tscn" id="model"]
-[ext_resource type="Texture2D" path="res://games/minigame/GP_tank_war/assets/ui/bmpt_silhouette.svg" id="icon"]
+[ext_resource type="Resource" path="res://games/minigame/GP_tank_war/ammo/auto30_apds.tres" id="ammo_0"]
+[ext_resource type="Resource" path="res://games/minigame/GP_tank_war/ammo/atgm_ataka.tres" id="ammo_1"]
+[ext_resource type="Resource" path="res://games/minigame/GP_tank_war/ammo/mg_pktm.tres" id="ammo_mg"]
+[ext_resource type="Texture2D" uid="uid://d0m3cs6dhda2j" path="res://games/minigame/GP_tank_war/assets/ui/twin_cannon.svg" id="gun_icon"]
+[ext_resource type="Texture2D" uid="uid://6t5ps6q48ypa" path="res://games/minigame/GP_tank_war/assets/ui/bmpt_silhouette.svg" id="icon"]
+[ext_resource type="Texture2D" uid="uid://c7q00ywm2svk1" path="res://games/minigame/GP_tank_war/assets/ui/missile_launcher.svg" id="launcher_icon"]
+[ext_resource type="PackedScene" uid="uid://j0takirdvcgl" path="res://games/minigame/GP_tank_war/vehicles/bmpt.tscn" id="model"]
+[ext_resource type="Script" uid="uid://chsyrr7plaxvo" path="res://games/minigame/GP_tank_war/scripts/shell_spec.gd" id="shell_script"]
+[ext_resource type="Script" uid="uid://bbrcdf2uxe4c4" path="res://games/minigame/GP_tank_war/scripts/vehicle_spec.gd" id="spec"]
 
 [resource]
 script = ExtResource("spec")
+id = &"bmpt"
 name_key = &"vehicle.bmpt.name"
 description_key = &"vehicle.bmpt.description"
 scene = ExtResource("model")
 silhouette = ExtResource("icon")
-weapons = Array[int]([2, 4])
-max_speed = 13.2
-acceleration = 4.5
+gun_icon = ExtResource("gun_icon")
+launcher_icon = ExtResource("launcher_icon")
+max_hp = 110.0
+armor_scale = 0.92
+max_speed = 13.5
+reverse_speed = 4.8
+acceleration = 4.6
+pivot_turn_rate = 1.02
+move_turn_rate = 0.52
+yaw_acceleration = 2.3
 traverse_rate = 1.05
-damage_multiplier = 1.05
+elevation_rate = 0.75
+min_depression_deg = -6.0
+max_elevation_deg = 32.0
+weapons = Array[int]([2, 4])
+ammo_specs = Array[ExtResource("shell_script")]([ExtResource("ammo_0"), ExtResource("ammo_1")])
+coax_ammo = ExtResource("ammo_mg")
+mg_belt_size = 250
+mg_reload_seconds = 8.0

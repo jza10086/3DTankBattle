@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="MatBody"]
+albedo_color = Color(0.36, 0.41, 0.32, 1)
+metallic = 0.4
+roughness = 0.5
+
+[sub_resource type="StandardMaterial3D" id="MatWarhead"]
+albedo_color = Color(0.72, 0.25, 0.18, 1)
+metallic = 0.35
+roughness = 0.45
+
+[sub_resource type="StandardMaterial3D" id="MatFlare"]
+shading_mode = 0
+albedo_color = Color(1, 0.86, 0.46, 1)
+
+[sub_resource type="CylinderMesh" id="TubeMesh"]
+top_radius = 0.068
+bottom_radius = 0.068
+height = 0.68
+radial_segments = 10
+
+[sub_resource type="CylinderMesh" id="TipMesh"]
+top_radius = 0.01
+bottom_radius = 0.068
+height = 0.18
+radial_segments = 10
+
+[sub_resource type="BoxMesh" id="FinMesh"]
+size = Vector3(0.28, 0.015, 0.16)
+
+[sub_resource type="SphereMesh" id="FlareMesh"]
+radius = 0.11
+height = 0.36
+radial_segments = 8
+rings = 4
+
+[node name="AtgmModel" type="Node3D"]
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("TubeMesh")
+surface_material_override/0 = SubResource("MatBody")
+
+[node name="Warhead" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, -0.43)
+mesh = SubResource("TipMesh")
+surface_material_override/0 = SubResource("MatWarhead")
+
+[node name="FinHorizontal" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.22)
+mesh = SubResource("FinMesh")
+surface_material_override/0 = SubResource("MatBody")
+
+[node name="FinVertical" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0.22)
+mesh = SubResource("FinMesh")
+surface_material_override/0 = SubResource("MatBody")
+
+[node name="MotorFlare" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0.42)
+mesh = SubResource("FlareMesh")
+surface_material_override/0 = SubResource("MatFlare")

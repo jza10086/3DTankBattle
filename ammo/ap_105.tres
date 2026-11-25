@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="TankShellSpec" format=3]
+
+[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/shell_spec.gd" id="1"]
+[ext_resource type="Texture2D" path="res://games/minigame/GP_tank_war/assets/ui/shell_ap.svg" id="2"]
+[ext_resource type="PackedScene" path="res://games/minigame/GP_tank_war/ammo/models/apfsds_model.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"ap_105"
+ammo_code = 0
+display_name = "穿甲弹"
+short_label = "AP"
+weapon_name = "M68A1  /  105 mm"
+shell_type = 0
+icon = ExtResource("2")
+fire_audio_cue = &"cannon"
+model_scene = ExtResource("3")
+model_scale = Vector3(1, 1, 1)
+caliber_mm = 105.0
+visual_radius = 0.045
+visual_length = 0.48
+tracer_color = Color(1, 0.96, 0.72, 1)
+impact_flash_size = 0.85
+impact_smoke_count = 6
+muzzle_velocity = 165.0
+gravity = 9.8
+drag_factor = 0.0
+max_lifetime = 8.0
+reload_time = 3.2
+automatic = false
+guided_missile = false
+guidance_turn_rate = 0.0
+recoil_impulse = 1.0
+camera_shake = 1.0
+penetration_mm = 210.0
+penetration_drop_per_100m = 16.0
+normalization_deg = 5.0
+ricochet_start_angle = 72.0
+ricochet_guaranteed_angle = 80.0
+overmatch_ratio = 7.0
+base_damage = 52.0
+spall_bonus_ratio = 0.3
+component_damage = true
+explosive = false
+splash_radius = 0.0
+splash_damage = 0.0
+splash_track_threshold = 4.0
+overpressure_penetration_mm = 0.0

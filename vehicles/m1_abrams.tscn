@@ -1,7 +1,8 @@
-[gd_scene format=4]
+[gd_scene format=4 uid="uid://cv2wmyyxlg83i"]
 
-[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/tank_controller.gd" id="1_y64yt"]
-[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/tank_visual.gd" id="2_7lg8q"]
+[ext_resource type="Script" uid="uid://dlj8mjc20ltfn" path="res://games/minigame/GP_tank_war/scripts/tank_controller.gd" id="1_y64yt"]
+[ext_resource type="Script" uid="uid://brj58jymam08v" path="res://games/minigame/GP_tank_war/scripts/tank_visual.gd" id="2_7lg8q"]
+[ext_resource type="Script" uid="uid://c87452itl1bo0" path="res://games/minigame/GP_tank_war/scripts/armor_zone.gd" id="3_jlab2"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_j3o0f"]
 size = Vector3(2.6000001, 1.15, 5.5)
@@ -5115,58 +5116,51 @@ size = Vector3(2.15, 0.65, 2.65)
 [sub_resource type="BoxShape3D" id="BoxShape3D_2bsr7"]
 size = Vector3(0.18, 0.18, 2.9)
 
-[node name="Tank" type="CharacterBody3D" unique_id=1559528090 node_paths=PackedStringArray("coax_muzzle", "_barrel_shape", "_turret_shape", "armor", "nameplate", "visual")]
+[node name="Tank" type="CharacterBody3D" unique_id=1559528090 node_paths=PackedStringArray("coax_muzzle", "visual", "armor", "_turret_shape", "_barrel_shape", "nameplate")]
 collision_layer = 2
 collision_mask = 3
 floor_constant_speed = true
 floor_max_angle = 0.75049156
 floor_snap_length = 0.95
 script = ExtResource("1_y64yt")
-_barrel_shape = NodePath("Armor/Barrel")
-_turret_shape = NodePath("Armor/Turret")
+coax_muzzle = NodePath("Visual/Model/M1Abrams/TurretPivot/BarrelPivot/CoaxMuzzle")
+visual = NodePath("Visual")
 armor = NodePath("Armor")
-barrel_length = 2.9
+_turret_shape = NodePath("Armor/Turret")
+_barrel_shape = NodePath("Armor/Barrel")
 nameplate = NodePath("Nameplate")
 turret_center = Vector3(0, 0.3, 0.25)
-visual = NodePath("Visual")
-coax_muzzle = NodePath("Visual/Model/M1Abrams/TurretPivot/BarrelPivot/CoaxMuzzle")
-
+barrel_length = 2.9
 
 [node name="Collision" type="CollisionShape3D" parent="." unique_id=1088411882]
 shape = SubResource("BoxShape3D_j3o0f")
 
-
-[node name="Visual" type="Node3D" parent="." unique_id=1519621504 node_paths=PackedStringArray("_recoil", "barrel", "launcher", "left_shoes", "left_wheels", "missile_muzzle", "muzzle", "right_shoes", "right_wheels", "second_muzzle", "turret")]
+[node name="Visual" type="Node3D" parent="." unique_id=1519621504 node_paths=PackedStringArray("missile_muzzle", "second_muzzle", "launcher", "turret", "barrel", "muzzle", "_recoil", "left_shoes", "right_shoes", "left_wheels", "right_wheels")]
 script = ExtResource("2_7lg8q")
-_recoil = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot/Recoil")
-barrel = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot")
-launcher = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot")
-left_path = PackedVector3Array(-1.0259999, 0.041040003, -1.7352002, -1.0260001, 0.041040003, 1.72944, -1.0260001, 0.041641217, 1.7478052, -1.0260001, 0.043442287, 1.7660918, -1.0260001, 0.046435494, 1.7842215, -1.0260001, 0.050608028, 1.8021165, -1.0260001, 0.05594202, 1.8197002, -1.0260001, 0.06241463, 1.8368976, -1.0260001, 0.06999814, 1.8536348, -1.0260001, 0.07866007, 1.86984, -1.0260001, 0.088363335, 1.8854442, -1.0260001, 0.099066384, 1.9003803, -1.0260001, 0.50146115, 2.4119523, -1.0260001, 0.5107867, 2.4233155, -1.0260001, 0.5208356, 2.4340446, -1.0260001, 0.5315646, 2.4440932, -1.0260001, 0.54292786, 2.453419, -1.0260001, 0.5548767, 2.4619815, -1.0260001, 0.56736, 2.469744, -1.0260001, 0.5803243, 2.4766736, -1.0260001, 0.593714, 2.4827404, -1.0260001, 0.6074719, 2.4879184, -1.0260001, 0.62153894, 2.4921856, -1.0260001, 0.6358549, 2.4955237, -1.0260001, 0.6503586, 2.4979184, -1.0260001, 0.66498786, 2.4993591, -1.0260001, 0.67968005, 2.49984, -1.0260001, 0.6943722, 2.4993591, -1.0260001, 0.7090014, 2.4979184, -1.0260001, 0.7235051, 2.4955237, -1.0260001, 0.73782116, 2.4921856, -1.0260001, 0.7518882, 2.4879184, -1.0260001, 0.7656461, 2.4827404, -1.0260001, 0.77903575, 2.4766736, -1.0260001, 0.79200006, 2.469744, -1.0260001, 0.80448335, 2.4619815, -1.0260001, 0.8164322, 2.453419, -1.0260001, 0.8277955, 2.4440932, -1.0260001, 0.83852446, 2.4340446, -1.0260001, 0.84857327, 2.4233155, -1.0260001, 0.85789895, 2.4119523, -1.0260001, 0.86646134, 2.4000034, -1.0260001, 0.87422395, 2.38752, -1.0260001, 0.8811535, 2.3745558, -1.0260001, 0.8872204, 2.361166, -1.0260001, 0.8923984, 2.3474083, -1.0260001, 0.8966656, 2.3333411, -1.0260001, 0.9000036, 2.319025, -1.0260001, 0.9023982, 2.3045216, -1.0260001, 0.90383905, 2.2898922, -1.0260001, 0.91296005, 2.1312, -1.026, 0.90576005, -1.1664001, -1.0259999, 0.7670321, -2.3046155, -1.0259999, 0.76462984, -2.3191657, -1.0259999, 0.7612811, -2.3335276, -1.0259999, 0.7570002, -2.3476398, -1.0259999, 0.75180554, -2.3614416, -1.0259999, 0.74571925, -2.3748744, -1.0259999, 0.7387675, -2.38788, -1.0259999, 0.73098, -2.4004035, -1.0259999, 0.7223902, -2.4123905, -1.0259999, 0.71303463, -2.4237902, -1.0259999, 0.70295364, -2.4345539, -1.0259999, 0.6921902, -2.4446347, -1.0259999, 0.6807905, -2.4539902, -1.0259999, 0.66880333, -2.46258, -1.0259999, 0.65628, -2.4703677, -1.0259999, 0.6432742, -2.4773195, -1.0259999, 0.62984157, -2.4834056, -1.0259999, 0.61603963, -2.4886003, -1.0259999, 0.60192746, -2.4928813, -1.0259999, 0.5875656, -2.49623, -1.0259999, 0.5730154, -2.498632, -1.0259999, 0.55833924, -2.5000775, -1.0259999, 0.5436, -2.50056, -1.0259999, 0.5288608, -2.5000775, -1.0259999, 0.51418465, -2.498632, -1.0259999, 0.49963444, -2.49623, -1.0259999, 0.48527256, -2.4928813, -1.0259999, 0.4711604, -2.4886003, -1.0259999, 0.4573585, -2.4834056, -1.0259999, 0.44392583, -2.4773195, -1.0259999, 0.43092003, -2.4703677, -1.0259999, 0.41839674, -2.46258, -1.0259999, 0.40640953, -2.4539902, -1.0259999, 0.39500985, -2.4446347, -1.0259999, 0.3842464, -2.4345539, -1.0259999, 0.3741654, -2.4237902, -1.0259999, 0.36480993, -2.4123905, -1.0259999, 0.35622004, -2.4004035, -1.0259999, 0.34843254, -2.38788, -1.0259999, 0.34148076, -2.3748744, -1.0259999, 0.06999814, -1.8593948, -1.0259999, 0.06241463, -1.8426576, -1.0259999, 0.05594202, -1.8254602, -1.0259999, 0.050608028, -1.8078765, -1.0259999, 0.046435494, -1.7899814, -1.0259999, 0.043442287, -1.7718519, -1.0259999, 0.041641217, -1.7535653)
-left_shoes = Array[NodePath]([NodePath("Model/M1Abrams/TrackL000"), NodePath("Model/M1Abrams/TrackL001"), NodePath("Model/M1Abrams/TrackL002"), NodePath("Model/M1Abrams/TrackL003"), NodePath("Model/M1Abrams/TrackL004"), NodePath("Model/M1Abrams/TrackL005"), NodePath("Model/M1Abrams/TrackL006"), NodePath("Model/M1Abrams/TrackL007"), NodePath("Model/M1Abrams/TrackL008"), NodePath("Model/M1Abrams/TrackL009"), NodePath("Model/M1Abrams/TrackL010"), NodePath("Model/M1Abrams/TrackL011"), NodePath("Model/M1Abrams/TrackL012"), NodePath("Model/M1Abrams/TrackL013"), NodePath("Model/M1Abrams/TrackL014"), NodePath("Model/M1Abrams/TrackL015"), NodePath("Model/M1Abrams/TrackL016"), NodePath("Model/M1Abrams/TrackL017"), NodePath("Model/M1Abrams/TrackL018"), NodePath("Model/M1Abrams/TrackL019"), NodePath("Model/M1Abrams/TrackL020"), NodePath("Model/M1Abrams/TrackL021"), NodePath("Model/M1Abrams/TrackL022"), NodePath("Model/M1Abrams/TrackL023"), NodePath("Model/M1Abrams/TrackL024"), NodePath("Model/M1Abrams/TrackL025"), NodePath("Model/M1Abrams/TrackL026"), NodePath("Model/M1Abrams/TrackL027"), NodePath("Model/M1Abrams/TrackL028"), NodePath("Model/M1Abrams/TrackL029"), NodePath("Model/M1Abrams/TrackL030"), NodePath("Model/M1Abrams/TrackL031"), NodePath("Model/M1Abrams/TrackL032"), NodePath("Model/M1Abrams/TrackL033"), NodePath("Model/M1Abrams/TrackL034"), NodePath("Model/M1Abrams/TrackL035"), NodePath("Model/M1Abrams/TrackL036"), NodePath("Model/M1Abrams/TrackL037"), NodePath("Model/M1Abrams/TrackL038"), NodePath("Model/M1Abrams/TrackL039"), NodePath("Model/M1Abrams/TrackL040"), NodePath("Model/M1Abrams/TrackL041"), NodePath("Model/M1Abrams/TrackL042"), NodePath("Model/M1Abrams/TrackL043"), NodePath("Model/M1Abrams/TrackL044"), NodePath("Model/M1Abrams/TrackL045"), NodePath("Model/M1Abrams/TrackL046"), NodePath("Model/M1Abrams/TrackL047"), NodePath("Model/M1Abrams/TrackL048"), NodePath("Model/M1Abrams/TrackL049"), NodePath("Model/M1Abrams/TrackL050"), NodePath("Model/M1Abrams/TrackL051"), NodePath("Model/M1Abrams/TrackL052"), NodePath("Model/M1Abrams/TrackL053"), NodePath("Model/M1Abrams/TrackL054"), NodePath("Model/M1Abrams/TrackL055"), NodePath("Model/M1Abrams/TrackL056"), NodePath("Model/M1Abrams/TrackL057"), NodePath("Model/M1Abrams/TrackL058"), NodePath("Model/M1Abrams/TrackL059"), NodePath("Model/M1Abrams/TrackL060"), NodePath("Model/M1Abrams/TrackL061"), NodePath("Model/M1Abrams/TrackL062"), NodePath("Model/M1Abrams/TrackL063"), NodePath("Model/M1Abrams/TrackL064"), NodePath("Model/M1Abrams/TrackL065"), NodePath("Model/M1Abrams/TrackL066"), NodePath("Model/M1Abrams/TrackL067"), NodePath("Model/M1Abrams/TrackL068"), NodePath("Model/M1Abrams/TrackL069"), NodePath("Model/M1Abrams/TrackL070"), NodePath("Model/M1Abrams/TrackL071"), NodePath("Model/M1Abrams/TrackL072"), NodePath("Model/M1Abrams/TrackL073"), NodePath("Model/M1Abrams/TrackL074"), NodePath("Model/M1Abrams/TrackL075"), NodePath("Model/M1Abrams/TrackL076"), NodePath("Model/M1Abrams/TrackL077"), NodePath("Model/M1Abrams/TrackL078"), NodePath("Model/M1Abrams/TrackL079"), NodePath("Model/M1Abrams/TrackL080"), NodePath("Model/M1Abrams/TrackL081"), NodePath("Model/M1Abrams/TrackL082"), NodePath("Model/M1Abrams/TrackL083")])
-left_wheels = Array[NodePath]([NodePath("Model/M1Abrams/WheelL1"), NodePath("Model/M1Abrams/WheelL2"), NodePath("Model/M1Abrams/WheelL3"), NodePath("Model/M1Abrams/WheelL4"), NodePath("Model/M1Abrams/WheelL5"), NodePath("Model/M1Abrams/WheelL6"), NodePath("Model/M1Abrams/WheelL7"), NodePath("Model/M1Abrams/WheelL8"), NodePath("Model/M1Abrams/WheelL9")])
 missile_muzzle = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot/Recoil/Muzzle")
-muzzle = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot/Recoil/Muzzle")
-right_path = PackedVector3Array(1.0260001, 0.041040003, -1.7352002, 1.0259999, 0.041040003, 1.72944, 1.0259999, 0.041641217, 1.7478052, 1.0259999, 0.043442287, 1.7660918, 1.0259999, 0.046435494, 1.7842215, 1.0259999, 0.050608028, 1.8021165, 1.0259999, 0.05594202, 1.8197002, 1.0259999, 0.06241463, 1.8368976, 1.0259999, 0.06999814, 1.8536348, 1.0259999, 0.07866007, 1.86984, 1.0259999, 0.088363335, 1.8854442, 1.0259999, 0.099066384, 1.9003803, 1.0259999, 0.50146115, 2.4119523, 1.0259999, 0.5107867, 2.4233155, 1.0259999, 0.5208356, 2.4340446, 1.0259999, 0.5315646, 2.4440932, 1.0259999, 0.54292786, 2.453419, 1.0259999, 0.5548767, 2.4619815, 1.0259999, 0.56736, 2.469744, 1.0259999, 0.5803243, 2.4766736, 1.0259999, 0.593714, 2.4827404, 1.0259999, 0.6074719, 2.4879184, 1.0259999, 0.62153894, 2.4921856, 1.0259999, 0.6358549, 2.4955237, 1.0259999, 0.6503586, 2.4979184, 1.0259999, 0.66498786, 2.4993591, 1.0259999, 0.67968005, 2.49984, 1.0259999, 0.6943722, 2.4993591, 1.0259999, 0.7090014, 2.4979184, 1.0259999, 0.7235051, 2.4955237, 1.0259999, 0.73782116, 2.4921856, 1.0259999, 0.7518882, 2.4879184, 1.0259999, 0.7656461, 2.4827404, 1.0259999, 0.77903575, 2.4766736, 1.0259999, 0.79200006, 2.469744, 1.0259999, 0.80448335, 2.4619815, 1.0259999, 0.8164322, 2.453419, 1.0259999, 0.8277955, 2.4440932, 1.0259999, 0.83852446, 2.4340446, 1.0259999, 0.84857327, 2.4233155, 1.0259999, 0.85789895, 2.4119523, 1.0259999, 0.86646134, 2.4000034, 1.0259999, 0.87422395, 2.38752, 1.0259999, 0.8811535, 2.3745558, 1.0259999, 0.8872204, 2.361166, 1.0259999, 0.8923984, 2.3474083, 1.0259999, 0.8966656, 2.3333411, 1.0259999, 0.9000036, 2.319025, 1.0259999, 0.9023982, 2.3045216, 1.0259999, 0.90383905, 2.2898922, 1.0259999, 0.91296005, 2.1312, 1.026, 0.90576005, -1.1664001, 1.0260001, 0.7670321, -2.3046155, 1.0260001, 0.76462984, -2.3191657, 1.0260001, 0.7612811, -2.3335276, 1.0260001, 0.7570002, -2.3476398, 1.0260001, 0.75180554, -2.3614416, 1.0260001, 0.74571925, -2.3748744, 1.0260001, 0.7387675, -2.38788, 1.0260001, 0.73098, -2.4004035, 1.0260001, 0.7223902, -2.4123905, 1.0260001, 0.71303463, -2.4237902, 1.0260001, 0.70295364, -2.4345539, 1.0260001, 0.6921902, -2.4446347, 1.0260001, 0.6807905, -2.4539902, 1.0260001, 0.66880333, -2.46258, 1.0260001, 0.65628, -2.4703677, 1.0260001, 0.6432742, -2.4773195, 1.0260001, 0.62984157, -2.4834056, 1.0260001, 0.61603963, -2.4886003, 1.0260001, 0.60192746, -2.4928813, 1.0260001, 0.5875656, -2.49623, 1.0260001, 0.5730154, -2.498632, 1.0260001, 0.55833924, -2.5000775, 1.0260001, 0.5436, -2.50056, 1.0260001, 0.5288608, -2.5000775, 1.0260001, 0.51418465, -2.498632, 1.0260001, 0.49963444, -2.49623, 1.0260001, 0.48527256, -2.4928813, 1.0260001, 0.4711604, -2.4886003, 1.0260001, 0.4573585, -2.4834056, 1.0260001, 0.44392583, -2.4773195, 1.0260001, 0.43092003, -2.4703677, 1.0260001, 0.41839674, -2.46258, 1.0260001, 0.40640953, -2.4539902, 1.0260001, 0.39500985, -2.4446347, 1.0260001, 0.3842464, -2.4345539, 1.0260001, 0.3741654, -2.4237902, 1.0260001, 0.36480993, -2.4123905, 1.0260001, 0.35622004, -2.4004035, 1.0260001, 0.34843254, -2.38788, 1.0260001, 0.34148076, -2.3748744, 1.0260001, 0.06999814, -1.8593948, 1.0260001, 0.06241463, -1.8426576, 1.0260001, 0.05594202, -1.8254602, 1.0260001, 0.050608028, -1.8078765, 1.0260001, 0.046435494, -1.7899814, 1.0260001, 0.043442287, -1.7718519, 1.0260001, 0.041641217, -1.7535653)
-right_shoes = Array[NodePath]([NodePath("Model/M1Abrams/TrackR000"), NodePath("Model/M1Abrams/TrackR001"), NodePath("Model/M1Abrams/TrackR002"), NodePath("Model/M1Abrams/TrackR003"), NodePath("Model/M1Abrams/TrackR004"), NodePath("Model/M1Abrams/TrackR005"), NodePath("Model/M1Abrams/TrackR006"), NodePath("Model/M1Abrams/TrackR007"), NodePath("Model/M1Abrams/TrackR008"), NodePath("Model/M1Abrams/TrackR009"), NodePath("Model/M1Abrams/TrackR010"), NodePath("Model/M1Abrams/TrackR011"), NodePath("Model/M1Abrams/TrackR012"), NodePath("Model/M1Abrams/TrackR013"), NodePath("Model/M1Abrams/TrackR014"), NodePath("Model/M1Abrams/TrackR015"), NodePath("Model/M1Abrams/TrackR016"), NodePath("Model/M1Abrams/TrackR017"), NodePath("Model/M1Abrams/TrackR018"), NodePath("Model/M1Abrams/TrackR019"), NodePath("Model/M1Abrams/TrackR020"), NodePath("Model/M1Abrams/TrackR021"), NodePath("Model/M1Abrams/TrackR022"), NodePath("Model/M1Abrams/TrackR023"), NodePath("Model/M1Abrams/TrackR024"), NodePath("Model/M1Abrams/TrackR025"), NodePath("Model/M1Abrams/TrackR026"), NodePath("Model/M1Abrams/TrackR027"), NodePath("Model/M1Abrams/TrackR028"), NodePath("Model/M1Abrams/TrackR029"), NodePath("Model/M1Abrams/TrackR030"), NodePath("Model/M1Abrams/TrackR031"), NodePath("Model/M1Abrams/TrackR032"), NodePath("Model/M1Abrams/TrackR033"), NodePath("Model/M1Abrams/TrackR034"), NodePath("Model/M1Abrams/TrackR035"), NodePath("Model/M1Abrams/TrackR036"), NodePath("Model/M1Abrams/TrackR037"), NodePath("Model/M1Abrams/TrackR038"), NodePath("Model/M1Abrams/TrackR039"), NodePath("Model/M1Abrams/TrackR040"), NodePath("Model/M1Abrams/TrackR041"), NodePath("Model/M1Abrams/TrackR042"), NodePath("Model/M1Abrams/TrackR043"), NodePath("Model/M1Abrams/TrackR044"), NodePath("Model/M1Abrams/TrackR045"), NodePath("Model/M1Abrams/TrackR046"), NodePath("Model/M1Abrams/TrackR047"), NodePath("Model/M1Abrams/TrackR048"), NodePath("Model/M1Abrams/TrackR049"), NodePath("Model/M1Abrams/TrackR050"), NodePath("Model/M1Abrams/TrackR051"), NodePath("Model/M1Abrams/TrackR052"), NodePath("Model/M1Abrams/TrackR053"), NodePath("Model/M1Abrams/TrackR054"), NodePath("Model/M1Abrams/TrackR055"), NodePath("Model/M1Abrams/TrackR056"), NodePath("Model/M1Abrams/TrackR057"), NodePath("Model/M1Abrams/TrackR058"), NodePath("Model/M1Abrams/TrackR059"), NodePath("Model/M1Abrams/TrackR060"), NodePath("Model/M1Abrams/TrackR061"), NodePath("Model/M1Abrams/TrackR062"), NodePath("Model/M1Abrams/TrackR063"), NodePath("Model/M1Abrams/TrackR064"), NodePath("Model/M1Abrams/TrackR065"), NodePath("Model/M1Abrams/TrackR066"), NodePath("Model/M1Abrams/TrackR067"), NodePath("Model/M1Abrams/TrackR068"), NodePath("Model/M1Abrams/TrackR069"), NodePath("Model/M1Abrams/TrackR070"), NodePath("Model/M1Abrams/TrackR071"), NodePath("Model/M1Abrams/TrackR072"), NodePath("Model/M1Abrams/TrackR073"), NodePath("Model/M1Abrams/TrackR074"), NodePath("Model/M1Abrams/TrackR075"), NodePath("Model/M1Abrams/TrackR076"), NodePath("Model/M1Abrams/TrackR077"), NodePath("Model/M1Abrams/TrackR078"), NodePath("Model/M1Abrams/TrackR079"), NodePath("Model/M1Abrams/TrackR080"), NodePath("Model/M1Abrams/TrackR081"), NodePath("Model/M1Abrams/TrackR082"), NodePath("Model/M1Abrams/TrackR083")])
-right_wheels = Array[NodePath]([NodePath("Model/M1Abrams/WheelR1"), NodePath("Model/M1Abrams/WheelR2"), NodePath("Model/M1Abrams/WheelR3"), NodePath("Model/M1Abrams/WheelR4"), NodePath("Model/M1Abrams/WheelR5"), NodePath("Model/M1Abrams/WheelR6"), NodePath("Model/M1Abrams/WheelR7"), NodePath("Model/M1Abrams/WheelR8"), NodePath("Model/M1Abrams/WheelR9")])
 second_muzzle = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot/Recoil/Muzzle")
+launcher = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot")
 turret = NodePath("Model/M1Abrams/TurretPivot")
-
+barrel = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot")
+muzzle = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot/Recoil/Muzzle")
+_recoil = NodePath("Model/M1Abrams/TurretPivot/BarrelPivot/Recoil")
+left_path = PackedVector3Array(-1.0259999, 0.041040003, -1.7352002, -1.0260001, 0.041040003, 1.72944, -1.0260001, 0.041641217, 1.7478052, -1.0260001, 0.043442287, 1.7660918, -1.0260001, 0.046435494, 1.7842215, -1.0260001, 0.050608028, 1.8021165, -1.0260001, 0.05594202, 1.8197002, -1.0260001, 0.06241463, 1.8368976, -1.0260001, 0.06999814, 1.8536348, -1.0260001, 0.07866007, 1.86984, -1.0260001, 0.088363335, 1.8854442, -1.0260001, 0.099066384, 1.9003803, -1.0260001, 0.50146115, 2.4119523, -1.0260001, 0.5107867, 2.4233155, -1.0260001, 0.5208356, 2.4340446, -1.0260001, 0.5315646, 2.4440932, -1.0260001, 0.54292786, 2.453419, -1.0260001, 0.5548767, 2.4619815, -1.0260001, 0.56736, 2.469744, -1.0260001, 0.5803243, 2.4766736, -1.0260001, 0.593714, 2.4827404, -1.0260001, 0.6074719, 2.4879184, -1.0260001, 0.62153894, 2.4921856, -1.0260001, 0.6358549, 2.4955237, -1.0260001, 0.6503586, 2.4979184, -1.0260001, 0.66498786, 2.4993591, -1.0260001, 0.67968005, 2.49984, -1.0260001, 0.6943722, 2.4993591, -1.0260001, 0.7090014, 2.4979184, -1.0260001, 0.7235051, 2.4955237, -1.0260001, 0.73782116, 2.4921856, -1.0260001, 0.7518882, 2.4879184, -1.0260001, 0.7656461, 2.4827404, -1.0260001, 0.77903575, 2.4766736, -1.0260001, 0.79200006, 2.469744, -1.0260001, 0.80448335, 2.4619815, -1.0260001, 0.8164322, 2.453419, -1.0260001, 0.8277955, 2.4440932, -1.0260001, 0.83852446, 2.4340446, -1.0260001, 0.84857327, 2.4233155, -1.0260001, 0.85789895, 2.4119523, -1.0260001, 0.86646134, 2.4000034, -1.0260001, 0.87422395, 2.38752, -1.0260001, 0.8811535, 2.3745558, -1.0260001, 0.8872204, 2.361166, -1.0260001, 0.8923984, 2.3474083, -1.0260001, 0.8966656, 2.3333411, -1.0260001, 0.9000036, 2.319025, -1.0260001, 0.9023982, 2.3045216, -1.0260001, 0.90383905, 2.2898922, -1.0260001, 0.91296005, 2.1312, -1.026, 0.90576005, -1.1664001, -1.0259999, 0.7670321, -2.3046155, -1.0259999, 0.76462984, -2.3191657, -1.0259999, 0.7612811, -2.3335276, -1.0259999, 0.7570002, -2.3476398, -1.0259999, 0.75180554, -2.3614416, -1.0259999, 0.74571925, -2.3748744, -1.0259999, 0.7387675, -2.38788, -1.0259999, 0.73098, -2.4004035, -1.0259999, 0.7223902, -2.4123905, -1.0259999, 0.71303463, -2.4237902, -1.0259999, 0.70295364, -2.4345539, -1.0259999, 0.6921902, -2.4446347, -1.0259999, 0.6807905, -2.4539902, -1.0259999, 0.66880333, -2.46258, -1.0259999, 0.65628, -2.4703677, -1.0259999, 0.6432742, -2.4773195, -1.0259999, 0.62984157, -2.4834056, -1.0259999, 0.61603963, -2.4886003, -1.0259999, 0.60192746, -2.4928813, -1.0259999, 0.5875656, -2.49623, -1.0259999, 0.5730154, -2.498632, -1.0259999, 0.55833924, -2.5000775, -1.0259999, 0.5436, -2.50056, -1.0259999, 0.5288608, -2.5000775, -1.0259999, 0.51418465, -2.498632, -1.0259999, 0.49963444, -2.49623, -1.0259999, 0.48527256, -2.4928813, -1.0259999, 0.4711604, -2.4886003, -1.0259999, 0.4573585, -2.4834056, -1.0259999, 0.44392583, -2.4773195, -1.0259999, 0.43092003, -2.4703677, -1.0259999, 0.41839674, -2.46258, -1.0259999, 0.40640953, -2.4539902, -1.0259999, 0.39500985, -2.4446347, -1.0259999, 0.3842464, -2.4345539, -1.0259999, 0.3741654, -2.4237902, -1.0259999, 0.36480993, -2.4123905, -1.0259999, 0.35622004, -2.4004035, -1.0259999, 0.34843254, -2.38788, -1.0259999, 0.34148076, -2.3748744, -1.0259999, 0.06999814, -1.8593948, -1.0259999, 0.06241463, -1.8426576, -1.0259999, 0.05594202, -1.8254602, -1.0259999, 0.050608028, -1.8078765, -1.0259999, 0.046435494, -1.7899814, -1.0259999, 0.043442287, -1.7718519, -1.0259999, 0.041641217, -1.7535653)
+right_path = PackedVector3Array(1.0260001, 0.041040003, -1.7352002, 1.0259999, 0.041040003, 1.72944, 1.0259999, 0.041641217, 1.7478052, 1.0259999, 0.043442287, 1.7660918, 1.0259999, 0.046435494, 1.7842215, 1.0259999, 0.050608028, 1.8021165, 1.0259999, 0.05594202, 1.8197002, 1.0259999, 0.06241463, 1.8368976, 1.0259999, 0.06999814, 1.8536348, 1.0259999, 0.07866007, 1.86984, 1.0259999, 0.088363335, 1.8854442, 1.0259999, 0.099066384, 1.9003803, 1.0259999, 0.50146115, 2.4119523, 1.0259999, 0.5107867, 2.4233155, 1.0259999, 0.5208356, 2.4340446, 1.0259999, 0.5315646, 2.4440932, 1.0259999, 0.54292786, 2.453419, 1.0259999, 0.5548767, 2.4619815, 1.0259999, 0.56736, 2.469744, 1.0259999, 0.5803243, 2.4766736, 1.0259999, 0.593714, 2.4827404, 1.0259999, 0.6074719, 2.4879184, 1.0259999, 0.62153894, 2.4921856, 1.0259999, 0.6358549, 2.4955237, 1.0259999, 0.6503586, 2.4979184, 1.0259999, 0.66498786, 2.4993591, 1.0259999, 0.67968005, 2.49984, 1.0259999, 0.6943722, 2.4993591, 1.0259999, 0.7090014, 2.4979184, 1.0259999, 0.7235051, 2.4955237, 1.0259999, 0.73782116, 2.4921856, 1.0259999, 0.7518882, 2.4879184, 1.0259999, 0.7656461, 2.4827404, 1.0259999, 0.77903575, 2.4766736, 1.0259999, 0.79200006, 2.469744, 1.0259999, 0.80448335, 2.4619815, 1.0259999, 0.8164322, 2.453419, 1.0259999, 0.8277955, 2.4440932, 1.0259999, 0.83852446, 2.4340446, 1.0259999, 0.84857327, 2.4233155, 1.0259999, 0.85789895, 2.4119523, 1.0259999, 0.86646134, 2.4000034, 1.0259999, 0.87422395, 2.38752, 1.0259999, 0.8811535, 2.3745558, 1.0259999, 0.8872204, 2.361166, 1.0259999, 0.8923984, 2.3474083, 1.0259999, 0.8966656, 2.3333411, 1.0259999, 0.9000036, 2.319025, 1.0259999, 0.9023982, 2.3045216, 1.0259999, 0.90383905, 2.2898922, 1.0259999, 0.91296005, 2.1312, 1.026, 0.90576005, -1.1664001, 1.0260001, 0.7670321, -2.3046155, 1.0260001, 0.76462984, -2.3191657, 1.0260001, 0.7612811, -2.3335276, 1.0260001, 0.7570002, -2.3476398, 1.0260001, 0.75180554, -2.3614416, 1.0260001, 0.74571925, -2.3748744, 1.0260001, 0.7387675, -2.38788, 1.0260001, 0.73098, -2.4004035, 1.0260001, 0.7223902, -2.4123905, 1.0260001, 0.71303463, -2.4237902, 1.0260001, 0.70295364, -2.4345539, 1.0260001, 0.6921902, -2.4446347, 1.0260001, 0.6807905, -2.4539902, 1.0260001, 0.66880333, -2.46258, 1.0260001, 0.65628, -2.4703677, 1.0260001, 0.6432742, -2.4773195, 1.0260001, 0.62984157, -2.4834056, 1.0260001, 0.61603963, -2.4886003, 1.0260001, 0.60192746, -2.4928813, 1.0260001, 0.5875656, -2.49623, 1.0260001, 0.5730154, -2.498632, 1.0260001, 0.55833924, -2.5000775, 1.0260001, 0.5436, -2.50056, 1.0260001, 0.5288608, -2.5000775, 1.0260001, 0.51418465, -2.498632, 1.0260001, 0.49963444, -2.49623, 1.0260001, 0.48527256, -2.4928813, 1.0260001, 0.4711604, -2.4886003, 1.0260001, 0.4573585, -2.4834056, 1.0260001, 0.44392583, -2.4773195, 1.0260001, 0.43092003, -2.4703677, 1.0260001, 0.41839674, -2.46258, 1.0260001, 0.40640953, -2.4539902, 1.0260001, 0.39500985, -2.4446347, 1.0260001, 0.3842464, -2.4345539, 1.0260001, 0.3741654, -2.4237902, 1.0260001, 0.36480993, -2.4123905, 1.0260001, 0.35622004, -2.4004035, 1.0260001, 0.34843254, -2.38788, 1.0260001, 0.34148076, -2.3748744, 1.0260001, 0.06999814, -1.8593948, 1.0260001, 0.06241463, -1.8426576, 1.0260001, 0.05594202, -1.8254602, 1.0260001, 0.050608028, -1.8078765, 1.0260001, 0.046435494, -1.7899814, 1.0260001, 0.043442287, -1.7718519, 1.0260001, 0.041641217, -1.7535653)
+left_shoes = [NodePath("Model/M1Abrams/TrackL000"), NodePath("Model/M1Abrams/TrackL001"), NodePath("Model/M1Abrams/TrackL002"), NodePath("Model/M1Abrams/TrackL003"), NodePath("Model/M1Abrams/TrackL004"), NodePath("Model/M1Abrams/TrackL005"), NodePath("Model/M1Abrams/TrackL006"), NodePath("Model/M1Abrams/TrackL007"), NodePath("Model/M1Abrams/TrackL008"), NodePath("Model/M1Abrams/TrackL009"), NodePath("Model/M1Abrams/TrackL010"), NodePath("Model/M1Abrams/TrackL011"), NodePath("Model/M1Abrams/TrackL012"), NodePath("Model/M1Abrams/TrackL013"), NodePath("Model/M1Abrams/TrackL014"), NodePath("Model/M1Abrams/TrackL015"), NodePath("Model/M1Abrams/TrackL016"), NodePath("Model/M1Abrams/TrackL017"), NodePath("Model/M1Abrams/TrackL018"), NodePath("Model/M1Abrams/TrackL019"), NodePath("Model/M1Abrams/TrackL020"), NodePath("Model/M1Abrams/TrackL021"), NodePath("Model/M1Abrams/TrackL022"), NodePath("Model/M1Abrams/TrackL023"), NodePath("Model/M1Abrams/TrackL024"), NodePath("Model/M1Abrams/TrackL025"), NodePath("Model/M1Abrams/TrackL026"), NodePath("Model/M1Abrams/TrackL027"), NodePath("Model/M1Abrams/TrackL028"), NodePath("Model/M1Abrams/TrackL029"), NodePath("Model/M1Abrams/TrackL030"), NodePath("Model/M1Abrams/TrackL031"), NodePath("Model/M1Abrams/TrackL032"), NodePath("Model/M1Abrams/TrackL033"), NodePath("Model/M1Abrams/TrackL034"), NodePath("Model/M1Abrams/TrackL035"), NodePath("Model/M1Abrams/TrackL036"), NodePath("Model/M1Abrams/TrackL037"), NodePath("Model/M1Abrams/TrackL038"), NodePath("Model/M1Abrams/TrackL039"), NodePath("Model/M1Abrams/TrackL040"), NodePath("Model/M1Abrams/TrackL041"), NodePath("Model/M1Abrams/TrackL042"), NodePath("Model/M1Abrams/TrackL043"), NodePath("Model/M1Abrams/TrackL044"), NodePath("Model/M1Abrams/TrackL045"), NodePath("Model/M1Abrams/TrackL046"), NodePath("Model/M1Abrams/TrackL047"), NodePath("Model/M1Abrams/TrackL048"), NodePath("Model/M1Abrams/TrackL049"), NodePath("Model/M1Abrams/TrackL050"), NodePath("Model/M1Abrams/TrackL051"), NodePath("Model/M1Abrams/TrackL052"), NodePath("Model/M1Abrams/TrackL053"), NodePath("Model/M1Abrams/TrackL054"), NodePath("Model/M1Abrams/TrackL055"), NodePath("Model/M1Abrams/TrackL056"), NodePath("Model/M1Abrams/TrackL057"), NodePath("Model/M1Abrams/TrackL058"), NodePath("Model/M1Abrams/TrackL059"), NodePath("Model/M1Abrams/TrackL060"), NodePath("Model/M1Abrams/TrackL061"), NodePath("Model/M1Abrams/TrackL062"), NodePath("Model/M1Abrams/TrackL063"), NodePath("Model/M1Abrams/TrackL064"), NodePath("Model/M1Abrams/TrackL065"), NodePath("Model/M1Abrams/TrackL066"), NodePath("Model/M1Abrams/TrackL067"), NodePath("Model/M1Abrams/TrackL068"), NodePath("Model/M1Abrams/TrackL069"), NodePath("Model/M1Abrams/TrackL070"), NodePath("Model/M1Abrams/TrackL071"), NodePath("Model/M1Abrams/TrackL072"), NodePath("Model/M1Abrams/TrackL073"), NodePath("Model/M1Abrams/TrackL074"), NodePath("Model/M1Abrams/TrackL075"), NodePath("Model/M1Abrams/TrackL076"), NodePath("Model/M1Abrams/TrackL077"), NodePath("Model/M1Abrams/TrackL078"), NodePath("Model/M1Abrams/TrackL079"), NodePath("Model/M1Abrams/TrackL080"), NodePath("Model/M1Abrams/TrackL081"), NodePath("Model/M1Abrams/TrackL082"), NodePath("Model/M1Abrams/TrackL083")]
+right_shoes = [NodePath("Model/M1Abrams/TrackR000"), NodePath("Model/M1Abrams/TrackR001"), NodePath("Model/M1Abrams/TrackR002"), NodePath("Model/M1Abrams/TrackR003"), NodePath("Model/M1Abrams/TrackR004"), NodePath("Model/M1Abrams/TrackR005"), NodePath("Model/M1Abrams/TrackR006"), NodePath("Model/M1Abrams/TrackR007"), NodePath("Model/M1Abrams/TrackR008"), NodePath("Model/M1Abrams/TrackR009"), NodePath("Model/M1Abrams/TrackR010"), NodePath("Model/M1Abrams/TrackR011"), NodePath("Model/M1Abrams/TrackR012"), NodePath("Model/M1Abrams/TrackR013"), NodePath("Model/M1Abrams/TrackR014"), NodePath("Model/M1Abrams/TrackR015"), NodePath("Model/M1Abrams/TrackR016"), NodePath("Model/M1Abrams/TrackR017"), NodePath("Model/M1Abrams/TrackR018"), NodePath("Model/M1Abrams/TrackR019"), NodePath("Model/M1Abrams/TrackR020"), NodePath("Model/M1Abrams/TrackR021"), NodePath("Model/M1Abrams/TrackR022"), NodePath("Model/M1Abrams/TrackR023"), NodePath("Model/M1Abrams/TrackR024"), NodePath("Model/M1Abrams/TrackR025"), NodePath("Model/M1Abrams/TrackR026"), NodePath("Model/M1Abrams/TrackR027"), NodePath("Model/M1Abrams/TrackR028"), NodePath("Model/M1Abrams/TrackR029"), NodePath("Model/M1Abrams/TrackR030"), NodePath("Model/M1Abrams/TrackR031"), NodePath("Model/M1Abrams/TrackR032"), NodePath("Model/M1Abrams/TrackR033"), NodePath("Model/M1Abrams/TrackR034"), NodePath("Model/M1Abrams/TrackR035"), NodePath("Model/M1Abrams/TrackR036"), NodePath("Model/M1Abrams/TrackR037"), NodePath("Model/M1Abrams/TrackR038"), NodePath("Model/M1Abrams/TrackR039"), NodePath("Model/M1Abrams/TrackR040"), NodePath("Model/M1Abrams/TrackR041"), NodePath("Model/M1Abrams/TrackR042"), NodePath("Model/M1Abrams/TrackR043"), NodePath("Model/M1Abrams/TrackR044"), NodePath("Model/M1Abrams/TrackR045"), NodePath("Model/M1Abrams/TrackR046"), NodePath("Model/M1Abrams/TrackR047"), NodePath("Model/M1Abrams/TrackR048"), NodePath("Model/M1Abrams/TrackR049"), NodePath("Model/M1Abrams/TrackR050"), NodePath("Model/M1Abrams/TrackR051"), NodePath("Model/M1Abrams/TrackR052"), NodePath("Model/M1Abrams/TrackR053"), NodePath("Model/M1Abrams/TrackR054"), NodePath("Model/M1Abrams/TrackR055"), NodePath("Model/M1Abrams/TrackR056"), NodePath("Model/M1Abrams/TrackR057"), NodePath("Model/M1Abrams/TrackR058"), NodePath("Model/M1Abrams/TrackR059"), NodePath("Model/M1Abrams/TrackR060"), NodePath("Model/M1Abrams/TrackR061"), NodePath("Model/M1Abrams/TrackR062"), NodePath("Model/M1Abrams/TrackR063"), NodePath("Model/M1Abrams/TrackR064"), NodePath("Model/M1Abrams/TrackR065"), NodePath("Model/M1Abrams/TrackR066"), NodePath("Model/M1Abrams/TrackR067"), NodePath("Model/M1Abrams/TrackR068"), NodePath("Model/M1Abrams/TrackR069"), NodePath("Model/M1Abrams/TrackR070"), NodePath("Model/M1Abrams/TrackR071"), NodePath("Model/M1Abrams/TrackR072"), NodePath("Model/M1Abrams/TrackR073"), NodePath("Model/M1Abrams/TrackR074"), NodePath("Model/M1Abrams/TrackR075"), NodePath("Model/M1Abrams/TrackR076"), NodePath("Model/M1Abrams/TrackR077"), NodePath("Model/M1Abrams/TrackR078"), NodePath("Model/M1Abrams/TrackR079"), NodePath("Model/M1Abrams/TrackR080"), NodePath("Model/M1Abrams/TrackR081"), NodePath("Model/M1Abrams/TrackR082"), NodePath("Model/M1Abrams/TrackR083")]
+left_wheels = [NodePath("Model/M1Abrams/WheelL1"), NodePath("Model/M1Abrams/WheelL2"), NodePath("Model/M1Abrams/WheelL3"), NodePath("Model/M1Abrams/WheelL4"), NodePath("Model/M1Abrams/WheelL5"), NodePath("Model/M1Abrams/WheelL6"), NodePath("Model/M1Abrams/WheelL7"), NodePath("Model/M1Abrams/WheelL8"), NodePath("Model/M1Abrams/WheelL9")]
+right_wheels = [NodePath("Model/M1Abrams/WheelR1"), NodePath("Model/M1Abrams/WheelR2"), NodePath("Model/M1Abrams/WheelR3"), NodePath("Model/M1Abrams/WheelR4"), NodePath("Model/M1Abrams/WheelR5"), NodePath("Model/M1Abrams/WheelR6"), NodePath("Model/M1Abrams/WheelR7"), NodePath("Model/M1Abrams/WheelR8"), NodePath("Model/M1Abrams/WheelR9")]
 
 [node name="Model" type="Node3D" parent="Visual" unique_id=596571024]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
 
-
 [node name="M1Abrams" type="Node3D" parent="Visual/Model" unique_id=2116444556]
-
-
 
 [node name="Driver hatch and three vision blocks_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1365723128]
 mesh = SubResource("ArrayMesh_t32n7")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/1 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/2 = SubResource("StandardMaterial3D_13j8t")
-
 
 [node name="Lighting, brush guards and tow eyes_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=782753595]
 mesh = SubResource("ArrayMesh_kfqe0")
@@ -5178,105 +5172,87 @@ surface_material_override/4 = SubResource("StandardMaterial3D_56opt")
 surface_material_override/5 = SubResource("StandardMaterial3D_xcidj")
 surface_material_override/6 = SubResource("StandardMaterial3D_2rvrn")
 
-
 [node name="Lower hull • bevelled belly_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=777484527]
 mesh = SubResource("ArrayMesh_2it4o")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
-
 
 [node name="Skirt 01 • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1076593676]
 mesh = SubResource("ArrayMesh_105h4")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 
-
 [node name="Skirt 01 • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=662416758]
 mesh = SubResource("ArrayMesh_7b4ub")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
-
 
 [node name="Skirt 02 • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1191582365]
 mesh = SubResource("ArrayMesh_s7rbm")
 surface_material_override/0 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 
-
 [node name="Skirt 02 • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=662144232]
 mesh = SubResource("ArrayMesh_30ugy")
 surface_material_override/0 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
-
 
 [node name="Skirt 03 • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1720871183]
 mesh = SubResource("ArrayMesh_yy47e")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 
-
 [node name="Skirt 03 • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1812498652]
 mesh = SubResource("ArrayMesh_6hkt6")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
-
 
 [node name="Skirt 04 • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1426503725]
 mesh = SubResource("ArrayMesh_aui5j")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 
-
 [node name="Skirt 04 • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1607839497]
 mesh = SubResource("ArrayMesh_1fwv0")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
-
 
 [node name="Skirt 05 • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=289412029]
 mesh = SubResource("ArrayMesh_yk0u4")
 surface_material_override/0 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 
-
 [node name="Skirt 05 • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1519681841]
 mesh = SubResource("ArrayMesh_qd2hu")
 surface_material_override/0 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
-
 
 [node name="Skirt 06 • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=996909161]
 mesh = SubResource("ArrayMesh_ihrmx")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 
-
 [node name="Skirt 06 • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1530824636]
 mesh = SubResource("ArrayMesh_nhknx")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
-
 
 [node name="Skirt 07 • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=925379138]
 mesh = SubResource("ArrayMesh_umltw")
 surface_material_override/0 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 
-
 [node name="Skirt 07 • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=260199198]
 mesh = SubResource("ArrayMesh_rusg8")
 surface_material_override/0 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 
-
 [node name="Skirt identification chevron • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=182650790]
 mesh = SubResource("ArrayMesh_5wxa2")
 surface_material_override/0 = SubResource("StandardMaterial3D_21u8j")
 
-
 [node name="Skirt identification chevron • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=70484800]
 mesh = SubResource("ArrayMesh_q1oan")
 surface_material_override/0 = SubResource("StandardMaterial3D_21u8j")
-
 
 [node name="TrackL000" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=4087097]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0259999, 0.041040003, -1.7352002)
@@ -5285,7 +5261,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR000" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1156377638]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0260001, 0.041040003, -1.7352002)
 mesh = SubResource("ArrayMesh_5ao3j")
@@ -5293,17 +5268,14 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="Turbine deck and rear exhaust grilles_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=394168536]
 mesh = SubResource("ArrayMesh_g8yu5")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/1 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/2 = SubResource("StandardMaterial3D_56opt")
 
-
 [node name="TurretPivot" type="Node3D" parent="Visual/Model/M1Abrams" unique_id=1934320997]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0656, -0.10800001)
-
 
 [node name="Ammunition bustle • three blow-off panels_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=244994047]
 mesh = SubResource("ArrayMesh_2rm6m")
@@ -5311,14 +5283,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/2 = SubResource("StandardMaterial3D_o2wyg")
 
-
 [node name="BarrelPivot" type="Node3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=895320145]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.36720002, -0.972)
 
-
 [node name="Recoil" type="Node3D" parent="Visual/Model/M1Abrams/TurretPivot/BarrelPivot" unique_id=1925901845]
-
-
 
 [node name="M68A1 • shield, thermal sleeve and bore_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot/BarrelPivot/Recoil" unique_id=498381564]
 mesh = SubResource("ArrayMesh_yu0pm")
@@ -5329,37 +5297,33 @@ surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_xcidj")
 surface_material_override/5 = SubResource("StandardMaterial3D_56opt")
 
-
 [node name="Muzzle" type="Node3D" parent="Visual/Model/M1Abrams/TurretPivot/BarrelPivot/Recoil" unique_id=1362523561]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.2400002)
 
+[node name="CoaxMuzzle" type="Marker3D" parent="Visual/Model/M1Abrams/TurretPivot/BarrelPivot" unique_id=1720116503]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.44, 0.04, -0.85)
 
 [node name="Bin callsign 27 • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=409020728]
 mesh = SubResource("ArrayMesh_71go6")
 surface_material_override/0 = SubResource("StandardMaterial3D_21u8j")
 
-
 [node name="Bin callsign 27 • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=814188792]
 mesh = SubResource("ArrayMesh_2o2gi")
 surface_material_override/0 = SubResource("StandardMaterial3D_21u8j")
-
 
 [node name="Bustle stowage rails • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=354587584]
 mesh = SubResource("ArrayMesh_etx7c")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/1 = SubResource("StandardMaterial3D_a6gxi")
 
-
 [node name="Bustle stowage rails • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=856471785]
 mesh = SubResource("ArrayMesh_s5u5u")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/1 = SubResource("StandardMaterial3D_a6gxi")
 
-
 [node name="Cast and welded turret • short cheek array_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=570171282]
 mesh = SubResource("ArrayMesh_dc6lu")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
-
 
 [node name="Commander cupola • vision ring_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=1094479414]
 mesh = SubResource("ArrayMesh_ttui5")
@@ -5368,7 +5332,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/2 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/3 = SubResource("StandardMaterial3D_13j8t")
 
-
 [node name="Gunner primary sight • armoured hood_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=1267467387]
 mesh = SubResource("ArrayMesh_rnrvi")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
@@ -5376,14 +5339,12 @@ surface_material_override/1 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/2 = SubResource("StandardMaterial3D_13j8t")
 surface_material_override/3 = SubResource("StandardMaterial3D_o0dum")
 
-
 [node name="Loader hatch • handle and periscope_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=153235670]
 mesh = SubResource("ArrayMesh_hrok2")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/1 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/2 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/3 = SubResource("StandardMaterial3D_a6gxi")
-
 
 [node name="M2 | cradle and receiver_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=710271118]
 mesh = SubResource("ArrayMesh_ni3lw")
@@ -5393,22 +5354,18 @@ surface_material_override/2 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_56opt")
 
-
 [node name="M2 | fixed mounting post_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=363067094]
 mesh = SubResource("ArrayMesh_nkr5q")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
-
 
 [node name="M2 | muzzle flash_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=1086431634]
 mesh = SubResource("ArrayMesh_3budf")
 surface_material_override/0 = SubResource("StandardMaterial3D_6cp4e")
 surface_material_override/1 = SubResource("StandardMaterial3D_s7u43")
 
-
 [node name="M2 | recoiling barrel_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=1095122522]
 mesh = SubResource("ArrayMesh_fbd14")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
-
 
 [node name="M250 smoke launchers • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=1142074618]
 mesh = SubResource("ArrayMesh_u08vk")
@@ -5417,7 +5374,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_56opt")
 
-
 [node name="M250 smoke launchers • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=974261862]
 mesh = SubResource("ArrayMesh_20fxt")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
@@ -5425,24 +5381,20 @@ surface_material_override/1 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_56opt")
 
-
 [node name="Radio whip • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=163850803]
 mesh = SubResource("ArrayMesh_xajt6")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/1 = SubResource("StandardMaterial3D_t46s3")
-
 
 [node name="Radio whip • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=1420841020]
 mesh = SubResource("ArrayMesh_s1sbg")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/1 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="Rolled tarpaulin and straps_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=1970953849]
 mesh = SubResource("ArrayMesh_g3c54")
 surface_material_override/0 = SubResource("StandardMaterial3D_ixdq7")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
-
 
 [node name="Stowage bin • L_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=1098437959]
 mesh = SubResource("ArrayMesh_v6nir")
@@ -5451,7 +5403,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/2 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/3 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="Stowage bin • R_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=737888922]
 mesh = SubResource("ArrayMesh_3o2qm")
 surface_material_override/0 = SubResource("StandardMaterial3D_o0dum")
@@ -5459,16 +5410,13 @@ surface_material_override/1 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/2 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/3 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="Turret race_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams/TurretPivot" unique_id=1793105387]
 mesh = SubResource("ArrayMesh_tawpl")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="Upper hull • glacis and shoulders_001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2060658813]
 mesh = SubResource("ArrayMesh_0fp1d")
 surface_material_override/0 = SubResource("StandardMaterial3D_a6gxi")
-
 
 [node name="WheelL1" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=793944973]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0260001, 0.67968005, 2.2752001)
@@ -5477,7 +5425,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
-
 
 [node name="WheelL2" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=137521737]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0259999, 0.5436, -2.2752001)
@@ -5488,7 +5435,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="WheelL3" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=493238084]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0259999, 0.32184002, -1.7352002)
 mesh = SubResource("ArrayMesh_jejbh")
@@ -5497,7 +5443,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
-
 
 [node name="WheelL4" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=214853229]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.026, 0.32184002, -1.15776)
@@ -5508,7 +5453,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="WheelL5" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=908897496]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.026, 0.32184002, -0.58032006)
 mesh = SubResource("ArrayMesh_2r6jv")
@@ -5517,7 +5461,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
-
 
 [node name="WheelL6" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1300909099]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.026, 0.32184002, -0.0028800452)
@@ -5528,7 +5471,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="WheelL7" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=690111003]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.026, 0.32184002, 0.5745599)
 mesh = SubResource("ArrayMesh_rnlge")
@@ -5537,7 +5479,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
-
 
 [node name="WheelL8" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2041154236]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.026, 0.32184002, 1.1520001)
@@ -5548,7 +5489,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="WheelL9" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1946862158]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0260001, 0.32184002, 1.72944)
 mesh = SubResource("ArrayMesh_h1nrv")
@@ -5558,7 +5498,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="WheelR1" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2143070241]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0259999, 0.67968005, 2.2752001)
 mesh = SubResource("ArrayMesh_jvj67")
@@ -5566,7 +5505,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
-
 
 [node name="WheelR2" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1822520802]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0260001, 0.5436, -2.2752001)
@@ -5577,7 +5515,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="WheelR3" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=365459594]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0260001, 0.32184002, -1.7352002)
 mesh = SubResource("ArrayMesh_gub3s")
@@ -5586,7 +5523,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
-
 
 [node name="WheelR4" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=241579021]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.026, 0.32184002, -1.15776)
@@ -5597,7 +5533,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="WheelR5" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=23507498]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.026, 0.32184002, -0.58031994)
 mesh = SubResource("ArrayMesh_mitqp")
@@ -5606,7 +5541,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
-
 
 [node name="WheelR6" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=240849320]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.026, 0.32184002, -0.0028799553)
@@ -5617,7 +5551,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="WheelR7" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1878327536]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.026, 0.32184002, 0.57456005)
 mesh = SubResource("ArrayMesh_htf87")
@@ -5626,7 +5559,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_o0dum")
 surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
-
 
 [node name="WheelR8" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2015341202]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.026, 0.32184002, 1.1520001)
@@ -5637,7 +5569,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="WheelR9" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=558871038]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0259999, 0.32184002, 1.72944)
 mesh = SubResource("ArrayMesh_1wjpk")
@@ -5647,14 +5578,12 @@ surface_material_override/2 = SubResource("StandardMaterial3D_a6gxi")
 surface_material_override/3 = SubResource("StandardMaterial3D_o2wyg")
 surface_material_override/4 = SubResource("StandardMaterial3D_t46s3")
 
-
 [node name="TrackL001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=148555090]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0259999, 0.041040003, -1.6074296)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL002" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=651762364]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0259999, 0.041040003, -1.4796592)
@@ -5663,14 +5592,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL003" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2062028399]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0259999, 0.041040003, -1.3518887)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL004" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=90129259]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0259999, 0.041040003, -1.2241182)
@@ -5679,14 +5606,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL005" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=600426692]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0259999, 0.041040003, -1.0963476)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL006" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=280339849]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0259999, 0.041040003, -0.96857715)
@@ -5695,14 +5620,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL007" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1405608322]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, -0.84080666)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL008" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1717970201]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, -0.7130362)
@@ -5711,14 +5634,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL009" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=577597105]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, -0.58526564)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL010" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1988874625]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, -0.4574951)
@@ -5727,14 +5648,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL011" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1971347718]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, -0.32972467)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL012" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1791209143]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, -0.20195413)
@@ -5743,14 +5662,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL013" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1928716462]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, -0.07418358)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL014" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2086677844]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, 0.05358684)
@@ -5759,14 +5676,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL015" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1202102203]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, 0.18135738)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL016" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1892022491]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, 0.3091278)
@@ -5775,14 +5690,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL017" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1805705031]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, 0.43689847)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL018" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=164327846]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, 0.5646689)
@@ -5791,14 +5704,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL019" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1094364118]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, 0.69243956)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL020" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1966614468]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.026, 0.041040003, 0.82021)
@@ -5807,14 +5718,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL021" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1073644482]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0260001, 0.041040003, 0.9479804)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL022" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1068770135]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0260001, 0.041040003, 1.0757508)
@@ -5823,14 +5732,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL023" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=599600071]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0260001, 0.041040003, 1.2035213)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL024" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=151065299]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0260001, 0.041040003, 1.3312919)
@@ -5839,14 +5746,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL025" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1807182025]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0260001, 0.041040003, 1.4590623)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL026" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1253612602]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0260001, 0.041040003, 1.586833)
@@ -5855,14 +5760,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL027" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=608975589]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, -1.0260001, 0.041040003, 1.7146034)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL028" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=794305089]
 transform = Transform3D(1, 0, 0, 0, 0.9108645, 0.41270566, 0, -0.41270566, 0.9108645, -1.0260001, 0.06352216, 1.839342)
@@ -5871,14 +5774,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL029" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=407968472]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, -1.0260001, 0.13427788, 1.9451452)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL030" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=134485301]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, -1.0260001, 0.21327129, 2.045571)
@@ -5887,14 +5788,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL031" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2128794349]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, -1.0260001, 0.2922647, 2.1459968)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL032" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=63611355]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, -1.0260001, 0.3712581, 2.2464228)
@@ -5903,14 +5802,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL033" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1727696481]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, -1.0260001, 0.45025152, 2.3468485)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL034" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=277263666]
 transform = Transform3D(1, 0, 0, 0, 0.63439935, 0.7730054, 0, -0.7730054, 0.63439935, -1.0260001, 0.5322138, 2.444626)
@@ -5919,14 +5816,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL035" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1992897865]
 transform = Transform3D(1, 0, 0, 0, 0.16290228, 0.98664224, 0, -0.98664224, 0.16290228, -1.0260001, 0.6467179, 2.4973173)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL036" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=178457791]
 transform = Transform3D(1, 0, 0, 0, -0.41270864, 0.91086304, 0, -0.91086304, -0.41270864, -1.0260001, 0.7715487, 2.480066)
@@ -5935,14 +5830,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL037" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2119957343]
 transform = Transform3D(1, 0, 0, 0, -0.8492034, 0.52806586, 0, -0.52806586, -0.8492034, -1.0260001, 0.86749136, 2.3983471)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL038" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=978159360]
 transform = Transform3D(1, 0, 0, 0, -0.99835235, 0.057381377, 0, -0.057381377, -0.99835235, -1.0260001, 0.9045346, 2.2777915)
@@ -5951,14 +5844,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL039" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1243301343]
 transform = Transform3D(1, 0, 0, 0, -0.99835235, 0.057381377, 0, -0.057381377, -0.99835235, -1.0260001, 0.9118662, 2.1502314)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL040" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2131593959]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.9127227, 2.0224926)
@@ -5967,14 +5858,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL041" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=63774555]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.9124437, 1.8947225)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL042" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1779834220]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.91216475, 1.7669523)
@@ -5983,14 +5872,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL043" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1893904559]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.9118858, 1.6391821)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL044" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=165012697]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.9116068, 1.5114119)
@@ -5999,14 +5886,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL045" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1078318399]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.91132784, 1.3836417)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL046" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1092448042]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.9110488, 1.2558714)
@@ -6015,14 +5900,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL047" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=950788104]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.9107699, 1.1281012)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL048" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=899665400]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.91049093, 1.000331)
@@ -6031,14 +5914,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL049" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=441801610]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.9102119, 0.87256086)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL050" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=383637704]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.909933, 0.7447907)
@@ -6047,14 +5928,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL051" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2105538856]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.90965396, 0.6170205)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL052" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=571188726]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.0260001, 0.909375, 0.4892503)
@@ -6063,14 +5942,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL053" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1067671485]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.90909606, 0.36148)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL054" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=477603966]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.90881705, 0.23370981)
@@ -6079,14 +5956,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL055" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=659582231]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.9085381, 0.10593963)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL056" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1331049067]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.9082591, -0.021830559)
@@ -6095,14 +5970,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL057" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=188447347]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.90798014, -0.14960074)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL058" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1331922692]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.90770113, -0.27737093)
@@ -6111,14 +5984,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL059" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=403281269]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.9074222, -0.40514112)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL060" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=645251108]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.90714324, -0.5329113)
@@ -6127,14 +5998,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL061" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=493161812]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.9068642, -0.6606815)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL062" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=354891554]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.9065853, -0.7884517)
@@ -6143,14 +6012,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL063" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1294357413]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.90630627, -0.91622186)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL064" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2104761663]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, -1.026, 0.9060273, -1.043992)
@@ -6159,14 +6026,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL065" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1535435881]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, -1.026, 0.9051113, -1.1717228)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL066" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=993372713]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, -1.026, 0.8896528, -1.2985547)
@@ -6175,14 +6040,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL067" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=358497426]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, -1.026, 0.87419426, -1.4253867)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL068" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=13153352]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, -1.026, 0.85873574, -1.5522186)
@@ -6191,14 +6054,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL069" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1205115219]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, -1.026, 0.8432772, -1.6790504)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL070" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=354354406]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, -1.0259999, 0.8278187, -1.8058823)
@@ -6207,14 +6068,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL071" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2067818013]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, -1.0259999, 0.81236017, -1.9327142)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL072" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=251615971]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, -1.0259999, 0.79690164, -2.0595462)
@@ -6223,14 +6082,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL073" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1821176407]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, -1.0259999, 0.7814431, -2.186378)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL074" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1809250297]
 transform = Transform3D(1, 0, 0, 0, -0.9866434, -0.16289526, 0, 0.16289526, -0.9866434, -1.0259999, 0.7656217, -2.313158)
@@ -6239,14 +6096,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL075" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1480397510]
 transform = Transform3D(1, 0, 0, 0, -0.7298729, -0.6835829, 0, 0.6835829, -0.7298729, -1.0259999, 0.7105024, -2.426494)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL076" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1748016350]
 transform = Transform3D(1, 0, 0, 0, -0.2902948, -0.95693725, 0, 0.95693725, -0.2902948, -1.0259999, 0.6031232, -2.4925187)
@@ -6255,14 +6110,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL077" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=532329705]
 transform = Transform3D(1, 0, 0, 0, 0.29029536, -0.95693713, 0, 0.95693713, 0.29029536, -1.0259999, 0.47709656, -2.490401)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL078" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1438251777]
 transform = Transform3D(1, 0, 0, 0, 0.77301294, -0.6343903, 0, 0.6343903, 0.77301294, -1.0259999, 0.37188792, -2.421015)
@@ -6271,14 +6124,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL079" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1700727187]
 transform = Transform3D(1, 0, 0, 0, 0.88479257, -0.46598512, 0, 0.46598512, 0.88479257, -1.0259999, 0.30775648, -2.3108401)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL080" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=607145771]
 transform = Transform3D(1, 0, 0, 0, 0.88479257, -0.46598512, 0, 0.46598512, 0.88479257, -1.0259999, 0.24821731, -2.1977897)
@@ -6287,14 +6138,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL081" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1560512958]
 transform = Transform3D(1, 0, 0, 0, 0.88479257, -0.46598512, 0, 0.46598512, 0.88479257, -1.0259999, 0.18867816, -2.0847392)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackL082" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=498261995]
 transform = Transform3D(1, 0, 0, 0, 0.88479257, -0.46598512, 0, 0.46598512, 0.88479257, -1.0259999, 0.129139, -1.971689)
@@ -6303,14 +6152,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackL083" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=767033164]
 transform = Transform3D(1, 0, 0, 0, 0.9108645, -0.41270566, 0, 0.41270566, 0.9108645, -1.0259999, 0.0696454, -1.8586162)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR001" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1088350108]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0260001, 0.041040003, -1.6074296)
@@ -6319,14 +6166,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR002" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1291404678]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0260001, 0.041040003, -1.4796592)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR003" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=50409461]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0260001, 0.041040003, -1.3518887)
@@ -6335,14 +6180,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR004" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=596236032]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0260001, 0.041040003, -1.2241182)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR005" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1446919855]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0260001, 0.041040003, -1.0963476)
@@ -6351,14 +6194,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR006" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1612007502]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0260001, 0.041040003, -0.96857715)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR007" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1088032211]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, -0.84080666)
@@ -6367,14 +6208,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR008" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1439487662]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, -0.7130362)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR009" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2001016462]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, -0.58526564)
@@ -6383,14 +6222,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR010" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1374461352]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, -0.4574951)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR011" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=336842965]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, -0.32972467)
@@ -6399,14 +6236,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR012" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2077255170]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, -0.20195413)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR013" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1445601220]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, -0.07418358)
@@ -6415,14 +6250,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR014" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1063635467]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, 0.05358684)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR015" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1877950203]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, 0.18135738)
@@ -6431,14 +6264,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR016" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=338778505]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, 0.3091278)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR017" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1173803755]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, 0.43689847)
@@ -6447,14 +6278,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR018" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1956968451]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, 0.5646689)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR019" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1777954060]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, 0.69243956)
@@ -6463,14 +6292,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR020" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1065466915]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.026, 0.041040003, 0.82021)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR021" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=586081592]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0259999, 0.041040003, 0.9479804)
@@ -6479,14 +6306,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR022" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=632734475]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0259999, 0.041040003, 1.0757508)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR023" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1596402182]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0259999, 0.041040003, 1.2035213)
@@ -6495,14 +6320,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR024" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=615321111]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0259999, 0.041040003, 1.3312919)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR025" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=82632688]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0259999, 0.041040003, 1.4590623)
@@ -6511,14 +6334,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR026" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=59184219]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0259999, 0.041040003, 1.586833)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR027" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1245904510]
 transform = Transform3D(1, 0, -6.881482e-08, 0, 1, 0, 0, 0, 1, 1.0259999, 0.041040003, 1.7146034)
@@ -6527,14 +6348,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR028" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1520645545]
 transform = Transform3D(1, 0, 0, 0, 0.9108645, 0.41270566, 0, -0.41270566, 0.9108645, 1.0259999, 0.06352216, 1.839342)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR029" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=506112857]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, 1.0259999, 0.13427788, 1.9451452)
@@ -6543,14 +6362,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR030" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=335788873]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, 1.0259999, 0.21327129, 2.045571)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR031" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=988793142]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, 1.0259999, 0.2922647, 2.1459968)
@@ -6559,14 +6376,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR032" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=446067729]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, 1.0259999, 0.3712581, 2.2464228)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR033" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=346824693]
 transform = Transform3D(1, 0, 0, 0, 0.7859858, 0.6182445, 0, -0.6182445, 0.7859858, 1.0259999, 0.45025152, 2.3468485)
@@ -6575,14 +6390,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR034" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1808920854]
 transform = Transform3D(1, 0, 0, 0, 0.63439935, 0.7730054, 0, -0.7730054, 0.63439935, 1.0259999, 0.5322138, 2.444626)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR035" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=227251581]
 transform = Transform3D(1, 0, 0, 0, 0.16290228, 0.98664224, 0, -0.98664224, 0.16290228, 1.0259999, 0.6467179, 2.4973173)
@@ -6591,14 +6404,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR036" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1901899593]
 transform = Transform3D(1, 0, 0, 0, -0.41270864, 0.91086304, 0, -0.91086304, -0.41270864, 1.0259999, 0.7715487, 2.480066)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR037" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1928672542]
 transform = Transform3D(1, 0, 0, 0, -0.8492034, 0.52806586, 0, -0.52806586, -0.8492034, 1.0259999, 0.86749136, 2.3983471)
@@ -6607,14 +6418,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR038" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1274188444]
 transform = Transform3D(1, 0, 0, 0, -0.99835235, 0.057381377, 0, -0.057381377, -0.99835235, 1.0259999, 0.9045346, 2.2777915)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR039" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=808528383]
 transform = Transform3D(1, 0, 0, 0, -0.99835235, 0.057381377, 0, -0.057381377, -0.99835235, 1.0259999, 0.9118662, 2.1502314)
@@ -6623,14 +6432,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR040" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=982392723]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.9127227, 2.0224926)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR041" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=863694027]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.9124437, 1.8947225)
@@ -6639,14 +6446,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR042" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=322905309]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.91216475, 1.7669523)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR043" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=322924015]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.9118858, 1.6391821)
@@ -6655,14 +6460,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR044" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1432014611]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.9116068, 1.5114119)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR045" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1726443122]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.91132784, 1.3836417)
@@ -6671,14 +6474,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR046" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=439064019]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.9110488, 1.2558714)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR047" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1940510113]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.9107699, 1.1281012)
@@ -6687,14 +6488,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR048" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=315904901]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.91049093, 1.000331)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR049" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1497243126]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.9102119, 0.87256086)
@@ -6703,14 +6502,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR050" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1112093072]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.909933, 0.7447907)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR051" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=140841761]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.90965396, 0.6170205)
@@ -6719,14 +6516,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR052" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2068491640]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.0259999, 0.909375, 0.4892503)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR053" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=290666200]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.90909606, 0.36148)
@@ -6735,14 +6530,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR054" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1655855193]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.90881705, 0.23370981)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR055" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=770042360]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.9085381, 0.10593963)
@@ -6751,14 +6544,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR056" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=306207148]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.9082591, -0.021830559)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR057" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=213592225]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.90798014, -0.14960074)
@@ -6767,14 +6558,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR058" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1348139561]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.90770113, -0.27737093)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR059" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=60227727]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.9074222, -0.40514112)
@@ -6783,14 +6572,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR060" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=422816531]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.90714324, -0.5329113)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR061" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1034723204]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.9068642, -0.6606815)
@@ -6799,14 +6586,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR062" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=650379572]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.9065853, -0.7884517)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR063" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=507613463]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.90630627, -0.91622186)
@@ -6815,14 +6600,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR064" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1554152078]
 transform = Transform3D(1, 0, 3.615023e-08, 0, -0.9999976, -0.0021834015, 0, 0.0021834015, -0.9999976, 1.026, 0.9060273, -1.043992)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR065" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1722200212]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, 1.026, 0.9051113, -1.1717228)
@@ -6831,14 +6614,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR066" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2091885550]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, 1.026, 0.8896528, -1.2985547)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR067" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=271406675]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, 1.026, 0.87419426, -1.4253867)
@@ -6847,14 +6628,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR068" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1998070947]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, 1.026, 0.85873574, -1.5522186)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR069" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=149514794]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, 1.026, 0.8432772, -1.6790504)
@@ -6863,14 +6642,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR070" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=243985022]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, 1.0260001, 0.8278187, -1.8058823)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR071" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1885467914]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, 1.0260001, 0.81236017, -1.9327142)
@@ -6879,14 +6656,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR072" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=636346566]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, 1.0260001, 0.79690164, -2.0595462)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR073" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1813285871]
 transform = Transform3D(1, 0, 1.0396414e-07, 0, -0.9926541, -0.12098666, 0, 0.12098666, -0.9926541, 1.0260001, 0.7814431, -2.186378)
@@ -6895,14 +6670,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR074" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=437312447]
 transform = Transform3D(1, 0, 0, 0, -0.9866434, -0.16289526, 0, 0.16289526, -0.9866434, 1.0260001, 0.7656217, -2.313158)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR075" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=658894587]
 transform = Transform3D(1, 0, 0, 0, -0.7298729, -0.6835829, 0, 0.6835829, -0.7298729, 1.0260001, 0.7105024, -2.426494)
@@ -6911,14 +6684,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR076" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2125420685]
 transform = Transform3D(1, 0, 0, 0, -0.2902948, -0.95693725, 0, 0.95693725, -0.2902948, 1.0260001, 0.6031232, -2.4925187)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR077" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=997110756]
 transform = Transform3D(1, 0, 0, 0, 0.29029536, -0.95693713, 0, 0.95693713, 0.29029536, 1.0260001, 0.47709656, -2.490401)
@@ -6927,14 +6698,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR078" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1230084446]
 transform = Transform3D(1, 0, 0, 0, 0.77301294, -0.6343903, 0, 0.6343903, 0.77301294, 1.0260001, 0.37188792, -2.421015)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR079" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2092840448]
 transform = Transform3D(1, 0, 0, 0, 0.88479257, -0.46598512, 0, 0.46598512, 0.88479257, 1.0260001, 0.30775648, -2.3108401)
@@ -6943,14 +6712,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR080" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=2036065162]
 transform = Transform3D(1, 0, 0, 0, 0.88479257, -0.46598512, 0, 0.46598512, 0.88479257, 1.0260001, 0.24821731, -2.1977897)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR081" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1154836623]
 transform = Transform3D(1, 0, 0, 0, 0.88479257, -0.46598512, 0, 0.46598512, 0.88479257, 1.0260001, 0.18867816, -2.0847392)
@@ -6959,14 +6726,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="TrackR082" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=521196226]
 transform = Transform3D(1, 0, 0, 0, 0.88479257, -0.46598512, 0, 0.46598512, 0.88479257, 1.0260001, 0.129139, -1.971689)
 mesh = SubResource("ArrayMesh_5ao3j")
 surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
-
 
 [node name="TrackR083" type="MeshInstance3D" parent="Visual/Model/M1Abrams" unique_id=1265743826]
 transform = Transform3D(1, 0, 0, 0, 0.9108645, -0.41270566, 0, 0.41270566, 0.9108645, 1.0260001, 0.0696454, -1.8586162)
@@ -6975,48 +6740,72 @@ surface_material_override/0 = SubResource("StandardMaterial3D_t46s3")
 surface_material_override/1 = SubResource("StandardMaterial3D_0o77a")
 surface_material_override/2 = SubResource("StandardMaterial3D_xcidj")
 
-
 [node name="Armor" type="Area3D" parent="." unique_id=1749425913]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-
 [node name="Hull" type="CollisionShape3D" parent="Armor" unique_id=862157978]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 shape = SubResource("BoxShape3D_w44x7")
+script = ExtResource("3_jlab2")
+front_mm = 130.0
+side_mm = 60.0
+rear_mm = 30.0
+roof_mm = 32.0
+underside_mm = 25.0
 metadata/part = "hull"
-
 
 [node name="LeftTrack" type="CollisionShape3D" parent="Armor" unique_id=1922688883]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.03, -0.13, 0)
 shape = SubResource("BoxShape3D_n70q1")
+script = ExtResource("3_jlab2")
+part = "left_track"
+front_mm = 25.0
+side_mm = 25.0
+rear_mm = 25.0
+roof_mm = 25.0
+underside_mm = 25.0
 metadata/part = "left_track"
-
 
 [node name="RightTrack" type="CollisionShape3D" parent="Armor" unique_id=1837205735]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.03, -0.13, 0)
 shape = SubResource("BoxShape3D_qhwua")
+script = ExtResource("3_jlab2")
+part = "right_track"
+front_mm = 25.0
+side_mm = 25.0
+rear_mm = 25.0
+roof_mm = 25.0
+underside_mm = 25.0
 metadata/part = "right_track"
-
 
 [node name="Turret" type="CollisionShape3D" parent="Armor" unique_id=872427691]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7656, 0.14199999)
 shape = SubResource("BoxShape3D_ninkb")
+script = ExtResource("3_jlab2")
+part = "turret"
+front_mm = 165.0
+side_mm = 90.0
+rear_mm = 45.0
+roof_mm = 34.0
+underside_mm = 40.0
 metadata/part = "turret"
-
 
 [node name="Barrel" type="CollisionShape3D" parent="Armor" unique_id=414078007]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.83280003, -2.5300002)
 shape = SubResource("BoxShape3D_2bsr7")
+script = ExtResource("3_jlab2")
+part = "barrel"
+front_mm = 30.0
+side_mm = 30.0
+rear_mm = 30.0
+roof_mm = 30.0
+underside_mm = 30.0
 metadata/part = "barrel"
-
 
 [node name="Nameplate" type="Label3D" parent="." unique_id=712526580]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 pixel_size = 0.008
 billboard = 1
 font_size = 40
-
-[node name="CoaxMuzzle" type="Marker3D" parent="Visual/Model/M1Abrams/TurretPivot/BarrelPivot"]
-position = Vector3(0.44, 0.04, -0.85)

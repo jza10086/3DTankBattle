@@ -1,7 +1,8 @@
-[gd_scene format=4]
+[gd_scene format=4 uid="uid://j0takirdvcgl"]
 
-[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/tank_controller.gd" id="1_n63vw"]
-[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/tank_visual.gd" id="2_vavtu"]
+[ext_resource type="Script" uid="uid://dlj8mjc20ltfn" path="res://games/minigame/GP_tank_war/scripts/tank_controller.gd" id="1_n63vw"]
+[ext_resource type="Script" uid="uid://brj58jymam08v" path="res://games/minigame/GP_tank_war/scripts/tank_visual.gd" id="2_vavtu"]
+[ext_resource type="Script" uid="uid://c87452itl1bo0" path="res://games/minigame/GP_tank_war/scripts/armor_zone.gd" id="3_4y5uo"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6g823"]
 size = Vector3(2.55, 1.15, 4.9)
@@ -1125,6 +1126,38 @@ resource_name = "11 | Oxide red"
 cull_mode = 2
 albedo_color = Color(0.5516501, 0.2827793, 0.20285092, 1)
 roughness = 0.62
+
+[sub_resource type="BoxMesh" id="BoxMesh_4y5uo"]
+size = Vector3(0.056, 0.052, 0.34)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uesnp"]
+albedo_color = Color(0.3816, 0.4004, 0.2875, 1)
+metallic = 0.24
+roughness = 0.62
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_m7vlg"]
+top_radius = 0.014
+bottom_radius = 0.017
+height = 0.48
+radial_segments = 10
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6axbt"]
+albedo_color = Color(0.2401, 0.2601, 0.2552, 1)
+metallic = 0.63
+roughness = 0.62
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1d0ka"]
+top_radius = 0.018
+bottom_radius = 0.02
+height = 0.06
+radial_segments = 10
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e2wmk"]
+albedo_color = Color(0.16, 0.18, 0.18, 1)
+metallic = 0.68
+roughness = 0.55
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_mx1os"]
 _surfaces = [{
@@ -3375,66 +3408,57 @@ size = Vector3(1.8, 1.1, 1.9)
 [sub_resource type="BoxShape3D" id="BoxShape3D_p8143"]
 size = Vector3(0.5, 0.18, 2.5)
 
-[node name="Tank" type="CharacterBody3D" unique_id=494800247 node_paths=PackedStringArray("coax_muzzle", "_barrel_shape", "_turret_shape", "armor", "nameplate", "visual")]
+[node name="Tank" type="CharacterBody3D" unique_id=494800247 node_paths=PackedStringArray("coax_muzzle", "visual", "armor", "_turret_shape", "_barrel_shape", "nameplate")]
 collision_layer = 2
 collision_mask = 3
 floor_constant_speed = true
 floor_max_angle = 0.75049156
 floor_snap_length = 0.95
 script = ExtResource("1_n63vw")
-_barrel_shape = NodePath("Armor/Barrel")
-_turret_shape = NodePath("Armor/Turret")
+coax_muzzle = NodePath("Visual/Model/VehicleRig/TurretPivot/BarrelPivot/CoaxMuzzle")
+visual = NodePath("Visual")
 armor = NodePath("Armor")
-barrel_length = 2.5
+_turret_shape = NodePath("Armor/Turret")
+_barrel_shape = NodePath("Armor/Barrel")
 nameplate = NodePath("Nameplate")
 turret_center = Vector3(0, 0.5, 0)
-visual = NodePath("Visual")
-coax_muzzle = NodePath("Visual/Model/VehicleRig/TurretPivot/BarrelPivot/CoaxMuzzle")
-
+barrel_length = 2.5
 
 [node name="Collision" type="CollisionShape3D" parent="." unique_id=405967723]
 shape = SubResource("BoxShape3D_6g823")
 
-
-[node name="Visual" type="Node3D" parent="." unique_id=297706193 node_paths=PackedStringArray("_recoil", "barrel", "launcher", "left_shoes", "left_wheels", "missile_muzzle", "muzzle", "right_shoes", "right_wheels", "second_muzzle", "turret")]
+[node name="Visual" type="Node3D" parent="." unique_id=297706193 node_paths=PackedStringArray("missile_muzzle", "second_muzzle", "launcher", "turret", "barrel", "muzzle", "_recoil", "left_shoes", "right_shoes", "left_wheels", "right_wheels")]
 script = ExtResource("2_vavtu")
-_recoil = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot/Recoil")
-barrel = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot")
-launcher = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot")
-left_path = PackedVector3Array(-1.0207169, 0.03023993, -1.566, -1.0207171, 0.03023993, 1.566, -1.0207171, 0.03424664, 1.61691, -1.0207171, 0.046168104, 1.6665665, -1.0207171, 0.065710776, 1.7137468, -1.0207171, 0.28795683, 2.1567824, -1.0207171, 0.3088307, 2.1908455, -1.0207171, 0.33477622, 2.2212238, -1.0207171, 0.36515453, 2.2471695, -1.0207171, 0.39921764, 2.2680433, -1.0207171, 0.43612674, 2.2833316, -1.0207171, 0.47497302, 2.2926579, -1.0207171, 0.5148, 2.295792, -1.0207171, 0.554627, 2.2926579, -1.0207171, 0.59347326, 2.2833316, -1.0207171, 0.63038236, 2.2680433, -1.0207171, 0.66444546, 2.2471695, -1.0207171, 0.6948238, 2.2212238, -1.0207171, 0.72076935, 2.1908455, -1.0207171, 0.7416432, 2.1567824, -1.0207171, 0.7569314, 2.1198733, -1.0207171, 0.76625764, 2.081027, -1.0207171, 0.7693921, 2.0412002, -1.0207169, 0.7693921, -2.0412002, -1.0207169, 0.76625764, -2.081027, -1.0207169, 0.7569314, -2.1198733, -1.0207169, 0.7416432, -2.1567824, -1.0207169, 0.72076935, -2.1908455, -1.0207169, 0.6948238, -2.2212238, -1.0207169, 0.66444546, -2.2471695, -1.0207169, 0.63038236, -2.2680433, -1.0207169, 0.59347326, -2.2833316, -1.0207169, 0.554627, -2.2926579, -1.0207169, 0.5148, -2.295792, -1.0207169, 0.47497302, -2.2926579, -1.0207169, 0.43612674, -2.2833316, -1.0207169, 0.39921764, -2.2680433, -1.0207169, 0.36515453, -2.2471695, -1.0207169, 0.33477622, -2.2212238, -1.0207169, 0.3088307, -2.1908455, -1.0207169, 0.28795683, -2.1567824, -1.0207169, 0.065710776, -1.7137468, -1.0207169, 0.046168104, -1.6665665, -1.0207169, 0.03424664, -1.61691)
-left_shoes = Array[NodePath]([NodePath("Model/VehicleRig/TrackL000"), NodePath("Model/VehicleRig/TrackL001"), NodePath("Model/VehicleRig/TrackL002"), NodePath("Model/VehicleRig/TrackL003"), NodePath("Model/VehicleRig/TrackL004"), NodePath("Model/VehicleRig/TrackL005"), NodePath("Model/VehicleRig/TrackL006"), NodePath("Model/VehicleRig/TrackL007"), NodePath("Model/VehicleRig/TrackL008"), NodePath("Model/VehicleRig/TrackL009"), NodePath("Model/VehicleRig/TrackL010"), NodePath("Model/VehicleRig/TrackL011"), NodePath("Model/VehicleRig/TrackL012"), NodePath("Model/VehicleRig/TrackL013"), NodePath("Model/VehicleRig/TrackL014"), NodePath("Model/VehicleRig/TrackL015"), NodePath("Model/VehicleRig/TrackL016"), NodePath("Model/VehicleRig/TrackL017"), NodePath("Model/VehicleRig/TrackL018"), NodePath("Model/VehicleRig/TrackL019"), NodePath("Model/VehicleRig/TrackL020"), NodePath("Model/VehicleRig/TrackL021"), NodePath("Model/VehicleRig/TrackL022"), NodePath("Model/VehicleRig/TrackL023"), NodePath("Model/VehicleRig/TrackL024"), NodePath("Model/VehicleRig/TrackL025"), NodePath("Model/VehicleRig/TrackL026"), NodePath("Model/VehicleRig/TrackL027"), NodePath("Model/VehicleRig/TrackL028"), NodePath("Model/VehicleRig/TrackL029"), NodePath("Model/VehicleRig/TrackL030"), NodePath("Model/VehicleRig/TrackL031"), NodePath("Model/VehicleRig/TrackL032"), NodePath("Model/VehicleRig/TrackL033"), NodePath("Model/VehicleRig/TrackL034"), NodePath("Model/VehicleRig/TrackL035"), NodePath("Model/VehicleRig/TrackL036"), NodePath("Model/VehicleRig/TrackL037"), NodePath("Model/VehicleRig/TrackL038"), NodePath("Model/VehicleRig/TrackL039"), NodePath("Model/VehicleRig/TrackL040"), NodePath("Model/VehicleRig/TrackL041"), NodePath("Model/VehicleRig/TrackL042"), NodePath("Model/VehicleRig/TrackL043"), NodePath("Model/VehicleRig/TrackL044"), NodePath("Model/VehicleRig/TrackL045"), NodePath("Model/VehicleRig/TrackL046"), NodePath("Model/VehicleRig/TrackL047"), NodePath("Model/VehicleRig/TrackL048"), NodePath("Model/VehicleRig/TrackL049"), NodePath("Model/VehicleRig/TrackL050"), NodePath("Model/VehicleRig/TrackL051"), NodePath("Model/VehicleRig/TrackL052"), NodePath("Model/VehicleRig/TrackL053"), NodePath("Model/VehicleRig/TrackL054"), NodePath("Model/VehicleRig/TrackL055"), NodePath("Model/VehicleRig/TrackL056"), NodePath("Model/VehicleRig/TrackL057"), NodePath("Model/VehicleRig/TrackL058"), NodePath("Model/VehicleRig/TrackL059"), NodePath("Model/VehicleRig/TrackL060"), NodePath("Model/VehicleRig/TrackL061"), NodePath("Model/VehicleRig/TrackL062"), NodePath("Model/VehicleRig/TrackL063"), NodePath("Model/VehicleRig/TrackL064"), NodePath("Model/VehicleRig/TrackL065"), NodePath("Model/VehicleRig/TrackL066"), NodePath("Model/VehicleRig/TrackL067"), NodePath("Model/VehicleRig/TrackL068"), NodePath("Model/VehicleRig/TrackL069"), NodePath("Model/VehicleRig/TrackL070"), NodePath("Model/VehicleRig/TrackL071"), NodePath("Model/VehicleRig/TrackL072"), NodePath("Model/VehicleRig/TrackL073"), NodePath("Model/VehicleRig/TrackL074"), NodePath("Model/VehicleRig/TrackL075"), NodePath("Model/VehicleRig/TrackL076")])
-left_wheels = Array[NodePath]([NodePath("Model/VehicleRig/WheelL1"), NodePath("Model/VehicleRig/WheelL2"), NodePath("Model/VehicleRig/WheelL3"), NodePath("Model/VehicleRig/WheelL4"), NodePath("Model/VehicleRig/WheelL5"), NodePath("Model/VehicleRig/WheelL6"), NodePath("Model/VehicleRig/WheelL7"), NodePath("Model/VehicleRig/WheelL8")])
 missile_muzzle = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot/MissileMuzzle")
-muzzle = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot/Recoil/Muzzle")
-right_path = PackedVector3Array(1.0207171, 0.03023993, -1.566, 1.0207169, 0.03023993, 1.566, 1.0207169, 0.03424664, 1.61691, 1.0207169, 0.046168104, 1.6665665, 1.0207169, 0.065710776, 1.7137468, 1.0207169, 0.28795683, 2.1567824, 1.0207169, 0.3088307, 2.1908455, 1.0207169, 0.33477622, 2.2212238, 1.0207169, 0.36515453, 2.2471695, 1.0207169, 0.39921764, 2.2680433, 1.0207169, 0.43612674, 2.2833316, 1.0207169, 0.47497302, 2.2926579, 1.0207169, 0.5148, 2.295792, 1.0207169, 0.554627, 2.2926579, 1.0207169, 0.59347326, 2.2833316, 1.0207169, 0.63038236, 2.2680433, 1.0207169, 0.66444546, 2.2471695, 1.0207169, 0.6948238, 2.2212238, 1.0207169, 0.72076935, 2.1908455, 1.0207169, 0.7416432, 2.1567824, 1.0207169, 0.7569314, 2.1198733, 1.0207169, 0.76625764, 2.081027, 1.0207169, 0.7693921, 2.0412002, 1.0207171, 0.7693921, -2.0412002, 1.0207171, 0.76625764, -2.081027, 1.0207171, 0.7569314, -2.1198733, 1.0207171, 0.7416432, -2.1567824, 1.0207171, 0.72076935, -2.1908455, 1.0207171, 0.6948238, -2.2212238, 1.0207171, 0.66444546, -2.2471695, 1.0207171, 0.63038236, -2.2680433, 1.0207171, 0.59347326, -2.2833316, 1.0207171, 0.554627, -2.2926579, 1.0207171, 0.5148, -2.295792, 1.0207171, 0.47497302, -2.2926579, 1.0207171, 0.43612674, -2.2833316, 1.0207171, 0.39921764, -2.2680433, 1.0207171, 0.36515453, -2.2471695, 1.0207171, 0.33477622, -2.2212238, 1.0207171, 0.3088307, -2.1908455, 1.0207171, 0.28795683, -2.1567824, 1.0207171, 0.065710776, -1.7137468, 1.0207171, 0.046168104, -1.6665665, 1.0207171, 0.03424664, -1.61691)
-right_shoes = Array[NodePath]([NodePath("Model/VehicleRig/TrackR000"), NodePath("Model/VehicleRig/TrackR001"), NodePath("Model/VehicleRig/TrackR002"), NodePath("Model/VehicleRig/TrackR003"), NodePath("Model/VehicleRig/TrackR004"), NodePath("Model/VehicleRig/TrackR005"), NodePath("Model/VehicleRig/TrackR006"), NodePath("Model/VehicleRig/TrackR007"), NodePath("Model/VehicleRig/TrackR008"), NodePath("Model/VehicleRig/TrackR009"), NodePath("Model/VehicleRig/TrackR010"), NodePath("Model/VehicleRig/TrackR011"), NodePath("Model/VehicleRig/TrackR012"), NodePath("Model/VehicleRig/TrackR013"), NodePath("Model/VehicleRig/TrackR014"), NodePath("Model/VehicleRig/TrackR015"), NodePath("Model/VehicleRig/TrackR016"), NodePath("Model/VehicleRig/TrackR017"), NodePath("Model/VehicleRig/TrackR018"), NodePath("Model/VehicleRig/TrackR019"), NodePath("Model/VehicleRig/TrackR020"), NodePath("Model/VehicleRig/TrackR021"), NodePath("Model/VehicleRig/TrackR022"), NodePath("Model/VehicleRig/TrackR023"), NodePath("Model/VehicleRig/TrackR024"), NodePath("Model/VehicleRig/TrackR025"), NodePath("Model/VehicleRig/TrackR026"), NodePath("Model/VehicleRig/TrackR027"), NodePath("Model/VehicleRig/TrackR028"), NodePath("Model/VehicleRig/TrackR029"), NodePath("Model/VehicleRig/TrackR030"), NodePath("Model/VehicleRig/TrackR031"), NodePath("Model/VehicleRig/TrackR032"), NodePath("Model/VehicleRig/TrackR033"), NodePath("Model/VehicleRig/TrackR034"), NodePath("Model/VehicleRig/TrackR035"), NodePath("Model/VehicleRig/TrackR036"), NodePath("Model/VehicleRig/TrackR037"), NodePath("Model/VehicleRig/TrackR038"), NodePath("Model/VehicleRig/TrackR039"), NodePath("Model/VehicleRig/TrackR040"), NodePath("Model/VehicleRig/TrackR041"), NodePath("Model/VehicleRig/TrackR042"), NodePath("Model/VehicleRig/TrackR043"), NodePath("Model/VehicleRig/TrackR044"), NodePath("Model/VehicleRig/TrackR045"), NodePath("Model/VehicleRig/TrackR046"), NodePath("Model/VehicleRig/TrackR047"), NodePath("Model/VehicleRig/TrackR048"), NodePath("Model/VehicleRig/TrackR049"), NodePath("Model/VehicleRig/TrackR050"), NodePath("Model/VehicleRig/TrackR051"), NodePath("Model/VehicleRig/TrackR052"), NodePath("Model/VehicleRig/TrackR053"), NodePath("Model/VehicleRig/TrackR054"), NodePath("Model/VehicleRig/TrackR055"), NodePath("Model/VehicleRig/TrackR056"), NodePath("Model/VehicleRig/TrackR057"), NodePath("Model/VehicleRig/TrackR058"), NodePath("Model/VehicleRig/TrackR059"), NodePath("Model/VehicleRig/TrackR060"), NodePath("Model/VehicleRig/TrackR061"), NodePath("Model/VehicleRig/TrackR062"), NodePath("Model/VehicleRig/TrackR063"), NodePath("Model/VehicleRig/TrackR064"), NodePath("Model/VehicleRig/TrackR065"), NodePath("Model/VehicleRig/TrackR066"), NodePath("Model/VehicleRig/TrackR067"), NodePath("Model/VehicleRig/TrackR068"), NodePath("Model/VehicleRig/TrackR069"), NodePath("Model/VehicleRig/TrackR070"), NodePath("Model/VehicleRig/TrackR071"), NodePath("Model/VehicleRig/TrackR072"), NodePath("Model/VehicleRig/TrackR073"), NodePath("Model/VehicleRig/TrackR074"), NodePath("Model/VehicleRig/TrackR075"), NodePath("Model/VehicleRig/TrackR076")])
-right_wheels = Array[NodePath]([NodePath("Model/VehicleRig/WheelR1"), NodePath("Model/VehicleRig/WheelR2"), NodePath("Model/VehicleRig/WheelR3"), NodePath("Model/VehicleRig/WheelR4"), NodePath("Model/VehicleRig/WheelR5"), NodePath("Model/VehicleRig/WheelR6"), NodePath("Model/VehicleRig/WheelR7"), NodePath("Model/VehicleRig/WheelR8")])
 second_muzzle = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot/Recoil/Muzzle2")
+launcher = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot")
 turret = NodePath("Model/VehicleRig/TurretPivot")
-
+barrel = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot")
+muzzle = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot/Recoil/Muzzle")
+_recoil = NodePath("Model/VehicleRig/TurretPivot/BarrelPivot/Recoil")
+left_path = PackedVector3Array(-1.0207169, 0.03023993, -1.566, -1.0207171, 0.03023993, 1.566, -1.0207171, 0.03424664, 1.61691, -1.0207171, 0.046168104, 1.6665665, -1.0207171, 0.065710776, 1.7137468, -1.0207171, 0.28795683, 2.1567824, -1.0207171, 0.3088307, 2.1908455, -1.0207171, 0.33477622, 2.2212238, -1.0207171, 0.36515453, 2.2471695, -1.0207171, 0.39921764, 2.2680433, -1.0207171, 0.43612674, 2.2833316, -1.0207171, 0.47497302, 2.2926579, -1.0207171, 0.5148, 2.295792, -1.0207171, 0.554627, 2.2926579, -1.0207171, 0.59347326, 2.2833316, -1.0207171, 0.63038236, 2.2680433, -1.0207171, 0.66444546, 2.2471695, -1.0207171, 0.6948238, 2.2212238, -1.0207171, 0.72076935, 2.1908455, -1.0207171, 0.7416432, 2.1567824, -1.0207171, 0.7569314, 2.1198733, -1.0207171, 0.76625764, 2.081027, -1.0207171, 0.7693921, 2.0412002, -1.0207169, 0.7693921, -2.0412002, -1.0207169, 0.76625764, -2.081027, -1.0207169, 0.7569314, -2.1198733, -1.0207169, 0.7416432, -2.1567824, -1.0207169, 0.72076935, -2.1908455, -1.0207169, 0.6948238, -2.2212238, -1.0207169, 0.66444546, -2.2471695, -1.0207169, 0.63038236, -2.2680433, -1.0207169, 0.59347326, -2.2833316, -1.0207169, 0.554627, -2.2926579, -1.0207169, 0.5148, -2.295792, -1.0207169, 0.47497302, -2.2926579, -1.0207169, 0.43612674, -2.2833316, -1.0207169, 0.39921764, -2.2680433, -1.0207169, 0.36515453, -2.2471695, -1.0207169, 0.33477622, -2.2212238, -1.0207169, 0.3088307, -2.1908455, -1.0207169, 0.28795683, -2.1567824, -1.0207169, 0.065710776, -1.7137468, -1.0207169, 0.046168104, -1.6665665, -1.0207169, 0.03424664, -1.61691)
+right_path = PackedVector3Array(1.0207171, 0.03023993, -1.566, 1.0207169, 0.03023993, 1.566, 1.0207169, 0.03424664, 1.61691, 1.0207169, 0.046168104, 1.6665665, 1.0207169, 0.065710776, 1.7137468, 1.0207169, 0.28795683, 2.1567824, 1.0207169, 0.3088307, 2.1908455, 1.0207169, 0.33477622, 2.2212238, 1.0207169, 0.36515453, 2.2471695, 1.0207169, 0.39921764, 2.2680433, 1.0207169, 0.43612674, 2.2833316, 1.0207169, 0.47497302, 2.2926579, 1.0207169, 0.5148, 2.295792, 1.0207169, 0.554627, 2.2926579, 1.0207169, 0.59347326, 2.2833316, 1.0207169, 0.63038236, 2.2680433, 1.0207169, 0.66444546, 2.2471695, 1.0207169, 0.6948238, 2.2212238, 1.0207169, 0.72076935, 2.1908455, 1.0207169, 0.7416432, 2.1567824, 1.0207169, 0.7569314, 2.1198733, 1.0207169, 0.76625764, 2.081027, 1.0207169, 0.7693921, 2.0412002, 1.0207171, 0.7693921, -2.0412002, 1.0207171, 0.76625764, -2.081027, 1.0207171, 0.7569314, -2.1198733, 1.0207171, 0.7416432, -2.1567824, 1.0207171, 0.72076935, -2.1908455, 1.0207171, 0.6948238, -2.2212238, 1.0207171, 0.66444546, -2.2471695, 1.0207171, 0.63038236, -2.2680433, 1.0207171, 0.59347326, -2.2833316, 1.0207171, 0.554627, -2.2926579, 1.0207171, 0.5148, -2.295792, 1.0207171, 0.47497302, -2.2926579, 1.0207171, 0.43612674, -2.2833316, 1.0207171, 0.39921764, -2.2680433, 1.0207171, 0.36515453, -2.2471695, 1.0207171, 0.33477622, -2.2212238, 1.0207171, 0.3088307, -2.1908455, 1.0207171, 0.28795683, -2.1567824, 1.0207171, 0.065710776, -1.7137468, 1.0207171, 0.046168104, -1.6665665, 1.0207171, 0.03424664, -1.61691)
+left_shoes = [NodePath("Model/VehicleRig/TrackL000"), NodePath("Model/VehicleRig/TrackL001"), NodePath("Model/VehicleRig/TrackL002"), NodePath("Model/VehicleRig/TrackL003"), NodePath("Model/VehicleRig/TrackL004"), NodePath("Model/VehicleRig/TrackL005"), NodePath("Model/VehicleRig/TrackL006"), NodePath("Model/VehicleRig/TrackL007"), NodePath("Model/VehicleRig/TrackL008"), NodePath("Model/VehicleRig/TrackL009"), NodePath("Model/VehicleRig/TrackL010"), NodePath("Model/VehicleRig/TrackL011"), NodePath("Model/VehicleRig/TrackL012"), NodePath("Model/VehicleRig/TrackL013"), NodePath("Model/VehicleRig/TrackL014"), NodePath("Model/VehicleRig/TrackL015"), NodePath("Model/VehicleRig/TrackL016"), NodePath("Model/VehicleRig/TrackL017"), NodePath("Model/VehicleRig/TrackL018"), NodePath("Model/VehicleRig/TrackL019"), NodePath("Model/VehicleRig/TrackL020"), NodePath("Model/VehicleRig/TrackL021"), NodePath("Model/VehicleRig/TrackL022"), NodePath("Model/VehicleRig/TrackL023"), NodePath("Model/VehicleRig/TrackL024"), NodePath("Model/VehicleRig/TrackL025"), NodePath("Model/VehicleRig/TrackL026"), NodePath("Model/VehicleRig/TrackL027"), NodePath("Model/VehicleRig/TrackL028"), NodePath("Model/VehicleRig/TrackL029"), NodePath("Model/VehicleRig/TrackL030"), NodePath("Model/VehicleRig/TrackL031"), NodePath("Model/VehicleRig/TrackL032"), NodePath("Model/VehicleRig/TrackL033"), NodePath("Model/VehicleRig/TrackL034"), NodePath("Model/VehicleRig/TrackL035"), NodePath("Model/VehicleRig/TrackL036"), NodePath("Model/VehicleRig/TrackL037"), NodePath("Model/VehicleRig/TrackL038"), NodePath("Model/VehicleRig/TrackL039"), NodePath("Model/VehicleRig/TrackL040"), NodePath("Model/VehicleRig/TrackL041"), NodePath("Model/VehicleRig/TrackL042"), NodePath("Model/VehicleRig/TrackL043"), NodePath("Model/VehicleRig/TrackL044"), NodePath("Model/VehicleRig/TrackL045"), NodePath("Model/VehicleRig/TrackL046"), NodePath("Model/VehicleRig/TrackL047"), NodePath("Model/VehicleRig/TrackL048"), NodePath("Model/VehicleRig/TrackL049"), NodePath("Model/VehicleRig/TrackL050"), NodePath("Model/VehicleRig/TrackL051"), NodePath("Model/VehicleRig/TrackL052"), NodePath("Model/VehicleRig/TrackL053"), NodePath("Model/VehicleRig/TrackL054"), NodePath("Model/VehicleRig/TrackL055"), NodePath("Model/VehicleRig/TrackL056"), NodePath("Model/VehicleRig/TrackL057"), NodePath("Model/VehicleRig/TrackL058"), NodePath("Model/VehicleRig/TrackL059"), NodePath("Model/VehicleRig/TrackL060"), NodePath("Model/VehicleRig/TrackL061"), NodePath("Model/VehicleRig/TrackL062"), NodePath("Model/VehicleRig/TrackL063"), NodePath("Model/VehicleRig/TrackL064"), NodePath("Model/VehicleRig/TrackL065"), NodePath("Model/VehicleRig/TrackL066"), NodePath("Model/VehicleRig/TrackL067"), NodePath("Model/VehicleRig/TrackL068"), NodePath("Model/VehicleRig/TrackL069"), NodePath("Model/VehicleRig/TrackL070"), NodePath("Model/VehicleRig/TrackL071"), NodePath("Model/VehicleRig/TrackL072"), NodePath("Model/VehicleRig/TrackL073"), NodePath("Model/VehicleRig/TrackL074"), NodePath("Model/VehicleRig/TrackL075"), NodePath("Model/VehicleRig/TrackL076")]
+right_shoes = [NodePath("Model/VehicleRig/TrackR000"), NodePath("Model/VehicleRig/TrackR001"), NodePath("Model/VehicleRig/TrackR002"), NodePath("Model/VehicleRig/TrackR003"), NodePath("Model/VehicleRig/TrackR004"), NodePath("Model/VehicleRig/TrackR005"), NodePath("Model/VehicleRig/TrackR006"), NodePath("Model/VehicleRig/TrackR007"), NodePath("Model/VehicleRig/TrackR008"), NodePath("Model/VehicleRig/TrackR009"), NodePath("Model/VehicleRig/TrackR010"), NodePath("Model/VehicleRig/TrackR011"), NodePath("Model/VehicleRig/TrackR012"), NodePath("Model/VehicleRig/TrackR013"), NodePath("Model/VehicleRig/TrackR014"), NodePath("Model/VehicleRig/TrackR015"), NodePath("Model/VehicleRig/TrackR016"), NodePath("Model/VehicleRig/TrackR017"), NodePath("Model/VehicleRig/TrackR018"), NodePath("Model/VehicleRig/TrackR019"), NodePath("Model/VehicleRig/TrackR020"), NodePath("Model/VehicleRig/TrackR021"), NodePath("Model/VehicleRig/TrackR022"), NodePath("Model/VehicleRig/TrackR023"), NodePath("Model/VehicleRig/TrackR024"), NodePath("Model/VehicleRig/TrackR025"), NodePath("Model/VehicleRig/TrackR026"), NodePath("Model/VehicleRig/TrackR027"), NodePath("Model/VehicleRig/TrackR028"), NodePath("Model/VehicleRig/TrackR029"), NodePath("Model/VehicleRig/TrackR030"), NodePath("Model/VehicleRig/TrackR031"), NodePath("Model/VehicleRig/TrackR032"), NodePath("Model/VehicleRig/TrackR033"), NodePath("Model/VehicleRig/TrackR034"), NodePath("Model/VehicleRig/TrackR035"), NodePath("Model/VehicleRig/TrackR036"), NodePath("Model/VehicleRig/TrackR037"), NodePath("Model/VehicleRig/TrackR038"), NodePath("Model/VehicleRig/TrackR039"), NodePath("Model/VehicleRig/TrackR040"), NodePath("Model/VehicleRig/TrackR041"), NodePath("Model/VehicleRig/TrackR042"), NodePath("Model/VehicleRig/TrackR043"), NodePath("Model/VehicleRig/TrackR044"), NodePath("Model/VehicleRig/TrackR045"), NodePath("Model/VehicleRig/TrackR046"), NodePath("Model/VehicleRig/TrackR047"), NodePath("Model/VehicleRig/TrackR048"), NodePath("Model/VehicleRig/TrackR049"), NodePath("Model/VehicleRig/TrackR050"), NodePath("Model/VehicleRig/TrackR051"), NodePath("Model/VehicleRig/TrackR052"), NodePath("Model/VehicleRig/TrackR053"), NodePath("Model/VehicleRig/TrackR054"), NodePath("Model/VehicleRig/TrackR055"), NodePath("Model/VehicleRig/TrackR056"), NodePath("Model/VehicleRig/TrackR057"), NodePath("Model/VehicleRig/TrackR058"), NodePath("Model/VehicleRig/TrackR059"), NodePath("Model/VehicleRig/TrackR060"), NodePath("Model/VehicleRig/TrackR061"), NodePath("Model/VehicleRig/TrackR062"), NodePath("Model/VehicleRig/TrackR063"), NodePath("Model/VehicleRig/TrackR064"), NodePath("Model/VehicleRig/TrackR065"), NodePath("Model/VehicleRig/TrackR066"), NodePath("Model/VehicleRig/TrackR067"), NodePath("Model/VehicleRig/TrackR068"), NodePath("Model/VehicleRig/TrackR069"), NodePath("Model/VehicleRig/TrackR070"), NodePath("Model/VehicleRig/TrackR071"), NodePath("Model/VehicleRig/TrackR072"), NodePath("Model/VehicleRig/TrackR073"), NodePath("Model/VehicleRig/TrackR074"), NodePath("Model/VehicleRig/TrackR075"), NodePath("Model/VehicleRig/TrackR076")]
+left_wheels = [NodePath("Model/VehicleRig/WheelL1"), NodePath("Model/VehicleRig/WheelL2"), NodePath("Model/VehicleRig/WheelL3"), NodePath("Model/VehicleRig/WheelL4"), NodePath("Model/VehicleRig/WheelL5"), NodePath("Model/VehicleRig/WheelL6"), NodePath("Model/VehicleRig/WheelL7"), NodePath("Model/VehicleRig/WheelL8")]
+right_wheels = [NodePath("Model/VehicleRig/WheelR1"), NodePath("Model/VehicleRig/WheelR2"), NodePath("Model/VehicleRig/WheelR3"), NodePath("Model/VehicleRig/WheelR4"), NodePath("Model/VehicleRig/WheelR5"), NodePath("Model/VehicleRig/WheelR6"), NodePath("Model/VehicleRig/WheelR7"), NodePath("Model/VehicleRig/WheelR8")]
 
 [node name="Model" type="Node3D" parent="Visual" unique_id=1214105341]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.6, 0)
 
-
 [node name="VehicleRig" type="Node3D" parent="Visual/Model" unique_id=1767613603]
-
-
 
 [node name="Armored fighting compartment_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1814499191]
 mesh = SubResource("ArrayMesh_65j27")
 surface_material_override/0 = SubResource("StandardMaterial3D_qo262")
 
-
 [node name="Armored keel_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1723144895]
 mesh = SubResource("ArrayMesh_nyg5t")
 surface_material_override/0 = SubResource("StandardMaterial3D_gc81l")
 
-
 [node name="Forward towing eyes_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=805196047]
 mesh = SubResource("ArrayMesh_l2ux2")
 surface_material_override/0 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="Glacis ERA, fender bins and engine louvers_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1511985484]
 mesh = SubResource("ArrayMesh_qjrh4")
@@ -3445,7 +3469,6 @@ surface_material_override/3 = SubResource("StandardMaterial3D_4icr4")
 surface_material_override/4 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/5 = SubResource("StandardMaterial3D_8gv80")
 
-
 [node name="Headlamps and cages_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=518216270]
 mesh = SubResource("ArrayMesh_cgepi")
 surface_material_override/0 = SubResource("StandardMaterial3D_gc81l")
@@ -3453,11 +3476,9 @@ surface_material_override/1 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/2 = SubResource("StandardMaterial3D_15251")
 surface_material_override/3 = SubResource("StandardMaterial3D_qo262")
 
-
 [node name="Low glacis and fender deck_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=201832818]
 mesh = SubResource("ArrayMesh_dmppt")
 surface_material_override/0 = SubResource("StandardMaterial3D_qo262")
-
 
 [node name="Skirt panels • L_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1422454852]
 mesh = SubResource("ArrayMesh_r4cd8")
@@ -3466,14 +3487,12 @@ surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 
-
 [node name="Skirt panels • R_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=947289873]
 mesh = SubResource("ArrayMesh_m3tyh")
 surface_material_override/0 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
-
 
 [node name="TrackL000" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1983063677]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207169, 0.03023993, -1.566)
@@ -3482,7 +3501,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR000" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=971040865]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207171, 0.03023993, -1.566)
 mesh = SubResource("ArrayMesh_kw7dj")
@@ -3490,14 +3508,11 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TurretPivot" type="Node3D" parent="Visual/Model/VehicleRig" unique_id=1807255788]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0728, -0.057600003)
 
-
 [node name="BarrelPivot" type="Node3D" parent="Visual/Model/VehicleRig/TurretPivot" unique_id=957575747]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.80639994, -0.18719998)
-
 
 [node name="Launch canister | hollow liner_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot" unique_id=1488594220]
 mesh = SubResource("ArrayMesh_akfli")
@@ -3505,14 +3520,10 @@ surface_material_override/0 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/1 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/2 = SubResource("StandardMaterial3D_4icr4")
 
-
 [node name="MissileMuzzle" type="Node3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot" unique_id=1691115451]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.77184, 0.13680005, -0.5443201)
 
-
 [node name="Recoil" type="Node3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot" unique_id=1627812891]
-
-
 
 [node name="2A42 L | tube_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot/Recoil" unique_id=1835004631]
 mesh = SubResource("ArrayMesh_dx1pe")
@@ -3521,7 +3532,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 surface_material_override/3 = SubResource("StandardMaterial3D_4icr4")
 
-
 [node name="2A42 R | tube_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot/Recoil" unique_id=1130280551]
 mesh = SubResource("ArrayMesh_fmwut")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
@@ -3529,14 +3539,11 @@ surface_material_override/1 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 surface_material_override/3 = SubResource("StandardMaterial3D_4icr4")
 
-
 [node name="Muzzle" type="Node3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot/Recoil" unique_id=1298289666]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.11015993, 0, -1.4702401)
 
-
 [node name="Muzzle2" type="Node3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot/Recoil" unique_id=2052519302]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11016007, 0, -1.4702401)
-
 
 [node name="Twin 2A42s and four Ataka launch tubes_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot" unique_id=101667480]
 mesh = SubResource("ArrayMesh_4dent")
@@ -3545,6 +3552,25 @@ surface_material_override/1 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_jjiud")
 
+[node name="CoaxMuzzle" type="Marker3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot" unique_id=791199693]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.94)
+
+[node name="PKTMMount" type="Node3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot" unique_id=467134795]
+
+[node name="Shroud" type="MeshInstance3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot/PKTMMount" unique_id=479510567]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, -0.34)
+mesh = SubResource("BoxMesh_4y5uo")
+surface_material_override/0 = SubResource("StandardMaterial3D_uesnp")
+
+[node name="Barrel" type="MeshInstance3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot/PKTMMount" unique_id=1517814388]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.05, -0.68)
+mesh = SubResource("CylinderMesh_m7vlg")
+surface_material_override/0 = SubResource("StandardMaterial3D_6axbt")
+
+[node name="MuzzleBrake" type="MeshInstance3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot/PKTMMount" unique_id=58561842]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.05, -0.91)
+mesh = SubResource("CylinderMesh_1d0ka")
+surface_material_override/0 = SubResource("StandardMaterial3D_e2wmk")
 
 [node name="Elevated weapon pedestal and panoramic sight_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig/TurretPivot" unique_id=751952838]
 mesh = SubResource("ArrayMesh_xi45p")
@@ -3555,7 +3581,6 @@ surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/5 = SubResource("StandardMaterial3D_4icr4")
 
-
 [node name="Twin bow grenade-launcher stations_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1225966350]
 mesh = SubResource("ArrayMesh_2lkjw")
 surface_material_override/0 = SubResource("StandardMaterial3D_qo262")
@@ -3563,12 +3588,10 @@ surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/3 = SubResource("StandardMaterial3D_uo756")
 
-
 [node name="Unditching log and straps_001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=851217387]
 mesh = SubResource("ArrayMesh_2wmcm")
 surface_material_override/0 = SubResource("StandardMaterial3D_ktsdr")
 surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
-
 
 [node name="WheelL1" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=22483849]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0207171, 0.5148, 2.0412002)
@@ -3577,7 +3600,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
-
 
 [node name="WheelL2" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=359757971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0207169, 0.5148, -2.0412002)
@@ -3588,7 +3610,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
 
-
 [node name="WheelL3" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=253526800]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0207169, 0.35568002, -1.566)
 mesh = SubResource("ArrayMesh_axkjr")
@@ -3597,7 +3618,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
-
 
 [node name="WheelL4" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=48081497]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.020717, 0.35568002, -0.93960005)
@@ -3608,7 +3628,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
 
-
 [node name="WheelL5" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=146136556]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.020717, 0.35568002, -0.31320006)
 mesh = SubResource("ArrayMesh_86pxc")
@@ -3617,7 +3636,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
-
 
 [node name="WheelL6" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=2067229575]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.020717, 0.35568002, 0.3132)
@@ -3628,7 +3646,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
 
-
 [node name="WheelL7" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=844205606]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.020717, 0.35568002, 0.93959993)
 mesh = SubResource("ArrayMesh_clblc")
@@ -3637,7 +3654,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
-
 
 [node name="WheelL8" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=350202969]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0207171, 0.35568002, 1.566)
@@ -3648,7 +3664,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
 
-
 [node name="WheelR1" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1895488697]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0207169, 0.5148, 2.0412002)
 mesh = SubResource("ArrayMesh_ik8w1")
@@ -3656,7 +3671,6 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
-
 
 [node name="WheelR2" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1074239331]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0207171, 0.5148, -2.0412002)
@@ -3667,7 +3681,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
 
-
 [node name="WheelR3" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1684804750]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0207171, 0.35568002, -1.566)
 mesh = SubResource("ArrayMesh_imiso")
@@ -3676,7 +3689,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
-
 
 [node name="WheelR4" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=98445567]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.020717, 0.35568002, -0.93959993)
@@ -3687,7 +3699,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
 
-
 [node name="WheelR5" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1049131637]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.020717, 0.35568002, -0.3132)
 mesh = SubResource("ArrayMesh_8t3vv")
@@ -3696,7 +3707,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
-
 
 [node name="WheelR6" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1492931641]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.020717, 0.35568002, 0.31320006)
@@ -3707,7 +3717,6 @@ surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
 
-
 [node name="WheelR7" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1767444581]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.020717, 0.35568002, 0.93960005)
 mesh = SubResource("ArrayMesh_evvpm")
@@ -3716,7 +3725,6 @@ surface_material_override/1 = SubResource("StandardMaterial3D_gc81l")
 surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
-
 
 [node name="WheelR8" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1480207216]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0207169, 0.35568002, 1.566)
@@ -3727,14 +3735,12 @@ surface_material_override/2 = SubResource("StandardMaterial3D_qo262")
 surface_material_override/3 = SubResource("StandardMaterial3D_p86rr")
 surface_material_override/4 = SubResource("StandardMaterial3D_uo756")
 
-
 [node name="TrackL001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1488018997]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207169, 0.03023993, -1.4378127)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL002" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=395210323]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207169, 0.03023993, -1.3096254)
@@ -3743,14 +3749,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL003" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1002875107]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207169, 0.03023993, -1.1814382)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL004" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=758810168]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207169, 0.03023993, -1.0532509)
@@ -3759,14 +3763,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL005" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=259501402]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207169, 0.03023993, -0.9250636)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL006" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1015406994]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207169, 0.03023993, -0.7968764)
@@ -3775,14 +3777,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL007" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1868914412]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, -0.6686891)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL008" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=776828033]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, -0.54050183)
@@ -3791,14 +3791,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL009" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1570663416]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, -0.41231453)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL010" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=868375570]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, -0.28412724)
@@ -3807,14 +3805,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL011" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=949723337]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, -0.15594006)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL012" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=180423323]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, -0.027752757)
@@ -3823,14 +3819,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL013" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=772735094]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, 0.10043442)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL014" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=610761309]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, 0.22862184)
@@ -3839,14 +3833,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL015" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=989077976]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, 0.35680914)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL016" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1150459143]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, 0.48499632)
@@ -3855,14 +3847,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL017" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=744245782]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, 0.61318374)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL018" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1704294736]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.020717, 0.03023993, 0.7413709)
@@ -3871,14 +3861,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL019" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=593342380]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207171, 0.03023993, 0.8695581)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL020" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=667080387]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207171, 0.03023993, 0.9977455)
@@ -3887,14 +3875,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL021" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1728311472]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207171, 0.03023993, 1.1259327)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL022" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=404474392]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207171, 0.03023993, 1.2541199)
@@ -3903,14 +3889,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL023" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1416385764]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207171, 0.03023993, 1.3823073)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL024" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1004998871]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, -1.0207171, 0.03023993, 1.5104945)
@@ -3919,14 +3903,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL025" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1825422242]
 transform = Transform3D(1, 0, 0, 0, 0.9723699, 0.23344521, 0, -0.23344521, 0.9723699, -1.0207171, 0.039292395, 1.637927)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL026" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=231126109]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, 0.44838864, 0, -0.44838864, 0.8938387, -1.0207171, 0.08708389, 1.7563529)
@@ -3935,14 +3917,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL027" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1715026790]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, 0.44838864, 0, -0.44838864, 0.8938387, -1.0207171, 0.1445616, 1.8709316)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL028" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=687730708]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, 0.44838864, 0, -0.44838864, 0.8938387, -1.0207171, 0.20203933, 1.9855105)
@@ -3951,14 +3931,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL029" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1363200607]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, 0.44838864, 0, -0.44838864, 0.8938387, -1.0207171, 0.25951704, 2.100089)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL030" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=2061171729]
 transform = Transform3D(1, 0, 0, 0, 0.76040643, 0.64944744, 0, -0.64944744, 0.76040643, -1.0207171, 0.3249438, 2.2097116)
@@ -3967,14 +3945,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL031" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1913897732]
 transform = Transform3D(1, 0, 0, 0, 0.3826856, 0.9238786, 0, -0.9238786, 0.3826856, -1.0207171, 0.4298417, 2.2807283)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL032" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=2078250369]
 transform = Transform3D(1, 0, 0, 0, -0.23344676, 0.9723696, 0, -0.9723696, -0.23344676, -1.0207171, 0.55611867, 2.2922997)
@@ -3983,14 +3959,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL033" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=665597733]
 transform = Transform3D(1, 0, 0, 0, -0.6494496, 0.76040465, 0, -0.76040465, -0.6494496, -1.0207171, 0.67195135, 2.240759)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL034" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1824358833]
 transform = Transform3D(1, 0, 0, 0, -0.9238796, 0.38268304, 0, -0.38268304, -0.9238796, -1.0207171, 0.748611, 2.1399608)
@@ -3999,14 +3973,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL035" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=966299799]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207171, 0.7693921, 2.0146554)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL036" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=80026797]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207171, 0.7693921, 1.8864682)
@@ -4015,14 +3987,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL037" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1627936482]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207171, 0.7693921, 1.7582809)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL038" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1151342420]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207171, 0.7693921, 1.6300936)
@@ -4031,14 +4001,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL039" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1463049317]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207171, 0.7693921, 1.5019064)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL040" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1611165122]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207171, 0.7693921, 1.3737191)
@@ -4047,14 +4015,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL041" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=2054326810]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207171, 0.7693921, 1.2455318)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL042" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1820886553]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207171, 0.7693921, 1.1173446)
@@ -4063,14 +4029,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL043" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=68197672]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, 0.9891572)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL044" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=217697178]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, 0.86097)
@@ -4079,14 +4043,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL045" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1842869241]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, 0.7327827)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL046" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=730766348]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, 0.60459554)
@@ -4095,14 +4057,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL047" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=525604303]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, 0.47640812)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL048" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=954860444]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, 0.34822094)
@@ -4111,14 +4071,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL049" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=640688967]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, 0.22003376)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL050" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=730336769]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, 0.09184635)
@@ -4127,14 +4085,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL051" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1927985082]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, -0.036340952)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL052" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=894394527]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, -0.16452813)
@@ -4143,14 +4099,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL053" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=722042594]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, -0.2927153)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL054" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=171508600]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, -0.42090273)
@@ -4159,14 +4113,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL055" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1770950534]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, -0.5490899)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL056" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=591444606]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, -0.6772773)
@@ -4175,14 +4127,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL057" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=203128178]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, -0.8054645)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL058" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1443303518]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.020717, 0.7693921, -0.9336517)
@@ -4191,14 +4141,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL059" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1931761422]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207169, 0.7693921, -1.0618389)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL060" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=9272823]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207169, 0.7693921, -1.1900263)
@@ -4207,14 +4155,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL061" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1401898618]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207169, 0.7693921, -1.3182137)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL062" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=364140294]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207169, 0.7693921, -1.4464009)
@@ -4223,14 +4169,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL063" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1536288320]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207169, 0.7693921, -1.5745881)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL064" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=688609198]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207169, 0.7693921, -1.7027752)
@@ -4239,14 +4183,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL065" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1900502384]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207169, 0.7693921, -1.8309624)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL066" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1450605511]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, -1.0207169, 0.7693921, -1.9591498)
@@ -4255,14 +4197,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL067" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=405035404]
 transform = Transform3D(1, 0, 0, 0, -0.9723696, -0.23344676, 0, 0.23344676, -0.9723696, -1.0207169, 0.7648133, -2.087043)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL068" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1943731386]
 transform = Transform3D(1, 0, 0, 0, -0.76040614, -0.6494479, 0, 0.6494479, -0.76040614, -1.0207169, 0.71133685, -2.2018895)
@@ -4271,14 +4211,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL069" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1408729886]
 transform = Transform3D(1, 0, 0, 0, -0.3826856, -0.9238786, 0, 0.9238786, -0.3826856, -1.0207169, 0.6092619, -2.2767918)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL070" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1855095630]
 transform = Transform3D(1, 0, 0, 0, 0.07845409, -0.9969178, 0, 0.9969178, 0.07845409, -1.0207169, 0.4836986, -2.2933445)
@@ -4287,14 +4225,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL071" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=567205003]
 transform = Transform3D(1, 0, 0, 0, 0.5224966, -0.8526414, 0, 0.8526414, 0.5224966, -1.0207169, 0.36550894, -2.2473867)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL072" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1418443678]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, -0.44838864, 0, 0.44838864, 0.8938387, -1.0207169, 0.28440508, -2.149702)
@@ -4303,14 +4239,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL073" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=2102169945]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, -0.44838864, 0, 0.44838864, 0.8938387, -1.0207169, 0.22692738, -2.0351233)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL074" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1672448793]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, -0.44838864, 0, 0.44838864, 0.8938387, -1.0207169, 0.16944967, -1.9205447)
@@ -4319,14 +4253,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackL075" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1407064033]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, -0.44838864, 0, 0.44838864, 0.8938387, -1.0207169, 0.11197196, -1.8059659)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackL076" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1582111109]
 transform = Transform3D(1, 0, 0, 0, 0.92387986, -0.38268265, 0, 0.38268265, 0.92387986, -1.0207169, 0.056137882, -1.6906357)
@@ -4335,14 +4267,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR001" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1403356580]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207171, 0.03023993, -1.4378127)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR002" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1972365726]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207171, 0.03023993, -1.3096254)
@@ -4351,14 +4281,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR003" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1271544012]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207171, 0.03023993, -1.1814382)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR004" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1219261676]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207171, 0.03023993, -1.0532509)
@@ -4367,14 +4295,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR005" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1486859778]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207171, 0.03023993, -0.9250636)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR006" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1016846361]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207171, 0.03023993, -0.7968764)
@@ -4383,14 +4309,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR007" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=621691507]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, -0.6686891)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR008" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=311907913]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, -0.54050183)
@@ -4399,14 +4323,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR009" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1944585300]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, -0.41231453)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR010" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=622172495]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, -0.28412724)
@@ -4415,14 +4337,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR011" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=2146311872]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, -0.15594006)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR012" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1928340700]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, -0.027752757)
@@ -4431,14 +4351,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR013" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1717787424]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, 0.10043442)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR014" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=430683853]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, 0.22862184)
@@ -4447,14 +4365,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR015" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1871243478]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, 0.35680914)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR016" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1323477183]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, 0.48499632)
@@ -4463,14 +4379,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR017" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1141143303]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, 0.61318374)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR018" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=61775806]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.020717, 0.03023993, 0.7413709)
@@ -4479,14 +4393,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR019" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1356624943]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207169, 0.03023993, 0.8695581)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR020" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1150943273]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207169, 0.03023993, 0.9977455)
@@ -4495,14 +4407,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR021" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=996630076]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207169, 0.03023993, 1.1259327)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR022" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1858847570]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207169, 0.03023993, 1.2541199)
@@ -4511,14 +4421,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR023" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1543663540]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207169, 0.03023993, 1.3823073)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR024" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1528340017]
 transform = Transform3D(1, 0, -7.612343e-08, 0, 1, 0, 0, 0, 1, 1.0207169, 0.03023993, 1.5104945)
@@ -4527,14 +4435,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR025" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=377120128]
 transform = Transform3D(1, 0, 0, 0, 0.9723699, 0.23344521, 0, -0.23344521, 0.9723699, 1.0207169, 0.039292395, 1.637927)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR026" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1397017458]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, 0.44838864, 0, -0.44838864, 0.8938387, 1.0207169, 0.08708389, 1.7563529)
@@ -4543,14 +4449,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR027" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1823546086]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, 0.44838864, 0, -0.44838864, 0.8938387, 1.0207169, 0.1445616, 1.8709316)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR028" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1206584336]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, 0.44838864, 0, -0.44838864, 0.8938387, 1.0207169, 0.20203933, 1.9855105)
@@ -4559,14 +4463,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR029" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=168499168]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, 0.44838864, 0, -0.44838864, 0.8938387, 1.0207169, 0.25951704, 2.100089)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR030" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1462674682]
 transform = Transform3D(1, 0, 0, 0, 0.76040643, 0.64944744, 0, -0.64944744, 0.76040643, 1.0207169, 0.3249438, 2.2097116)
@@ -4575,14 +4477,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR031" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1309709518]
 transform = Transform3D(1, 0, 0, 0, 0.3826856, 0.9238786, 0, -0.9238786, 0.3826856, 1.0207169, 0.4298417, 2.2807283)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR032" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=676230825]
 transform = Transform3D(1, 0, 0, 0, -0.23344676, 0.9723696, 0, -0.9723696, -0.23344676, 1.0207169, 0.55611867, 2.2922997)
@@ -4591,14 +4491,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR033" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1598470824]
 transform = Transform3D(1, 0, 0, 0, -0.6494496, 0.76040465, 0, -0.76040465, -0.6494496, 1.0207169, 0.67195135, 2.240759)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR034" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=608836044]
 transform = Transform3D(1, 0, 0, 0, -0.9238796, 0.38268304, 0, -0.38268304, -0.9238796, 1.0207169, 0.748611, 2.1399608)
@@ -4607,14 +4505,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR035" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1881095248]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207169, 0.7693921, 2.0146554)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR036" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1199033798]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207169, 0.7693921, 1.8864682)
@@ -4623,14 +4519,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR037" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1529360784]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207169, 0.7693921, 1.7582809)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR038" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=217337107]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207169, 0.7693921, 1.6300936)
@@ -4639,14 +4533,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR039" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=895657295]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207169, 0.7693921, 1.5019064)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR040" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=680608917]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207169, 0.7693921, 1.3737191)
@@ -4655,14 +4547,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR041" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1517244527]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207169, 0.7693921, 1.2455318)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR042" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1048044139]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207169, 0.7693921, 1.1173446)
@@ -4671,14 +4561,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR043" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=26558354]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, 0.9891572)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR044" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=304141547]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, 0.86097)
@@ -4687,14 +4575,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR045" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1405739318]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, 0.7327827)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR046" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1527492190]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, 0.60459554)
@@ -4703,14 +4589,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR047" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=2045454290]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, 0.47640812)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR048" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1810958118]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, 0.34822094)
@@ -4719,14 +4603,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR049" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1763903439]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, 0.22003376)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR050" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=239701261]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, 0.09184635)
@@ -4735,14 +4617,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR051" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=359494964]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, -0.036340952)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR052" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1954383900]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, -0.16452813)
@@ -4751,14 +4631,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR053" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=805003575]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, -0.2927153)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR054" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1776245886]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, -0.42090273)
@@ -4767,14 +4645,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR055" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1354367257]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, -0.5490899)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR056" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1791320911]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, -0.6772773)
@@ -4783,14 +4659,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR057" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1494341058]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, -0.8054645)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR058" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=9974410]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.020717, 0.7693921, -0.9336517)
@@ -4799,14 +4673,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR059" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1573842476]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207171, 0.7693921, -1.0618389)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR060" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=2141156474]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207171, 0.7693921, -1.1900263)
@@ -4815,14 +4687,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR061" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1054110652]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207171, 0.7693921, -1.3182137)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR062" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=755418823]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207171, 0.7693921, -1.4464009)
@@ -4831,14 +4701,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR063" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1709516011]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207171, 0.7693921, -1.5745881)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR064" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=466286133]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207171, 0.7693921, -1.7027752)
@@ -4847,14 +4715,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR065" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1200001694]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207171, 0.7693921, -1.8309624)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR066" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=649656065]
 transform = Transform3D(1, 0, 5.8401568e-08, 0, -1, 0, 0, 0, -1, 1.0207171, 0.7693921, -1.9591498)
@@ -4863,14 +4729,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR067" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=253528251]
 transform = Transform3D(1, 0, 0, 0, -0.9723696, -0.23344676, 0, 0.23344676, -0.9723696, 1.0207171, 0.7648133, -2.087043)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR068" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=913299031]
 transform = Transform3D(1, 0, 0, 0, -0.76040614, -0.6494479, 0, 0.6494479, -0.76040614, 1.0207171, 0.71133685, -2.2018895)
@@ -4879,14 +4743,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR069" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=174377216]
 transform = Transform3D(1, 0, 0, 0, -0.3826856, -0.9238786, 0, 0.9238786, -0.3826856, 1.0207171, 0.6092619, -2.2767918)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR070" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1515505489]
 transform = Transform3D(1, 0, 0, 0, 0.07845409, -0.9969178, 0, 0.9969178, 0.07845409, 1.0207171, 0.4836986, -2.2933445)
@@ -4895,14 +4757,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR071" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=256541229]
 transform = Transform3D(1, 0, 0, 0, 0.5224966, -0.8526414, 0, 0.8526414, 0.5224966, 1.0207171, 0.36550894, -2.2473867)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR072" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1719407200]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, -0.44838864, 0, 0.44838864, 0.8938387, 1.0207171, 0.28440508, -2.149702)
@@ -4911,14 +4771,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR073" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1348354334]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, -0.44838864, 0, 0.44838864, 0.8938387, 1.0207171, 0.22692738, -2.0351233)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR074" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=1870261707]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, -0.44838864, 0, 0.44838864, 0.8938387, 1.0207171, 0.16944967, -1.9205447)
@@ -4927,14 +4785,12 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="TrackR075" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=675096281]
 transform = Transform3D(1, 0, 0, 0, 0.8938387, -0.44838864, 0, 0.44838864, 0.8938387, 1.0207171, 0.11197196, -1.8059659)
 mesh = SubResource("ArrayMesh_kw7dj")
 surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
-
 
 [node name="TrackR076" type="MeshInstance3D" parent="Visual/Model/VehicleRig" unique_id=2010616891]
 transform = Transform3D(1, 0, 0, 0, 0.92387986, -0.38268265, 0, 0.38268265, 0.92387986, 1.0207171, 0.056137882, -1.6906357)
@@ -4943,48 +4799,72 @@ surface_material_override/0 = SubResource("StandardMaterial3D_uo756")
 surface_material_override/1 = SubResource("StandardMaterial3D_vxxeq")
 surface_material_override/2 = SubResource("StandardMaterial3D_oc7v2")
 
-
 [node name="Armor" type="Area3D" parent="." unique_id=1299066616]
 collision_layer = 4
 collision_mask = 0
 monitoring = false
 
-
 [node name="Hull" type="CollisionShape3D" parent="Armor" unique_id=2123001287]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
 shape = SubResource("BoxShape3D_sn1u3")
+script = ExtResource("3_4y5uo")
+front_mm = 115.0
+side_mm = 58.0
+rear_mm = 28.0
+roof_mm = 30.0
+underside_mm = 24.0
 metadata/part = "hull"
-
 
 [node name="LeftTrack" type="CollisionShape3D" parent="Armor" unique_id=2079657025]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.03, -0.13, 0)
 shape = SubResource("BoxShape3D_gbt28")
+script = ExtResource("3_4y5uo")
+part = "left_track"
+front_mm = 25.0
+side_mm = 25.0
+rear_mm = 25.0
+roof_mm = 25.0
+underside_mm = 25.0
 metadata/part = "left_track"
-
 
 [node name="RightTrack" type="CollisionShape3D" parent="Armor" unique_id=367122478]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.03, -0.13, 0)
 shape = SubResource("BoxShape3D_idu3n")
+script = ExtResource("3_4y5uo")
+part = "right_track"
+front_mm = 25.0
+side_mm = 25.0
+rear_mm = 25.0
+roof_mm = 25.0
+underside_mm = 25.0
 metadata/part = "right_track"
-
 
 [node name="Turret" type="CollisionShape3D" parent="Armor" unique_id=256725440]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9728, -0.057600003)
 shape = SubResource("BoxShape3D_lcwpt")
+script = ExtResource("3_4y5uo")
+part = "turret"
+front_mm = 95.0
+side_mm = 60.0
+rear_mm = 35.0
+roof_mm = 28.0
+underside_mm = 35.0
 metadata/part = "turret"
-
 
 [node name="Barrel" type="CollisionShape3D" parent="Armor" unique_id=723538954]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2792, -1.4948)
 shape = SubResource("BoxShape3D_p8143")
+script = ExtResource("3_4y5uo")
+part = "barrel"
+front_mm = 30.0
+side_mm = 30.0
+rear_mm = 30.0
+roof_mm = 30.0
+underside_mm = 30.0
 metadata/part = "barrel"
-
 
 [node name="Nameplate" type="Label3D" parent="." unique_id=1500518488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 pixel_size = 0.008
 billboard = 1
 font_size = 40
-
-[node name="CoaxMuzzle" type="Marker3D" parent="Visual/Model/VehicleRig/TurretPivot/BarrelPivot"]
-position = Vector3(0.44, 0.04, -0.85)

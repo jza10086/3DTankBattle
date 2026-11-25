@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="TankShellSpec" format=3]
+
+[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/shell_spec.gd" id="1"]
+[ext_resource type="Texture2D" path="res://games/minigame/GP_tank_war/assets/ui/shell_auto.svg" id="2"]
+[ext_resource type="PackedScene" path="res://games/minigame/GP_tank_war/ammo/models/autocannon_model.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"auto30_apds"
+ammo_code = 2
+display_name = "30 mm 机炮弹"
+short_label = "30mm"
+weapon_name = "双联 2A42  /  30 mm"
+shell_type = 0
+icon = ExtResource("2")
+fire_audio_cue = &"auto30"
+model_scene = ExtResource("3")
+model_scale = Vector3(1, 1, 1)
+caliber_mm = 30.0
+visual_radius = 0.028
+visual_length = 0.36
+tracer_color = Color(1, 0.84, 0.44, 1)
+impact_flash_size = 0.55
+impact_smoke_count = 4
+muzzle_velocity = 185.0
+gravity = 9.8
+drag_factor = 0.0
+max_lifetime = 6.0
+reload_time = 0.16
+automatic = true
+guided_missile = false
+guidance_turn_rate = 0.0
+recoil_impulse = 0.24
+camera_shake = 0.18
+penetration_mm = 78.0
+penetration_drop_per_100m = 14.0
+normalization_deg = 3.0
+ricochet_start_angle = 65.0
+ricochet_guaranteed_angle = 75.0
+overmatch_ratio = 7.0
+base_damage = 9.0
+spall_bonus_ratio = 0.2
+component_damage = true
+explosive = false
+splash_radius = 0.0
+splash_damage = 0.0
+splash_track_threshold = 4.0
+overpressure_penetration_mm = 0.0

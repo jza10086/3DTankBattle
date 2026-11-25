@@ -6,8 +6,8 @@ const TargetScript = preload("res://games/minigame/GP_tank_war/scripts/range_tar
 const ShellScript = preload("res://games/minigame/GP_tank_war/scripts/shell.gd")
 const CameraScript = preload("res://games/minigame/GP_tank_war/scripts/tank_camera.gd")
 const AudioScript = preload("res://games/minigame/GP_tank_war/scripts/combat_audio.gd")
-const Spec = preload("res://games/minigame/GP_tank_war/scripts/vehicle_spec.gd")
-const SPECS: Array[Spec] = [preload("res://games/minigame/GP_tank_war/vehicles/m1_abrams.tres"), preload("res://games/minigame/GP_tank_war/vehicles/bmpt.tres"), preload("res://games/minigame/GP_tank_war/vehicles/bradley.tres")]
+const DEFAULT_SPECS: Array[TankVehicleSpec] = [preload("res://games/minigame/GP_tank_war/vehicles/m1_abrams.tres"), preload("res://games/minigame/GP_tank_war/vehicles/bmpt.tres"), preload("res://games/minigame/GP_tank_war/vehicles/bradley.tres")]
+@export var vehicle_specs: Array[TankVehicleSpec] = [preload("res://games/minigame/GP_tank_war/vehicles/m1_abrams.tres"), preload("res://games/minigame/GP_tank_war/vehicles/bmpt.tres"), preload("res://games/minigame/GP_tank_war/vehicles/bradley.tres")]
 @export var camera: CameraScript
 @export var audio: AudioScript
 const Pages = preload("res://games/protocols/GP_default_protocol/round_pages.gd")
@@ -81,6 +81,7 @@ func _ready() -> void:
 	if api == null:
 		push_error("请从 GodotParty 大厅启动雷霆战争")
 		set_physics_process(false)
+		set_process(false)
 		set_process_unhandled_input(false)
 		return
 	_shell_spawner = MultiplayerSpawner.new()
@@ -91,9 +92,11 @@ func _ready() -> void:
 	add_to_group("party_minimal_hud")
 	hud = $GameHUD/RangeHUD
 	hud.game = self
+	if vehicle_specs.is_empty():
+		vehicle_specs.assign(DEFAULT_SPECS)
 	for index: int in players.size():
-		var vehicle: TankScript = SPECS[0].scene.instantiate()
-		vehicle.spec = SPECS[0]
+		var vehicle: TankScript = vehicle_specs[0].scene.instantiate()
+		vehicle.spec = vehicle_specs[0]
 		vehicle.name = "Tank%d" % index
 		add_child(vehicle)
 		vehicle.position = Vector3(0, 0.8, 18)
@@ -106,6 +109,7 @@ func _ready() -> void:
 			vehicle.position = Vector3(sin(angle) * 48.0, 0.8, cos(angle) * 48.0)
 			vehicle.rotation.y = angle
 		vehicle.start_transform = vehicle.transform
+		vehicle.snap_interpolation()
 		vehicle.nameplate.text = vehicle.player_name
 		vehicle.nameplate.hide()
 		vehicle.nameplate.modulate = Color(api.get_appearance(id).color)
@@ -119,10 +123,19 @@ func _ready() -> void:
 			target.queue_free()
 	tank = vehicles[local_id] if not local_id.is_empty() else vehicles[players[0].player_id]
 	camera.configure(tank, not local_id.is_empty())
-	for index: int in SPECS.size():
-		var button: Button = %VehicleCards.get_child(index)
-		button.text = "\n\n" + api.i18n.text(SPECS[index].name_key) + "\n" + api.i18n.text(SPECS[index].description_key).replace(" · ", "\n")
-		button.get_node("Silhouette").texture = SPECS[index].silhouette
+	var template_card: Button = %VehicleCards.get_child(0) as Button
+	while %VehicleCards.get_child_count() < vehicle_specs.size():
+		var extra_card: Button = template_card.duplicate() as Button
+		%VehicleCards.add_child(extra_card)
+	for index: int in %VehicleCards.get_child_count():
+		var button: Button = %VehicleCards.get_child(index) as Button
+		if index >= vehicle_specs.size():
+			button.hide()
+			continue
+		button.show()
+		var item_spec: TankVehicleSpec = vehicle_specs[index]
+		button.text = "\n\n" + api.i18n.text(item_spec.resolved_name_key()) + "\n" + api.i18n.text(item_spec.resolved_description_key()).replace(" · ", "\n")
+		button.get_node("Silhouette").texture = item_spec.silhouette
 		button.pressed.connect(select_vehicle.bind(index))
 	assert(pages != null, "Assign ProtocolPages in the game scene")
 	var error: Error = pages.prepare(self, api, request, _begin_selection)
@@ -188,7 +201,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if api.input.event_matches(event, &"tank_sight"):
 		camera.set_first_person(not camera.first_person)
 	elif api.input.event_matches(event, &"tank_ammunition"):
-		_requested_ammunition = tank.spec.weapons[1] if _requested_ammunition == tank.spec.weapons[0] else tank.spec.weapons[0]
+		var codes: Array[int] = tank.weapon_codes()
+		if not codes.is_empty():
+			var current_idx: int = codes.find(_requested_ammunition)
+			_requested_ammunition = codes[(current_idx + 1) % codes.size()]
 		_input_clock = INPUT_INTERVAL
 	elif api.input.event_matches(event, &"tank_fire"):
 		_pending_fire = true
@@ -196,6 +212,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		_pending_recover = true
 	elif api.input.event_matches(event, &"tank_center"):
 		camera.center_on_vehicle()
+
+func _process(delta: float) -> void:
+	if not started or finished:
+		return
+	for vehicle: TankScript in vehicles.values():
+		vehicle.apply_render_interpolation()
+	var blocked: bool = api.input.input_blocked or not _focused
+	camera.coax_active = not blocked and not local_id.is_empty() and not tank.dead and not combat_ended and api.input.is_pressed(&"tank_machine_gun")
+	camera.render_update(delta)
+	hud.queue_redraw()
 
 func _physics_process(delta: float) -> void:
 	if not started or finished:
@@ -271,7 +297,7 @@ func _send_input(blocked: bool) -> void:
 		steer = float(api.input.is_pressed(&"move_left")) - float(api.input.is_pressed(&"move_right"))
 	var data: Dictionary = {"seq": _input_sequence, "drive": drive, "steer": steer,
 		"brake": blocked or api.input.is_pressed(&"tank_brake"), "aim": tank.aim_point,
-		"direction_mode": camera.first_person, "direction": tank.requested_gun_direction,
+		"direction_mode": tank.aim_direction_mode, "direction": tank.requested_gun_direction,
 		"automatic": DamageModel.is_automatic(_requested_ammunition) and api.input.is_pressed(&"tank_fire") and not blocked,
 		"machine_gun": api.input.is_pressed(&"tank_machine_gun") and not blocked, "ammunition": _requested_ammunition}
 	if api.is_host():
@@ -284,7 +310,7 @@ func _send_input(blocked: bool) -> void:
 	if (_pending_fire or _pending_recover) and not blocked:
 		_action_sequence += 1
 		var action: Dictionary = {"seq": _action_sequence, "fire": _pending_fire, "recover": _pending_recover,
-			"ammunition": _requested_ammunition, "aim": tank.aim_point, "direction_mode": camera.first_person,
+			"ammunition": _requested_ammunition, "aim": tank.aim_point, "direction_mode": tank.aim_direction_mode,
 			"direction": tank.requested_gun_direction}
 		var error: Error = api.net.send_to_host(&"tank_action", action)
 		if error != OK:
@@ -336,7 +362,7 @@ func _message(sender: Dictionary, topic: StringName, payload: Variant) -> void:
 func _accept_input(id: String, data: Dictionary) -> void:
 	if combat_ended:
 		return
-	if not data.get("ammunition") is int or data.ammunition not in vehicles[id].spec.weapons:
+	if not data.get("ammunition") is int or data.ammunition not in vehicles[id].weapon_codes():
 		return
 	if not data.get("seq") is int or data.seq <= commands[id].sequence:
 		return
@@ -373,8 +399,9 @@ func _fire_vehicle(id: String) -> void:
 	if not vehicle.begin_fire():
 		return
 	_shot_id += 1
+	var active_spec: TankShellSpec = vehicle.ammo_spec()
 	var origin: Vector3 = vehicle.shot_muzzle().global_position
-	var velocity: Vector3 = vehicle.muzzle_direction() * DamageModel.shell_speed(vehicle.ammunition)
+	var velocity: Vector3 = vehicle.muzzle_direction() * active_spec.muzzle_velocity
 	_spawn_shell(_shot_id, id, origin, velocity, vehicle.ammunition)
 
 func _fire_machine_gun(id: String) -> void:
@@ -382,9 +409,10 @@ func _fire_machine_gun(id: String) -> void:
 	if combat_ended or withdrawn.has(id) or not vehicle.begin_machine_gun_fire():
 		return
 	_shot_id += 1
+	var coax_spec: TankShellSpec = vehicle.coax_ammo_spec()
 	var origin: Vector3 = vehicle.coax_muzzle.global_position
-	var velocity: Vector3 = -vehicle.coax_muzzle.global_basis.z.normalized() * DamageModel.shell_speed(DamageModel.Ammo.MG)
-	_spawn_shell(_shot_id, id, origin, velocity, DamageModel.Ammo.MG)
+	var velocity: Vector3 = -vehicle.coax_muzzle.global_basis.z.normalized() * coax_spec.muzzle_velocity
+	_spawn_shell(_shot_id, id, origin, velocity, coax_spec.ammo_code)
 
 func _spawn_shell(id: int, player: String, origin: Vector3, velocity: Vector3, ammunition: int) -> void:
 	var shell: Node = _shell_spawner.spawn({"id": id, "player": player, "position": origin, "velocity": velocity,
@@ -407,13 +435,15 @@ func _make_shell(data: Variant) -> Node:
 	if shell.authoritative:
 		shell.damage_targets.assign(vehicles.values() + targets)
 	shell.shooter = vehicles[data.player]
+	shell.spec = shell.shooter.ammo_spec_for(data.ammunition)
 	shell.velocity = data.velocity
-	var delay: float = 0.0 if api.is_host() else clampf(float(api.net.host_time_msec() - data.at_msec) / 1000.0, 0.0, 8.0)
-	var gravity: float = DamageModel.gravity(shell.ammunition)
+	var delay: float = 0.0 if api.is_host() else clampf(float(api.net.host_time_msec() - data.at_msec) / 1000.0, 0.0, shell.spec.max_lifetime)
+	var gravity: float = shell.spec.gravity
 	var position_value: Vector3 = data.position + data.velocity * delay + Vector3.DOWN * gravity * delay * delay * 0.5
 	shell.position = to_local(position_value)
 	shell.velocity.y -= gravity * delay
 	shell.age = delay
+	shell.distance_traveled = data.position.distance_to(position_value)
 	shell.network_position = position_value
 	shell.network_velocity = shell.velocity
 	shell.configure_guidance()
@@ -429,11 +459,12 @@ func _present_shell(shell: ShellScript, data: Dictionary) -> void:
 		shell.hide()
 		shell.set_physics_process(false)
 		return
-	var automatic: bool = DamageModel.is_automatic(data.ammunition)
+	var shell_spec: TankShellSpec = shell.spec if shell.spec != null else DamageModel.get_spec(data.ammunition)
 	if data.player == local_id:
-		camera.shot_shake = maxf(camera.shot_shake, 0.035 if data.ammunition == DamageModel.Ammo.MG else (0.18 if automatic else 1.0))
+		camera.shot_shake = maxf(camera.shot_shake, shell_spec.camera_shake)
 	audio.fire(data.ammunition, data.position, shell)
-	_emit_effect(data.position, Color("ffdb7c"), 0.12 if data.ammunition == DamageModel.Ammo.MG else (0.3 if camera.first_person and data.player == local_id else 0.9), 0.12, Vector3.ZERO)
+	var flash_size: float = 0.12 if shell_spec.shell_type == TankShellSpec.ShellType.MG else (0.3 if camera.first_person and data.player == local_id else clampf(shell_spec.caliber_mm / 115.0, 0.35, 1.0))
+	_emit_effect(data.position, shell_spec.tracer_color, flash_size, 0.12, Vector3.ZERO)
 
 func _shell_impact(point: Vector3, normal: Vector3, contacts: Array[Dictionary], id: int, player: String, ammunition: int) -> void:
 	var feedback: Array[Dictionary] = []
@@ -481,9 +512,16 @@ func _impact_effect(point: Vector3, normal: Vector3, player: String, feedback: A
 			if entry.kind in ["hit", "disabled", "kill"]: hit_flash = 0.4
 		while feedbacks.size() > 4:
 			feedbacks.pop_front()
-	var explosive: bool = DamageModel.is_explosive(ammunition)
-	_emit_effect(point + normal * 0.2, Color("ffca67"), 2.8 if explosive else 0.8, 0.25 if explosive else 0.12, Vector3.ZERO)
-	for i: int in (14 if explosive else 6):
+	var shell_spec: TankShellSpec = DamageModel.get_spec(ammunition)
+	var explosive: bool = shell_spec.explosive
+	if surface == &"ricochet":
+		_emit_effect(point + normal * 0.15, Color("fff4b8"), 0.55, 0.14, Vector3.ZERO)
+		for i: int in 6:
+			var spark_vel: Vector3 = normal * randf_range(3.0, 8.0) + Vector3(randf_range(-4.0, 4.0), randf_range(1.0, 6.0), randf_range(-4.0, 4.0))
+			_emit_effect(point, Color("ffd87a"), 0.14, randf_range(0.2, 0.45), spark_vel)
+		return
+	_emit_effect(point + normal * 0.2, Color("ffca67"), shell_spec.impact_flash_size, 0.25 if explosive else 0.12, Vector3.ZERO)
+	for i: int in shell_spec.impact_smoke_count:
 		_emit_effect(point, Color("746e57"), randf_range(0.4, 1.1) if explosive else randf_range(0.15, 0.4), randf_range(0.7, 1.5), Vector3(randf_range(-3, 3), randf_range(0.4, 5), randf_range(-3, 3)))
 
 func _publish() -> void:
@@ -496,7 +534,11 @@ func _publish() -> void:
 		var previous: Dictionary = _published_facts.get(id, {})
 		var changed: Dictionary = {}
 		for key: String in current:
-			var same_deadline: bool = key.ends_with("_end") and previous.has(key) and current[key] > 0 and previous[key] > 0 and absi(current[key] - previous[key]) < 100
+			var same_deadline: bool = false
+			if key == "weapon_reload_ends":
+				same_deadline = _same_reload_deadlines(previous.get(key), current[key])
+			elif key.ends_with("_end"):
+				same_deadline = previous.has(key) and current[key] > 0 and previous[key] > 0 and absi(current[key] - previous[key]) < 100
 			if not same_deadline and (not previous.has(key) or previous[key] != current[key]):
 				changed[key] = current[key]
 		if not changed.is_empty():
@@ -658,14 +700,14 @@ func select_vehicle(index: int) -> void:
 		return
 	selection_sent = true
 	for button: Button in %VehicleCards.get_children(): button.disabled = true
-	%SelectionStatus.text = api.i18n.text("selection.waiting", {"vehicle": api.i18n.text(SPECS[index].name_key)})
+	%SelectionStatus.text = api.i18n.text("selection.waiting", {"vehicle": api.i18n.text(vehicle_specs[index].resolved_name_key())})
 	_network_failure(api.net.send_to_host(&"tank_selection", {"kind": "choose", "vehicle": index}))
 
 func _selection_message(sender: Dictionary, payload: Variant) -> void:
 	if not payload is Dictionary:
 		return
 	if api.is_host() and payload.get("kind") == "choose":
-		if not payload.get("vehicle") is int or payload.vehicle < 0 or payload.vehicle >= SPECS.size():
+		if not payload.get("vehicle") is int or payload.vehicle < 0 or payload.vehicle >= vehicle_specs.size():
 			return
 		for player: Dictionary in api.get_players():
 			if player.connected and player.peer_id == sender.peer_id and player.player_id in sender.player_ids and not vehicle_choices.has(player.player_id):
@@ -678,7 +720,7 @@ func _selection_message(sender: Dictionary, payload: Variant) -> void:
 			return
 		for player: Dictionary in players:
 			var value: Variant = payload.choices.get(player.player_id)
-			if not value is int or value < 0 or value >= SPECS.size():
+			if not value is int or value < 0 or value >= vehicle_specs.size():
 				_network_failure(ERR_INVALID_DATA)
 				return
 		vehicle_choices.assign(payload.choices)
@@ -702,15 +744,18 @@ func _deploy_vehicles() -> void:
 	for id: String in vehicles:
 		var previous: TankScript = vehicles[id]
 		var index: int = vehicle_choices[id]
-		var vehicle: TankScript = SPECS[index].scene.instantiate()
-		vehicle.spec = SPECS[index]
+		var chosen_spec: TankVehicleSpec = vehicle_specs[index]
+		var vehicle: TankScript = chosen_spec.scene.instantiate()
+		vehicle.spec = chosen_spec
 		vehicle.vehicle_index = index
 		vehicle.transform = previous.transform
 		vehicle.player_id = previous.player_id
 		vehicle.player_name = previous.player_name
-		vehicle.hp = previous.hp
 		vehicle.dead = previous.dead
 		add_child(vehicle)
+		vehicle.max_hp = vehicle.configured_max_hp()
+		vehicle.hp = 0.0 if vehicle.dead else vehicle.max_hp
+		vehicle.snap_interpolation()
 		vehicle.nameplate.text = previous.nameplate.text
 		vehicle.nameplate.modulate = previous.nameplate.modulate
 		vehicle.nameplate.hide()
@@ -729,7 +774,7 @@ func _deploy_vehicles() -> void:
 func _accept_action(id: String, data: Dictionary) -> void:
 	if combat_ended or vehicles[id].dead or not data.get("seq") is int or data.seq <= int(_action_sequences.get(id, 0)):
 		return
-	if not data.get("fire") is bool or not data.get("recover") is bool or not data.get("ammunition") is int or data.ammunition not in vehicles[id].spec.weapons or not data.get("direction_mode") is bool:
+	if not data.get("fire") is bool or not data.get("recover") is bool or not data.get("ammunition") is int or data.ammunition not in vehicles[id].weapon_codes() or not data.get("direction_mode") is bool:
 		return
 	if not data.get("aim") is Vector3 or not data.aim.is_finite() or data.aim.length() > 2000.0 or not data.get("direction") is Vector3 or not data.direction.is_finite() or data.direction.length_squared() < 0.5 or data.direction.length_squared() > 1.5:
 		return
@@ -743,6 +788,23 @@ func _accept_action(id: String, data: Dictionary) -> void:
 	if data.recover and players.size() == 1:
 		vehicle.reset_vehicle()
 
+func _same_reload_deadlines(prev_val: Variant, curr_val: Variant) -> bool:
+	if not (prev_val is Dictionary and curr_val is Dictionary):
+		return false
+	if prev_val.size() != curr_val.size():
+		return false
+	for code: Variant in curr_val:
+		if not prev_val.has(code):
+			return false
+		var prev_ms: int = int(prev_val[code])
+		var curr_ms: int = int(curr_val[code])
+		if prev_ms == curr_ms:
+			continue
+		if prev_ms > 0 and curr_ms > 0 and absi(curr_ms - prev_ms) < 100:
+			continue
+		return false
+	return true
+
 func _receive_facts(payload: Dictionary) -> void:
 	if not payload.get("vehicles") is Dictionary or not payload.get("targets") is Dictionary:
 		return
@@ -751,10 +813,22 @@ func _receive_facts(payload: Dictionary) -> void:
 			return
 		if not _combat_facts.has(id):
 			_combat_facts[id] = {}
+		var allowed_codes: Array[int] = vehicles[id].weapon_codes()
 		for key: String in payload.vehicles[id]:
 			var value: Variant = payload.vehicles[id][key]
+			if key == "weapon_reload_ends":
+				if not value is Dictionary:
+					return
+				for code_key: Variant in value:
+					if not code_key is int or int(code_key) not in allowed_codes:
+						return
+					var deadline: Variant = value[code_key]
+					if not deadline is int or int(deadline) < 0:
+						return
+				_combat_facts[id][key] = value.duplicate()
+				continue
 			if key.ends_with("_end"):
-				if key not in ["engine_end", "left_track_end", "right_track_end", "barrel_end", "reload_end", "mg_reload_end"] or not value is int or value < 0:
+				if key not in ["engine_end", "left_track_end", "right_track_end", "barrel_end", "mg_reload_end"] or not value is int or value < 0:
 					return
 			elif key == "dead":
 				if not value is bool:
@@ -763,14 +837,15 @@ func _receive_facts(payload: Dictionary) -> void:
 				if not (value is float or value is int) or not is_finite(float(value)) or value < 0:
 					return
 			elif key in ["kills", "rounds_fired", "ammunition", "mg_rounds", "mg_shots_fired"]:
-				if not value is int or value < 0 or (key == "ammunition" and value not in vehicles[id].spec.weapons):
+				if not value is int or value < 0 or (key == "ammunition" and value not in allowed_codes):
 					return
 			else:
 				return
 			_combat_facts[id][key] = value
-			if not key.ends_with("_end"):
+			if key == "ammunition":
+				vehicles[id].sync_active_ammunition(int(value))
+			elif not key.ends_with("_end"):
 				vehicles[id].set(key, value)
-		vehicles[id].components.reload_duration = DamageModel.reload_duration(vehicles[id].ammunition)
 	for index: Variant in payload.targets:
 		if not index is int or index < 0 or index >= targets.size() or not (payload.targets[index] is float or payload.targets[index] is int) or not is_finite(float(payload.targets[index])):
 			return
@@ -799,6 +874,18 @@ func _advance_remote_timers() -> void:
 		var vehicle: TankScript = vehicles[id]
 		var facts: Dictionary = _combat_facts[id]
 		for part: String in ["engine", "left_track", "right_track", "barrel"]:
-			vehicle.components.set(part + "_remaining", maxf(0.0, float(facts[part + "_end"] - now) / 1000.0))
-		vehicle.components.reload_remaining = maxf(0.0, float(facts.reload_end - now) / 1000.0 - vehicle.components.barrel_remaining)
-		vehicle.mg_reload_remaining = maxf(0.0, float(facts.mg_reload_end - now) / 1000.0)
+			vehicle.components.set(part + "_remaining", maxf(0.0, float(int(facts.get(part + "_end", 0)) - now) / 1000.0))
+		var reload_ends: Variant = facts.get("weapon_reload_ends", {})
+		if reload_ends is Dictionary:
+			var updated_slots: Dictionary[StringName, bool] = {}
+			for code_key: Variant in reload_ends:
+				var code: int = int(code_key)
+				var slot: StringName = vehicle.reload_slot_for(code)
+				if updated_slots.has(slot):
+					continue
+				updated_slots[slot] = true
+				var deadline: int = int(reload_ends[code_key])
+				var barrel_offset: float = vehicle.components.barrel_remaining if vehicle.components.is_weapon_affected_by_barrel(slot) else 0.0
+				var remaining: float = maxf(0.0, float(deadline - now) / 1000.0 - barrel_offset) if deadline > 0 else 0.0
+				vehicle.components.set_weapon_reload_remaining(slot, remaining)
+		vehicle.mg_reload_remaining = maxf(0.0, float(int(facts.get("mg_reload_end", 0)) - now) / 1000.0)

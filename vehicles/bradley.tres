@@ -1,18 +1,43 @@
-[gd_resource type="Resource" script_class="" format=3]
+[gd_resource type="Resource" script_class="TankVehicleSpec" format=3]
 
 [ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/vehicle_spec.gd" id="spec"]
+[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/shell_spec.gd" id="shell_script"]
 [ext_resource type="PackedScene" path="res://games/minigame/GP_tank_war/vehicles/bradley.tscn" id="model"]
 [ext_resource type="Texture2D" path="res://games/minigame/GP_tank_war/assets/ui/bradley_silhouette.svg" id="icon"]
+[ext_resource type="Texture2D" path="res://games/minigame/GP_tank_war/assets/ui/autocannon.svg" id="gun_icon"]
+[ext_resource type="Texture2D" path="res://games/minigame/GP_tank_war/assets/ui/missile_launcher.svg" id="launcher_icon"]
+[ext_resource type="Resource" path="res://games/minigame/GP_tank_war/ammo/auto25_apds.tres" id="ammo_0"]
+[ext_resource type="Resource" path="res://games/minigame/GP_tank_war/ammo/atgm_tow.tres" id="ammo_1"]
+[ext_resource type="Resource" path="res://games/minigame/GP_tank_war/ammo/mg_762.tres" id="ammo_mg"]
 
 [resource]
 script = ExtResource("spec")
+id = &"bradley"
+display_name = ""
+description = ""
 name_key = &"vehicle.bradley.name"
 description_key = &"vehicle.bradley.description"
 scene = ExtResource("model")
 silhouette = ExtResource("icon")
+gun_icon = ExtResource("gun_icon")
+launcher_icon = ExtResource("launcher_icon")
+max_hp = 85.0
+armor_scale = 0.45
+damage_multiplier = 1.15
+max_speed = 16.5
+reverse_speed = 6.8
+acceleration = 5.6
+braking = 13.5
+coast_deceleration = 3.0
+pivot_turn_rate = 1.25
+move_turn_rate = 0.65
+yaw_acceleration = 2.8
+traverse_rate = 0.98
+elevation_rate = 0.72
+min_depression_deg = -9.0
+max_elevation_deg = 30.0
 weapons = Array[int]([3, 5])
-max_speed = 16.0
-reverse_speed = 6.5
-acceleration = 5.2
-traverse_rate = 0.95
-damage_multiplier = 1.4
+ammo_specs = Array[ExtResource("shell_script")]([ExtResource("ammo_0"), ExtResource("ammo_1")])
+coax_ammo = ExtResource("ammo_mg")
+mg_belt_size = 100
+mg_reload_seconds = 4.0

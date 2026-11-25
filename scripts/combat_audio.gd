@@ -21,7 +21,7 @@ var _serial: int = 0
 var _pending_starts: Dictionary[AudioStreamPlayer3D, Dictionary] = {}
 var _local: Tank
 var _hp: float
-var _reload: float
+var _weapon_reloads: Dictionary[StringName, float] = {}
 var _mg_reload: float
 var _disabled: bool = false
 
@@ -49,7 +49,12 @@ func start(vehicles: Array[Tank], local_vehicle: Tank) -> void:
 	AudioServer.add_bus_effect(AudioServer.get_bus_index(alarm.bus), peak_limiter)
 	if _local != null:
 		_hp = _local.hp
-		_reload = _local.reload_remaining
+		_weapon_reloads.clear()
+		for code: int in _local.weapon_codes():
+			var w_spec: TankShellSpec = _local.ammo_spec_for(code)
+			if not w_spec.automatic:
+				var slot: StringName = w_spec.resolved_reload_slot()
+				_weapon_reloads[slot] = _local.weapon_reload_remaining_for(code)
 		_mg_reload = _local.mg_reload_remaining
 
 ## Freeze continuous sources at the outcome, retaining the final hit/explosion
@@ -85,17 +90,29 @@ func advance(delta: float) -> void:
 	if _disabled and not disabled and not _local.dead:
 		scope.play_sfx(cues[&"repair"])
 	_disabled = disabled
-	var warning: bool = not _local.dead and (disabled or _local.hp <= 25.0)
+	var warning: bool = not _local.dead and (disabled or _local.hp <= _local.max_hp * 0.25)
 	if warning and not alarm.playing:
 		alarm.play()
 		scope.route_player(alarm, PartyGameAudio.Category.SFX)
 	elif not warning:
 		alarm.stop()
 	if not _local.dead:
-		if not Damage.is_automatic(_local.ammunition):
-			_reload_feedback(_reload, _local.reload_remaining)
+		var checked_slots: Dictionary[StringName, bool] = {}
+		for code: int in _local.weapon_codes():
+			var w_spec: TankShellSpec = _local.ammo_spec_for(code)
+			if w_spec.automatic:
+				continue
+			var slot: StringName = w_spec.resolved_reload_slot()
+			if checked_slots.has(slot):
+				continue
+			checked_slots[slot] = true
+			var current: float = _local.weapon_reload_remaining_for(code)
+			var previous: float = float(_weapon_reloads.get(slot, current))
+			_reload_feedback(previous, current)
+			_weapon_reloads[slot] = current
 		_reload_feedback(_mg_reload, _local.mg_reload_remaining)
-	_reload = _local.reload_remaining
+	else:
+		_weapon_reloads.clear()
 	_mg_reload = _local.mg_reload_remaining
 
 func _reload_feedback(previous: float, current: float) -> void:
@@ -107,9 +124,9 @@ func _reload_feedback(previous: float, current: float) -> void:
 func fire(ammunition: int, origin: Vector3, projectile: Node3D) -> void:
 	if not active:
 		return
-	var names: Array[StringName] = [&"cannon", &"cannon_he", &"auto30", &"auto25", &"ataka", &"tow", &"machine_gun"]
-	play_at(names[ammunition], origin)
-	if active and Damage.is_missile(ammunition):
+	var shell_spec: TankShellSpec = Damage.get_spec(ammunition)
+	play_at(shell_spec.fire_audio_cue, origin)
+	if active and shell_spec.guided_missile:
 		var motor: AudioStreamPlayer3D = AudioStreamPlayer3D.new()
 		var cue: PartyAudioCue = cues[&"missile_motor"]
 		motor.stream = cue.playback_stream()

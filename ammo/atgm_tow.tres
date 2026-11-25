@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="TankShellSpec" format=3]
+
+[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/shell_spec.gd" id="1"]
+[ext_resource type="Texture2D" path="res://games/minigame/GP_tank_war/assets/ui/missile.svg" id="2"]
+[ext_resource type="PackedScene" path="res://games/minigame/GP_tank_war/ammo/models/atgm_model.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"atgm_tow"
+ammo_code = 5
+display_name = "TOW 导弹"
+short_label = "TOW"
+weapon_name = "TOW  /  反坦克导弹"
+shell_type = 3
+icon = ExtResource("2")
+fire_audio_cue = &"tow"
+model_scene = ExtResource("3")
+model_scale = Vector3(1.12, 1.12, 1.08)
+caliber_mm = 152.0
+visual_radius = 0.09
+visual_length = 0.84
+tracer_color = Color(1, 0.88, 0.5, 1)
+impact_flash_size = 2.8
+impact_smoke_count = 14
+muzzle_velocity = 50.0
+gravity = 0.0
+drag_factor = 0.0
+max_lifetime = 8.0
+reload_time = 8.5
+automatic = false
+guided_missile = true
+guidance_turn_rate = 2.4
+recoil_impulse = 0.65
+camera_shake = 0.75
+penetration_mm = 340.0
+penetration_drop_per_100m = 0.0
+normalization_deg = 0.0
+ricochet_start_angle = 74.0
+ricochet_guaranteed_angle = 82.0
+overmatch_ratio = 7.0
+base_damage = 82.0
+spall_bonus_ratio = 0.15
+component_damage = true
+explosive = true
+splash_radius = 3.8
+splash_damage = 30.0
+splash_track_threshold = 4.0
+overpressure_penetration_mm = 28.0

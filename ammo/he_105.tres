@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="TankShellSpec" format=3]
+
+[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/shell_spec.gd" id="1"]
+[ext_resource type="Texture2D" path="res://games/minigame/GP_tank_war/assets/ui/shell_he.svg" id="2"]
+[ext_resource type="PackedScene" path="res://games/minigame/GP_tank_war/ammo/models/he_model.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"he_105"
+ammo_code = 1
+display_name = "高爆弹"
+short_label = "HE"
+weapon_name = "M68A1  /  105 mm"
+shell_type = 2
+icon = ExtResource("2")
+fire_audio_cue = &"cannon_he"
+model_scene = ExtResource("3")
+model_scale = Vector3(1, 1, 1)
+caliber_mm = 105.0
+visual_radius = 0.055
+visual_length = 0.42
+tracer_color = Color(1, 0.72, 0.32, 1)
+impact_flash_size = 2.8
+impact_smoke_count = 14
+muzzle_velocity = 88.0
+gravity = 9.8
+drag_factor = 0.0
+max_lifetime = 8.0
+reload_time = 4.0
+automatic = false
+guided_missile = false
+guidance_turn_rate = 0.0
+recoil_impulse = 1.0
+camera_shake = 1.0
+penetration_mm = 38.0
+penetration_drop_per_100m = 0.0
+normalization_deg = 0.0
+ricochet_start_angle = 84.0
+ricochet_guaranteed_angle = 89.0
+overmatch_ratio = 7.0
+base_damage = 64.0
+spall_bonus_ratio = 0.2
+component_damage = true
+explosive = true
+splash_radius = 4.5
+splash_damage = 34.0
+splash_track_threshold = 4.0
+overpressure_penetration_mm = 38.0

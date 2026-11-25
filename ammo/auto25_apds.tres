@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="TankShellSpec" format=3]
+
+[ext_resource type="Script" path="res://games/minigame/GP_tank_war/scripts/shell_spec.gd" id="1"]
+[ext_resource type="Texture2D" path="res://games/minigame/GP_tank_war/assets/ui/shell_auto.svg" id="2"]
+[ext_resource type="PackedScene" path="res://games/minigame/GP_tank_war/ammo/models/autocannon_model.tscn" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"auto25_apds"
+ammo_code = 3
+display_name = "25 mm 机炮弹"
+short_label = "25mm"
+weapon_name = "M242  /  25 mm"
+shell_type = 0
+icon = ExtResource("2")
+fire_audio_cue = &"auto25"
+model_scene = ExtResource("3")
+model_scale = Vector3(0.88, 0.88, 0.92)
+caliber_mm = 25.0
+visual_radius = 0.024
+visual_length = 0.32
+tracer_color = Color(1, 0.82, 0.42, 1)
+impact_flash_size = 0.5
+impact_smoke_count = 4
+muzzle_velocity = 170.0
+gravity = 9.8
+drag_factor = 0.0
+max_lifetime = 6.0
+reload_time = 0.24
+automatic = true
+guided_missile = false
+guidance_turn_rate = 0.0
+recoil_impulse = 0.24
+camera_shake = 0.16
+penetration_mm = 72.0
+penetration_drop_per_100m = 13.0
+normalization_deg = 3.0
+ricochet_start_angle = 65.0
+ricochet_guaranteed_angle = 75.0
+overmatch_ratio = 7.0
+base_damage = 11.0
+spall_bonus_ratio = 0.2
+component_damage = true
+explosive = false
+splash_radius = 0.0
+splash_damage = 0.0
+splash_track_threshold = 4.0
+overpressure_penetration_mm = 0.0

@@ -8,6 +8,7 @@ const Collider = preload("res://games/minigame/GP_tank_war/scripts/target_collid
 @export var colliders: Array[Collider]
 @export var index: int = 0
 @export var model_name: String = ""
+@export var armor_scale: float = 1.0
 var max_hp: float = 100.0
 var hp: float = 100.0
 var components: ComponentStatusScript = ComponentStatusScript.new()
@@ -103,8 +104,12 @@ func component_from_hit(world_point: Vector3, world_normal: Vector3, shape_index
 		return &"engine"
 	return &""
 
-func apply_shell_hit(world_point: Vector3, world_normal: Vector3, incoming_direction: Vector3, shape_index: int = -1, ammunition: int = DamageModel.Ammo.AP) -> Dictionary:
-	var result: Dictionary = DamageModel.evaluate(_part_for_shape(shape_index), global_basis, world_normal, incoming_direction, ammunition)
+func get_armor_scale() -> float:
+	return armor_scale
+
+func apply_shell_hit(world_point: Vector3, world_normal: Vector3, incoming_direction: Vector3, shape_index: int = -1, ammunition: int = DamageModel.Ammo.AP, travel_distance: float = 0.0, shell_spec: TankShellSpec = null) -> Dictionary:
+	var active_spec: TankShellSpec = shell_spec if shell_spec != null else DamageModel.get_spec(ammunition)
+	var result: Dictionary = DamageModel.evaluate_spec(active_spec, _part_for_shape(shape_index), global_basis, world_normal, incoming_direction, travel_distance, armor_scale, false)
 	result["hp"] = hp
 	result["max_hp"] = max_hp
 	result["point"] = world_point
@@ -124,7 +129,7 @@ func apply_shell_hit(world_point: Vector3, world_normal: Vector3, incoming_direc
 	result["hp"] = hp
 	result["destroyed"] = dead
 	# Ricochets/invalid/dead contacts neither apply nor refresh component timers.
-	if applied > 0.0 and not dead and not bool(result.ricochet) and ammunition != DamageModel.Ammo.MG:
+	if applied > 0.0 and not dead and not bool(result.ricochet) and active_spec.component_damage:
 		var component: StringName = component_from_hit(world_point, world_normal, shape_index)
 		if not component.is_empty():
 			result.disabled = not components.is_disabled(component)
@@ -173,14 +178,14 @@ func reset_target() -> void:
 	for collider: Collider in colliders:
 		collider.transform = global_transform.affine_inverse() * collider.source_mesh.global_transform
 
-func apply_blast_hit(origin: Vector3, amount: float) -> Dictionary:
+func apply_blast_hit(origin: Vector3, amount: float, track_threshold: float = 4.0) -> Dictionary:
 	var result: Dictionary = {"damage": 0.0, "destroyed": false, "component": "", "disabled": false}
 	if dead:
 		return result
 	result.damage = minf(hp, amount)
 	damage(result.damage)
 	result.destroyed = dead
-	if not dead and amount >= 4.0:
+	if not dead and amount >= track_threshold:
 		var component: StringName = &"left_track" if to_local(origin).x < 0.0 else &"right_track"
 		result.disabled = not components.is_disabled(component)
 		components.apply_component(component)

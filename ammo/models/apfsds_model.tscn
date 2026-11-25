@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="MatBody"]
+albedo_color = Color(0.28, 0.3, 0.32, 1)
+metallic = 0.85
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="MatTracer"]
+shading_mode = 0
+albedo_color = Color(1, 0.96, 0.72, 1)
+
+[sub_resource type="CylinderMesh" id="RodMesh"]
+top_radius = 0.008
+bottom_radius = 0.022
+height = 0.48
+radial_segments = 8
+
+[sub_resource type="BoxMesh" id="FinMesh"]
+size = Vector3(0.11, 0.012, 0.14)
+
+[sub_resource type="SphereMesh" id="TracerMesh"]
+radius = 0.042
+height = 0.24
+radial_segments = 8
+rings = 4
+
+[node name="ApfsdsModel" type="Node3D"]
+
+[node name="Penetrator" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, -0.06)
+mesh = SubResource("RodMesh")
+surface_material_override/0 = SubResource("MatBody")
+
+[node name="FinHorizontal" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.14)
+mesh = SubResource("FinMesh")
+surface_material_override/0 = SubResource("MatBody")
+
+[node name="FinVertical" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0.14)
+mesh = SubResource("FinMesh")
+surface_material_override/0 = SubResource("MatBody")
+
+[node name="Tracer" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0.22)
+mesh = SubResource("TracerMesh")
+surface_material_override/0 = SubResource("MatTracer")

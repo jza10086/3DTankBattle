@@ -6,6 +6,8 @@ extends Node3D
 @export var turret: Node3D
 @export var barrel: Node3D
 @export var muzzle: Node3D
+@export var primary_muzzles: Array[Node3D] = []
+@export var missile_muzzles: Array[Node3D] = []
 @export var _recoil: Node3D
 var _paths: Array[PackedVector3Array] = []
 var _lengths: Array[float] = []
@@ -90,4 +92,22 @@ func aim_launcher() -> void:
 		launcher.rotation.x = barrel.rotation.x
 
 func firing_muzzle(missile: bool, shot: int) -> Node3D:
-	return missile_muzzle if missile else (muzzle if shot % 2 == 0 else second_muzzle)
+	var muzzles: Array[Node3D] = active_muzzles(missile)
+	if muzzles.is_empty():
+		return missile_muzzle if missile else muzzle
+	return muzzles[posmod(shot, muzzles.size())]
+
+## Returns all distinct physical muzzles belonging to the active primary weapon.
+func active_muzzles(missile: bool) -> Array[Node3D]:
+	var configured: Array[Node3D] = missile_muzzles if missile else primary_muzzles
+	var resolved: Array[Node3D] = []
+	for node: Node3D in configured:
+		if node != null and node not in resolved:
+			resolved.append(node)
+	if not resolved.is_empty():
+		return resolved
+	if missile:
+		return [missile_muzzle]
+	if second_muzzle != null and second_muzzle != muzzle:
+		return [muzzle, second_muzzle]
+	return [muzzle]
